@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#12211F">
 <title>Vallouise — le carnet de famille</title>
 <link rel="manifest" href="manifest.json">
@@ -31,7 +31,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--neve)}
 html,body{margin:0;padding:0}
-body{background:var(--neve);min-height:100dvh;color:var(--nuit);font-family:var(--corps);
+body{background:var(--neve);min-height:100dvh;touch-action:manipulation;-webkit-text-size-adjust:100%;color:var(--nuit);font-family:var(--corps);
   font-size:15px;line-height:1.45;padding-bottom:var(--nav-h);overscroll-behavior-y:none}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -42,9 +42,10 @@ button{cursor:pointer;border:none;background:none}
 .borne{position:relative;overflow:hidden;background:var(--nuit);color:var(--neve);
   padding:calc(14px + env(safe-area-inset-top)) 18px 16px}
 .borne svg.fond{position:absolute;inset:0;width:100%;height:100%;opacity:.28}
-.borne-in{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.borne-in{position:relative;display:flex;align-items:flex-end;justify-content:space-between;
+  gap:12px;padding-right:58px}
 .borne h1{font-family:var(--display);font-weight:800;font-size:26px;line-height:1;margin:0;letter-spacing:-.02em}
-.borne .lieu{font-family:var(--cote);font-size:10.5px;letter-spacing:.16em;
+.borne .lieu{font-family:var(--cote);font-size:10px;letter-spacing:.13em;white-space:nowrap;
   text-transform:uppercase;color:var(--meleze);margin-bottom:6px;display:block}
 .alt{font-family:var(--cote);font-size:11px;text-align:right;color:rgba(244,246,244,.55);white-space:nowrap;line-height:1.5}
 .alt b{display:block;font-size:15px;color:var(--neve);font-weight:500}
@@ -93,12 +94,14 @@ main{padding:16px 14px 26px;max-width:760px;margin:0 auto}
 .consigne button{font-family:var(--cote);font-size:11px;text-transform:uppercase;letter-spacing:.08em;
   padding:5px 9px;border-radius:8px;background:rgba(255,255,255,.16);color:inherit;flex:none}
 .consigne.actif button{background:rgba(244,246,244,.18)}
-.grille{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:10px;max-width:396px;margin:0 auto}
-.jsem{font-family:var(--cote);font-size:9.5px;color:var(--granit);text-align:center;padding-bottom:5px;text-transform:uppercase}
-.jour{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;font-size:13.5px;position:relative;transition:transform .1s}
+.grille{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:10px;max-width:392px;
+  margin:0 auto;justify-items:stretch}
+.jsem{font-family:var(--cote);font-size:9.5px;color:var(--granit);text-align:center;
+  padding-bottom:5px;text-transform:uppercase;line-height:1}
+.jour{aspect-ratio:1;border-radius:9px;display:grid;place-items:center;width:100%;
+  font-size:13.5px;position:relative;transition:transform .1s}
 .jour:active{transform:scale(.9)}
-.jour.hors{visibility:hidden}
+.jour.hors{visibility:hidden;pointer-events:none}
 .jour.passe{color:#C3CBC7}
 .jour.auj{box-shadow:inset 0 0 0 1.5px var(--nuit);font-weight:700}
 .jour.pris{color:var(--blanc);font-weight:600}
@@ -148,10 +151,10 @@ textarea{min-height:78px;resize:vertical}
 /* ── Navigation ─────────────────────────────────────────────── */
 nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.94);
   backdrop-filter:blur(12px);border-top:1px solid var(--brume);
-  display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:var(--marge-bas);background:var(--blanc)}
-nav button{padding:9px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
-nav button svg.i{width:22px;height:22px}
-nav button span.l{font-family:var(--cote);font-size:9px;letter-spacing:.04em}
+  display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:var(--marge-bas);background:var(--blanc)}
+nav button{padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
+nav button svg.i{width:21px;height:21px}
+nav button span.l{font-family:var(--cote);font-size:8.5px;letter-spacing:.02em;white-space:nowrap}
 nav button.on{color:var(--nuit)}
 nav button.on span.l{color:var(--meleze)}
 
@@ -187,6 +190,17 @@ nav button.on span.l{color:var(--meleze)}
 .toast.mauvais{background:var(--alerte)}
 .chargement{text-align:center;padding:60px 20px;color:var(--granit);font-family:var(--cote);font-size:12px}
 .etoiles{color:var(--meleze);letter-spacing:1px}
+.onglets{display:flex;gap:4px;background:var(--brume);padding:4px;border-radius:12px;margin-bottom:14px}
+.onglets button{flex:1;padding:9px;border-radius:9px;font-weight:600;font-size:14.5px;color:var(--granit)}
+.onglets button.on{background:var(--blanc);color:var(--nuit);box-shadow:0 1px 3px rgba(18,33,31,.12)}
+.meteo-auj{display:flex;align-items:center;gap:13px}
+.meteo-auj .ico{font-size:38px;line-height:1}
+.meteo-auj .temp{font-family:var(--display);font-size:32px;font-weight:700;line-height:1.1}
+.meteo-jours{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:14px;
+  border-top:1px solid var(--brume);padding-top:12px}
+.meteo-jours .jm{display:flex;flex-direction:column;align-items:center;gap:3px}
+.meteo-jours .ico{font-size:19px}
+.meteo-jours b{font-size:14px}
 svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2px;
   background:var(--neve);border-radius:10px}
 .bande-photos{display:flex;gap:6px;overflow-x:auto;margin-top:11px;padding-bottom:2px;
@@ -195,10 +209,34 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
   background:var(--brume)}
 #r-phz .vignette{flex:none}
 #r-phz img{height:74px}
-.bandeau{color:var(--neve);text-align:center;font-family:var(--cote);font-size:11px;padding:7px 12px;display:none}
-.bandeau.on{display:block}
-#off{background:var(--ardoise)}
-#panne{background:var(--alerte);font-size:12.5px;line-height:1.5;font-family:var(--corps);text-align:left;padding:12px 16px}
+#panne{background:var(--alerte);color:#fff;font-size:12.5px;line-height:1.5;padding:12px 16px;display:none}
+#panne.on{display:block}
+.reseau{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--cote);
+  font-size:10.5px;padding:5px 12px;background:var(--brume);color:var(--ardoise)}
+.reseau i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:block}
+.reseau.off{background:var(--ardoise);color:var(--neve)}
+.reseau.off i,.reseau.attente i{background:var(--meleze)}
+.sos-bulle{position:absolute;top:calc(10px + env(safe-area-inset-top));right:14px;z-index:5;
+  background:var(--alerte);color:#fff;font-family:var(--cote);font-size:10px;letter-spacing:.1em;
+  padding:6px 11px;border-radius:20px;font-weight:700}
+.soleil{display:flex;gap:18px;margin-top:12px;border-top:1px solid var(--brume);padding-top:11px;
+  font-family:var(--cote);font-size:12px;color:var(--ardoise)}
+.vigilance{background:#FBEAE5;border-left:3px solid var(--alerte);border-radius:var(--r);
+  padding:13px 14px;margin-bottom:10px}
+.vigilance b{font-family:var(--display);font-size:15px;display:block;color:var(--alerte)}
+.carrousel{display:flex;gap:10px;overflow-x:auto;padding:0 14px 6px;margin:0 -14px;
+  scroll-snap-type:x mandatory}
+.sugg{flex:none;width:238px;scroll-snap-align:start;background:var(--blanc);border-radius:var(--r);
+  box-shadow:var(--ombre);overflow:hidden}
+.sugg .vis{height:100px;display:grid;place-items:end start;padding:10px;position:relative;overflow:hidden}
+.sugg .vis svg{position:absolute;inset:0;width:100%;height:100%}
+.sugg .vis span{position:relative;font-family:var(--cote);font-size:9.5px;letter-spacing:.12em;
+  color:#fff;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.sugg .cnt{padding:11px 12px 13px}
+.sugg h4{font-family:var(--display);font-size:15.5px;margin:0 0 4px;font-weight:700;line-height:1.2}
+.carte-embed{width:100%;height:210px;border:0;border-radius:10px;display:block;margin-top:10px;background:var(--brume)}
+.sos-gps{font-family:var(--cote);font-size:27px;font-weight:700;line-height:1.45;word-break:break-all}
+.sos-ligne{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -213,16 +251,20 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
       <path d="M-10 52 C 70 44, 105 26, 158 22 S 242 38, 294 18" opacity=".35"/>
     </g>
   </svg>
+  <button class="sos-bulle" id="sos">SOS</button>
   <div class="borne-in">
-    <div><span class="lieu">Vallouise · Hautes-Alpes</span><h1 id="titre">Séjours</h1></div>
+    <div><span class="lieu">Vallouise · Hautes-Alpes</span><h1 id="titre">Vallouise</h1></div>
     <div class="alt"><b id="alt">1 166 m</b><span id="sous">altitude du village</span></div>
   </div>
 </header>
-<div class="bandeau" id="off">Hors ligne — tes modifications partiront à la reconnexion</div>
-<div class="bandeau" id="panne"></div>
+<div class="reseau" id="reseau"><i></i><span id="reseau-txt">En ligne</span></div>
+<div id="panne"></div>
 
 <main>
   <div class="chargement" id="boot">Connexion au carnet…</div>
+
+  <!-- ══ ACCUEIL ═════════════════════════════════════════════ -->
+  <section class="vue" id="v-accueil"><div id="accueil"></div></section>
 
   <!-- ══ SÉJOURS ═════════════════════════════════════════════ -->
   <section class="vue" id="v-sejours">
@@ -241,7 +283,14 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
     <div id="liste-sejours"></div>
   </section>
 
-  <section class="vue" id="v-randos"><div id="liste-randos"></div></section>
+  <section class="vue" id="v-sorties">
+    <div class="onglets">
+      <button class="on" data-sortie="randos">Randos</button>
+      <button data-sortie="peche">Pêche</button>
+    </div>
+    <div id="liste-randos"></div>
+    <div id="liste-peche" hidden></div>
+  </section>
   <section class="vue" id="v-plans"><div id="liste-plans"></div></section>
   <section class="vue" id="v-photos"><div id="liste-photos"></div></section>
 
@@ -257,6 +306,12 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
         <button class="btn fant" id="changer-nom">Modifier</button>
       </div>
     </div>
+    <div class="carte">
+      <div class="entre">
+        <div><b>Contact d'urgence</b><div class="meta" id="urg-txt">aucun</div></div>
+        <button class="btn fant" id="urg-btn">Définir</button>
+      </div>
+    </div>
     <button class="mini" id="cfg-lien" style="margin-top:4px">Configuration Firebase</button>
   </section>
 </main>
@@ -264,11 +319,12 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 <button class="fab" id="fab" aria-label="Ajouter">+</button>
 
 <nav>
-  <button data-vue="sejours" class="on"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18M7 3v3M17 3v3M4 6h16a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"/><path d="M8 13h3v3H8z" fill="currentColor" stroke="none"/></svg><span class="l">SÉJOURS</span></button>
-  <button data-vue="randos"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 6 21M13 3l3 6M16 9l5 12M16 9l-4 2M9 13l4 2M11.5 17l4 2"/></svg><span class="l">RANDOS</span></button>
-  <button data-vue="plans"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg><span class="l">BONS PLANS</span></button>
+  <button data-vue="accueil" class="on"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.2 12 4l8 7.2"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/><path d="M10 20v-6h4v6"/></svg><span class="l">ACCUEIL</span></button>
+  <button data-vue="sejours"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18M7 3v3M17 3v3M4 6h16a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"/><path d="M8 13h3v3H8z" fill="currentColor" stroke="none"/></svg><span class="l">SÉJOURS</span></button>
+  <button data-vue="sorties"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 6 21M13 3l3 6M16 9l5 12M16 9l-4 2M9 13l4 2M11.5 17l4 2"/></svg><span class="l">SORTIES</span></button>
+  <button data-vue="plans"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg><span class="l">PLANS</span></button>
   <button data-vue="photos"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.8l1.4-2.2h6.6L16.7 7h2.8A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-9Z"/><circle cx="12" cy="12.6" r="3.4"/></svg><span class="l">PHOTOS</span></button>
-  <button data-vue="appart"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19 9 7l3.4 5.6L14.6 9 22 19H2Z"/><path d="M9 7l2.2 3.7-1.6 2.6"/></svg><span class="l">L'APPART</span></button>
+  <button data-vue="appart"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19 9 7l3.4 5.6L14.6 9 22 19H2Z"/><path d="M9 7l2.2 3.7-1.6 2.6"/></svg><span class="l">APPART</span></button>
 </nav>
 
 <div class="voile" id="voile"><div class="feuille" id="feuille"></div></div>
@@ -277,7 +333,7 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 
 <script type="module">
 /* ═══════════════════════════════════════════════════════════
-   1. CONFIGURATION FIREBASE  ← à remplir (voir README.md)
+   1. CONFIGURATION FIREBASE
    ═══════════════════════════════════════════════════════════ */
 const firebaseConfig = {
   apiKey:            "AIzaSyDV-Xqg2oYM9vgRf5eWUl5wsimQayKS-bA",
@@ -303,18 +359,22 @@ const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const el = (t,p={},...k)=>{const n=document.createElement(t);
   for(const[a,v]of Object.entries(p)){
-    if(v==null) continue;
+    if(v==null||v===false) continue;
     if(a==="class")n.className=v; else if(a==="html")n.innerHTML=v;
     else if(a.startsWith("on"))n.addEventListener(a.slice(2),v); else n.setAttribute(a,v);}
   k.flat().forEach(c=>c!=null&&c!==false&&n.append(c.nodeType?c:document.createTextNode(c)));
   return n;};
+/* Jamais de "null" ni "undefined" affiché dans un champ ou une carte */
+const val = v => (v===null||v===undefined||v==="null"||v==="undefined") ? "" : String(v);
 
 const COULEURS=["#E07A1F","#3E7C9B","#3F7D5A","#8E5AA8","#C4472C","#B68A0F","#2C6E8E","#A8556B"];
 const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 const MOIS_C=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
 const JSEM=["L","M","M","J","V","S","D"];
-const ALTITUDES={sejours:["1 166 m","altitude du village"],randos:["4 102 m","Barre des Écrins"],
-  plans:["1 874 m","Pré de Mme Carle"],photos:["2 542 m","refuge du Glacier Blanc"],appart:["1 166 m","le pied-à-terre"]};
+const VALLOUISE={lat:44.865, lon:6.489};
+const ALTITUDES={accueil:["1 166 m","altitude du village"],sejours:["1 166 m","altitude du village"],
+  sorties:["4 102 m","Barre des Écrins"],plans:["1 874 m","Pré de Mme Carle"],
+  photos:["2 542 m","refuge du Glacier Blanc"],appart:["1 166 m","le pied-à-terre"]};
 
 const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const auj=()=>iso(new Date());
@@ -324,6 +384,7 @@ const nuits=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
 const nuitees=(a,b)=>{const n=nuits(a,b);return `${n} nuit${n>1?"s":""}`;};
 const nb=n=>new Intl.NumberFormat("fr-FR").format(n);
 const decale=(s,j)=>{const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+j);return iso(d);};
+const heure=s=>s?s.slice(11,16).replace(":","h"):"—";
 
 let toastT;
 function toast(msg,mauvais){const t=$("#toast");t.textContent=msg;
@@ -335,142 +396,183 @@ function feuille(titre,corps,apres){
   f.append(el("h2",{},titre),corps);f.scrollTop=0;
   $("#voile").classList.add("on");apres?.();
 }
-const fermer=()=>{
-  const f=$("#feuille");
-  f.style.transition=""; f.style.transform="";
-  $("#voile").classList.remove("on");
-};
-
-/* Glisser la feuille vers le bas pour la fermer (comme les fiches iOS).
-   Ne démarre que si la feuille est déjà en haut de son défilement. */
-(()=>{
-  const f=$("#feuille"); let y0=0,dy=0,actif=false;
-  f.addEventListener("touchstart",e=>{
-    if(f.scrollTop>0 || $("#voile").dataset.bloque) return;
-    const t=e.target.tagName;
-    if(t==="TEXTAREA"||t==="SELECT") return;   // on laisse ces champs gérer leur propre geste
-    y0=e.touches[0].clientY; dy=0; actif=true; f.style.transition="none";
-  },{passive:true});
-  f.addEventListener("touchmove",e=>{
-    if(!actif) return;
-    dy=e.touches[0].clientY-y0;
-    if(dy<0){dy=0;}
-    f.style.transform=`translateY(${dy}px)`;
-    $("#voile").style.background=`rgba(18,33,31,${(0.55*(1-Math.min(dy/420,0.75))).toFixed(2)})`;
-  },{passive:true});
-  const fin=()=>{
-    if(!actif) return; actif=false;
-    f.style.transition="transform .22s cubic-bezier(.3,.8,.4,1)";
-    $("#voile").style.background="";
-    if(dy>110){ f.style.transform="translateY(110%)"; setTimeout(fermer,190); }
-    else f.style.transform="";
-  };
-  f.addEventListener("touchend",fin); f.addEventListener("touchcancel",fin);
-})();
+const fermer=()=>{const f=$("#feuille");f.style.transition="";f.style.transform="";
+  $("#voile").classList.remove("on");};
 $("#voile").addEventListener("click",e=>{if(e.target.id==="voile"&&!$("#voile").dataset.bloque)fermer();});
 
-/* ── Écriture NON bloquante ──────────────────────────────────
-   Firestore ne résout la promesse qu'après confirmation du serveur.
-   On ferme donc l'écran tout de suite (le cache local affiche déjà
-   la donnée) et on ne surveille que l'échec.                     */
+/* Glisser la feuille vers le bas pour la fermer */
+(()=>{const f=$("#feuille");let y0=0,dy=0,actif=false;
+  f.addEventListener("touchstart",e=>{
+    if(f.scrollTop>0||$("#voile").dataset.bloque)return;
+    const t=e.target.tagName; if(t==="TEXTAREA"||t==="SELECT"||t==="INPUT")return;
+    y0=e.touches[0].clientY;dy=0;actif=true;f.style.transition="none";},{passive:true});
+  f.addEventListener("touchmove",e=>{if(!actif)return;
+    dy=Math.max(0,e.touches[0].clientY-y0);
+    f.style.transform=`translateY(${dy}px)`;
+    $("#voile").style.background=`rgba(18,33,31,${(0.55*(1-Math.min(dy/420,.75))).toFixed(2)})`;},{passive:true});
+  const fin=()=>{if(!actif)return;actif=false;
+    f.style.transition="transform .22s cubic-bezier(.3,.8,.4,1)";$("#voile").style.background="";
+    if(dy>110){f.style.transform="translateY(110%)";setTimeout(fermer,190);}else f.style.transform="";};
+  f.addEventListener("touchend",fin);f.addEventListener("touchcancel",fin);})();
+
+/* ── Écriture non bloquante + compteur de synchronisation ───── */
+let enAttente=0;
 function ecrire(promesse,msgOk,apres){
   apres?.(); if(msgOk) toast(msgOk);
-  promesse.catch(err=>{
-    console.error(err);
-    const c=err?.code||"";
-    toast(c.includes("permission")
-      ? "Écriture refusée par Firestore : vérifie les règles de sécurité."
-      : "Échec de l'enregistrement — "+(err?.message||c||"raison inconnue"), true);
+  enAttente++; majReseau();
+  promesse.then(()=>{enAttente=Math.max(0,enAttente-1);majReseau();})
+    .catch(err=>{enAttente=Math.max(0,enAttente-1);majReseau();console.error(err);
+      const c=err?.code||"";
+      toast(c.includes("permission")
+        ? "Écriture refusée : les règles Firestore doivent être mises à jour (voir README)."
+        : "Échec de l'enregistrement — "+(err?.message||c||"raison inconnue"), true);});
+}
+addEventListener("unhandledrejection",e=>console.error(e.reason));
+
+function majReseau(){
+  const z=$("#reseau"), t=$("#reseau-txt");
+  if(!z) return;
+  z.classList.toggle("off",!navigator.onLine);
+  z.classList.toggle("attente",navigator.onLine&&enAttente>0);
+  t.textContent = !navigator.onLine
+    ? `Hors ligne · ${enAttente?enAttente+" saisie"+(enAttente>1?"s":"")+" en attente":"tes saisies sont gardées"}`
+    : enAttente>0 ? `Synchronisation de ${enAttente} saisie${enAttente>1?"s":""}…`
+    : "En ligne · tout est synchronisé";
+}
+addEventListener("online",()=>{majReseau();toast("Connexion retrouvée, synchronisation en cours");});
+addEventListener("offline",majReseau);
+majReseau();
+
+/* ═══════════════════════════════════════════════════════════
+   3. SOS & SECOURS
+   ═══════════════════════════════════════════════════════════ */
+const URGENCES=[
+  {t:"112 — Urgences",              n:"112"},
+  {t:"04 92 22 22 22 — CRS/PGHM 05",n:"0492222222"},
+  {t:"15 — SAMU",                   n:"15"},
+  {t:"114 — Urgence par SMS",       n:"114"}
+];
+let sosPos=null, sosWatch=null;
+function ouvrirSOS(){
+  const zone=el("div",{class:"carte",style:"border-left:3px solid var(--alerte)"},
+    el("div",{class:"meta"},"Acquisition de la position…"));
+  const c=el("div");
+  c.append(
+    el("p",{class:"txt",style:"margin-top:0"},
+      "Donne ces chiffres aux secours, dans cet ordre. En montagne hors domaine skiable, le 112 est le bon réflexe : le CODIS de Gap bascule vers le secours en montagne."),
+    zone,
+    el("div",{class:"titre-bloc"},"Appeler"),
+    ...URGENCES.map(u=>el("a",{class:"btn rouge plein",href:"tel:"+u.n,style:"margin-bottom:8px"},u.t)),
+    el("div",{class:"titre-bloc"},"Prévenir un proche"),
+    el("button",{class:"btn plein",id:"sos-sms"},"Envoyer ma position par SMS"),
+    el("button",{class:"btn fant plein",style:"margin-top:8px",id:"sos-part"},"Partager ma position"));
+  feuille("SOS & Secours",c,()=>{
+    const maj=p=>{
+      const {latitude:la,longitude:lo,altitude:al,accuracy:pr}=p.coords;
+      sosPos={la,lo,al,pr};
+      zone.innerHTML="";
+      zone.append(
+        el("div",{class:"meta"},"Latitude"),   el("div",{class:"sos-gps"},la.toFixed(5)),
+        el("div",{class:"meta",style:"margin-top:8px"},"Longitude"), el("div",{class:"sos-gps"},lo.toFixed(5)),
+        el("div",{class:"meta",style:"margin-top:8px"},"Altitude"),
+        el("div",{class:"sos-gps"},al!=null?Math.round(al)+" m":"non fournie"),
+        el("div",{class:"meta",style:"margin-top:10px"},
+          `précision ~${Math.round(pr)} m · ${new Date().toLocaleTimeString("fr-FR")}`),
+        el("div",{class:"sos-ligne"},
+          el("a",{class:"mini",style:"text-align:center;padding:9px",target:"_blank",rel:"noopener",
+            href:`https://maps.apple.com/?ll=${la},${lo}&q=Ma%20position`},"Plans ↗"),
+          el("button",{class:"mini",style:"padding:9px",onclick:()=>{
+            navigator.clipboard?.writeText(`${la.toFixed(5)}, ${lo.toFixed(5)}`)
+              .then(()=>toast("Coordonnées copiées"),()=>{});}},"Copier")));
+    };
+    if(!navigator.geolocation){zone.innerHTML="";zone.append(el("div",{class:"meta"},"Géolocalisation indisponible"));}
+    else{
+      if(sosWatch!=null) navigator.geolocation.clearWatch(sosWatch);
+      sosWatch=navigator.geolocation.watchPosition(maj,
+        e=>{zone.innerHTML="";zone.append(el("div",{class:"txt"},
+          e.code===1?"Position refusée. Réglages › Safari › Position, puis rouvre l'app."
+                    :"Position introuvable pour l'instant."));},
+        {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+    }
+    const texte=()=>sosPos
+      ? `Je suis ici : ${sosPos.la.toFixed(5)}, ${sosPos.lo.toFixed(5)}`
+        +(sosPos.al!=null?` (alt. ${Math.round(sosPos.al)} m)`:"")
+        +` https://maps.apple.com/?ll=${sosPos.la},${sosPos.lo}`
+      : "Position non disponible";
+    $("#sos-sms").onclick=()=>{
+      const num=localStorage.getItem("vl-urgence")||"";
+      if(!num) return toast("Aucun contact d'urgence : définis-le dans l'onglet Appart",true);
+      location.href=`sms:${num}?&body=${encodeURIComponent(texte())}`;};
+    $("#sos-part").onclick=()=>partager(texte());
   });
 }
-addEventListener("unhandledrejection",e=>{
-  console.error(e.reason); toast("Erreur : "+(e.reason?.message||e.reason),true);
-});
+$("#sos").onclick=ouvrirSOS;
+
+function formUrgence(){
+  const c=el("div");
+  c.append(
+    el("p",{class:"meta"},"Enregistré sur cet appareil uniquement. C'est ce numéro qui recevra ta position depuis l'écran SOS."),
+    el("label",{},"Nom"),
+    el("input",{id:"u-n",placeholder:"Claire",value:val(localStorage.getItem("vl-urgence-nom"))}),
+    el("label",{},"Téléphone"),
+    el("input",{id:"u-t",type:"tel",placeholder:"+33 6 …",value:val(localStorage.getItem("vl-urgence"))}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
+      localStorage.setItem("vl-urgence",$("#u-t").value.trim());
+      localStorage.setItem("vl-urgence-nom",$("#u-n").value.trim());
+      majUrgence();fermer();toast("Contact enregistré");}},"Enregistrer"));
+  feuille("Contact d'urgence",c);
+}
+function majUrgence(){
+  const n=localStorage.getItem("vl-urgence-nom"), t=localStorage.getItem("vl-urgence");
+  const z=$("#urg-txt"); if(z) z.textContent=t?`${n||"contact"} · ${t}`:"aucun";
+}
+$("#urg-btn").onclick=formUrgence;
 
 /* ═══════════════════════════════════════════════════════════
-   3. DÉMARRAGE — avec garde-fou de configuration
+   4. DÉMARRAGE
    ═══════════════════════════════════════════════════════════ */
 const CLES=["apiKey","authDomain","projectId","storageBucket","messagingSenderId","appId"];
-
-/* La config peut venir de deux endroits :
-   1. le bloc firebaseConfig ci-dessus (permanent, valable pour tout le monde)
-   2. l'écran de configuration, enregistré dans ce navigateur (dépannage, un appareil) */
-function configLocale(){
-  try{const j=JSON.parse(localStorage.getItem("vl-config")||"null");return j?.apiKey?j:null;}
-  catch{return null;}
-}
-function extraire(texte){
-  const c={};
-  for(const k of CLES){
-    const m=texte.match(new RegExp(k+'\\s*[:=]\\s*["\'`]([^"\'`]+)["\'`]'));
-    if(m) c[k]=m[1].trim();
-  }
-  return c;
-}
-function ecranConfig(msg){
+function configLocale(){try{const j=JSON.parse(localStorage.getItem("vl-config")||"null");return j?.apiKey?j:null;}catch{return null;}}
+function extraire(t){const c={};for(const k of CLES){
+  const m=t.match(new RegExp(k+'\\s*[:=]\\s*["\'`]([^"\'`]+)["\'`]'));if(m)c[k]=m[1].trim();}return c;}
+function ecranConfig(){
   $("#boot")?.remove();
-  const bloc=el("div",{class:"vue on",style:"max-width:560px;margin:0 auto"});
-  const zone=el("textarea",{id:"cfg",style:"min-height:170px;font-family:var(--cote);font-size:13px",
-    placeholder:'const firebaseConfig = {\n  apiKey: "AIza…",\n  authDomain: "…",\n  …\n};'});
+  const zone=el("textarea",{id:"cfg",style:"min-height:170px;font-family:var(--cote);font-size:13px"});
   const sortie=el("div",{style:"margin-top:14px"});
-  bloc.append(
+  $("main").append(el("div",{class:"vue on"},
     el("div",{class:"carte",style:"border-left:3px solid var(--meleze)"},
       el("h3",{},"Configuration Firebase"),
-      el("p",{class:"txt"}, msg||"L'app a besoin des identifiants de ton projet Firebase pour synchroniser les données entre les membres de la famille."),
-      el("p",{class:"txt",style:"font-size:13.5px;color:var(--granit)"},
-        "Console Firebase → ⚙ Paramètres du projet → Vos applications → icône </> → copie tout le bloc firebaseConfig affiché, et colle-le ci-dessous.")),
-    el("label",{},"Colle le bloc ici"),
-    zone,
+      el("p",{class:"txt"},"Console Firebase → ⚙ Paramètres du projet → Vos applications → icône </> → copie le bloc firebaseConfig et colle-le ci-dessous.")),
+    el("label",{},"Colle le bloc ici"), zone,
     el("button",{class:"btn accent plein",style:"margin-top:14px",onclick:()=>{
-      const c=extraire(zone.value);
-      const manque=CLES.filter(k=>!c[k]);
-      if(manque.length){
-        sortie.innerHTML="";
-        sortie.append(el("p",{class:"txt",style:"color:var(--alerte)"},
-          "Valeurs introuvables dans ce que tu as collé : "+manque.join(", ")+
-          ". Copie bien le bloc entier depuis la console Firebase."));
-        return;
-      }
-      localStorage.setItem("vl-config",JSON.stringify(c));
+      const c=extraire(zone.value), manque=CLES.filter(k=>!c[k]);
       sortie.innerHTML="";
-      const perm='const firebaseConfig = {\n'+CLES.map(k=>`  ${k}: "${c[k]}",`).join("\n").replace(/,$/,"")+'\n};';
-      sortie.append(
-        el("div",{class:"carte"},
-          el("h3",{},"Configuration acceptée"),
-          el("p",{class:"txt"},"Elle est enregistrée dans CE navigateur uniquement. Pour que toute la famille en profite, colle le bloc ci-dessous dans index.html (il remplace celui du haut du fichier), puis redéploie."),
-          Object.assign(el("textarea",{style:"min-height:150px;font-family:var(--cote);font-size:12.5px",readonly:""}),{value:perm}),
-          el("button",{class:"btn fant plein",style:"margin-top:10px",onclick:()=>{
-            navigator.clipboard?.writeText(perm).then(()=>toast("Bloc copié"),()=>toast("Copie impossible, sélectionne le texte à la main"));
-          }},"Copier le bloc")),
-        el("button",{class:"btn accent plein",onclick:()=>location.reload()},"Démarrer l'app"));
-      sortie.scrollIntoView({behavior:"smooth"});
-    }},"Valider la configuration"),
-    sortie
-  );
-  const ex=configLocale();
-  if(ex) bloc.append(el("button",{class:"btn danger plein",style:"margin-top:18px",onclick:()=>{
-    localStorage.removeItem("vl-config");location.reload();}},"Effacer la configuration enregistrée"));
-  document.querySelector("main").append(bloc);
-  $("#fab").style.display="none";
-  document.querySelector("nav").style.display="none";
+      if(manque.length) return sortie.append(el("p",{class:"txt",style:"color:var(--alerte)"},
+        "Valeurs introuvables : "+manque.join(", ")));
+      localStorage.setItem("vl-config",JSON.stringify(c));
+      sortie.append(el("button",{class:"btn accent plein",onclick:()=>location.reload()},"Démarrer l'app"));
+    }},"Valider"), sortie));
+  $("#fab").style.display="none"; $("nav").style.display="none";
 }
-
 const CONF = firebaseConfig.apiKey!=="À_REMPLIR" ? firebaseConfig : configLocale();
-if(!CONF){ ecranConfig(); throw new Error("configuration Firebase absente"); }
+if(!CONF){ ecranConfig(); throw new Error("config absente"); }
+
 const app=initializeApp(CONF);
 const auth=getAuth(app);
+/* Cache local persistant : les saisies terrain tiennent sans réseau
+   et repartent toutes seules au retour de la connexion. */
 const db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
 
-const S={moi:null,membres:{},sejours:[],randos:[],plans:[],photos:[],infos:[],
-  curseur:new Date(),vue:"sejours",selMode:false,selDeb:null};
+const S={moi:null,membres:{},sejours:[],randos:[],plans:[],photos:[],infos:[],prises:[],liens:[],
+  curseur:new Date(),vue:"accueil",sortie:"randos",selMode:false,selDeb:null};
 
 /* ═══════════════════════════════════════════════════════════
-   4. IDENTITÉ
+   5. IDENTITÉ
    ═══════════════════════════════════════════════════════════ */
 function demanderNom(force){
   const c=el("div");
   c.append(
-    el("p",{class:"meta"},"Ton prénom apparaîtra sur les séjours, les randos et les photos."),
+    el("p",{class:"meta"},"Ton prénom apparaîtra sur les séjours, les randos, les prises et les photos."),
     el("label",{},"Prénom"),
     el("input",{id:"f-nom",maxlength:"18",placeholder:"Nico"}),
     el("label",{},"Ta couleur"),
@@ -479,13 +581,11 @@ function demanderNom(force){
       const nom=$("#f-nom").value.trim();
       if(!nom) return toast("Il manque le prénom");
       const couleur=$("#f-coul .sel")?.dataset.c||COULEURS[0];
-      $("#voile").dataset.bloque="";
       ecrire(setDoc(doc(db,"membres",auth.currentUser.uid),{nom,couleur},{merge:true}),
-        "Bienvenue, "+nom, fermer);
-    }},"Entrer dans le carnet")
-  );
+        "Bienvenue, "+nom, ()=>{delete $("#voile").dataset.bloque;fermer();});
+    }},"Entrer dans le carnet"));
   feuille(force?"Bienvenue au chalet":"Ton profil",c,()=>{
-    $("#f-nom").value=S.moi?.nom||"";
+    $("#f-nom").value=val(S.moi?.nom);
     const z=$("#f-coul");
     COULEURS.forEach(col=>{
       const b=el("button",{class:"pastille","data-c":col,
@@ -493,8 +593,7 @@ function demanderNom(force){
       if(col===(S.moi?.couleur||COULEURS[0])){b.classList.add("sel");b.style.borderColor="var(--nuit)";}
       b.onclick=()=>{z.querySelectorAll("button").forEach(x=>{x.classList.remove("sel");x.style.borderColor="transparent";});
         b.classList.add("sel");b.style.borderColor="var(--nuit)";};
-      z.append(b);
-    });
+      z.append(b);});
     if(force) $("#voile").dataset.bloque="1";
   });
 }
@@ -503,28 +602,190 @@ const pastille=uid=>{const m=membre(uid);
   return el("div",{class:"pastille",style:`background:${m.couleur}`},m.nom[0]?.toUpperCase()||"?");};
 
 /* ═══════════════════════════════════════════════════════════
-   5. CALENDRIER — sélection en deux touches
+   6. PARTAGE, GÉOLOCALISATION, CARTE
+   ═══════════════════════════════════════════════════════════ */
+async function partager(texte){
+  try{ if(navigator.share) await navigator.share({text:texte});
+    else { await navigator.clipboard.writeText(texte); toast("Copié dans le presse-papier"); } }
+  catch(e){}
+}
+function carteEmbed(lat,lon,sat){
+  return el("iframe",{class:"carte-embed",loading:"lazy",referrerpolicy:"no-referrer-when-downgrade",
+    src:`https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed${sat?"&t=k":""}`});
+}
+function blocCarte(gps,onRetirer){
+  const z=el("div"); let sat=false;
+  const maj=()=>{
+    z.innerHTML="";
+    z.append(
+      el("div",{class:"recap"},
+        el("b",{},`${gps.lat.toFixed(5)}, ${gps.lon.toFixed(5)}`),
+        el("span",{class:"meta"},[gps.alt!=null?`altitude ${Math.round(gps.alt)} m`:null,
+          gps.precision?`précision ~${Math.round(gps.precision)} m`:null].filter(Boolean).join(" · "))),
+      el("div",{class:"onglets",style:"margin-top:10px"},
+        el("button",{class:sat?"":"on",onclick:()=>{sat=false;maj();}},"Plan"),
+        el("button",{class:sat?"on":"",onclick:()=>{sat=true;maj();}},"Satellite")),
+      carteEmbed(gps.lat,gps.lon,sat),
+      el("div",{class:"rangee",style:"margin-top:10px;flex-wrap:wrap"},
+        el("a",{class:"mini",target:"_blank",rel:"noopener",
+          href:`https://maps.apple.com/?ll=${gps.lat},${gps.lon}`},"Plans ↗"),
+        el("a",{class:"mini",target:"_blank",rel:"noopener",
+          href:`https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lon}`},"Google Maps ↗"),
+        onRetirer?el("button",{class:"mini",onclick:onRetirer},"Retirer"):null));
+  };
+  maj(); return z;
+}
+function geolocaliser(bouton,ok){
+  if(!navigator.geolocation) return toast("Géolocalisation indisponible",true);
+  const t=bouton.textContent; bouton.textContent="Localisation…"; bouton.disabled=true;
+  navigator.geolocation.getCurrentPosition(p=>{
+    bouton.textContent=t;bouton.disabled=false;
+    ok({lat:p.coords.latitude,lon:p.coords.longitude,alt:p.coords.altitude,precision:p.coords.accuracy});
+    toast("Position enregistrée");},
+    e=>{bouton.textContent=t;bouton.disabled=false;
+      toast(e.code===1?"Position refusée — autorise la localisation dans les réglages":"Position introuvable",true);},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+
+/* ═══════════════════════════════════════════════════════════
+   7. PHOTOS — import multiple, date modifiable
+   ═══════════════════════════════════════════════════════════ */
+function compresser(file,max,q){
+  return new Promise((res,rej)=>{
+    const img=new Image(),fr=new FileReader();
+    fr.onload=()=>img.src=fr.result;fr.onerror=()=>rej(new Error("lecture impossible"));
+    img.onload=()=>{let{width:w,height:h}=img;
+      const r=Math.min(1,max/Math.max(w,h));w=Math.round(w*r);h=Math.round(h*r);
+      const cv=Object.assign(document.createElement("canvas"),{width:w,height:h});
+      const cx=cv.getContext("2d");cx.imageSmoothingQuality="high";
+      cx.drawImage(img,0,0,w,h);res(cv.toDataURL("image/jpeg",q));};
+    img.onerror=()=>rej(new Error("image illisible"));fr.readAsDataURL(file);});
+}
+/* Qualité d'abord : on ne redescend que si le document dépasse la limite Firestore */
+async function preparerPhoto(file){
+  for(const [m,q] of [[2000,.85],[1700,.8],[1400,.74],[1100,.62]]){
+    const d=await compresser(file,m,q);
+    if(d.length<900000) return d;
+  }
+  return null;
+}
+function selecteurPhotos(input,zone,liste,apres){
+  input.onchange=async e=>{
+    const fs=[...e.target.files]; e.target.value="";
+    for(let i=0;i<fs.length;i++){
+      try{const d=await preparerPhoto(fs[i]);
+        if(!d){toast("Une photo est trop lourde même réduite",true);continue;}
+        liste.push(d);apres();}
+      catch(err){toast("Photo illisible",true);}
+    }
+    if(liste.length) toast(`${liste.length} photo${liste.length>1?"s":""} prête${liste.length>1?"s":""}`);
+  };
+}
+function vignettesForm(zone,existantes,liste,apres){
+  zone.innerHTML="";
+  existantes.forEach(p=>{
+    const v=el("div",{class:"vignette"},el("img",{src:p.data,alt:""}));
+    if(p.uid===auth.currentUser.uid)
+      v.append(el("button",{class:"sup",onclick:()=>{
+        if(confirm("Supprimer cette photo ?")){ecrire(deleteDoc(doc(db,"photos",p.id)));p.rando=null;p.prise=null;apres();}
+      }},"✕"));
+    zone.append(v);});
+  liste.forEach((d,i)=>{
+    const v=el("div",{class:"vignette"},el("img",{src:d,alt:""}));
+    v.append(el("button",{class:"sup",onclick:()=>{liste.splice(i,1);apres();}},"✕"));
+    zone.append(v);});
+  zone.style.display=zone.children.length?"flex":"none";
+}
+function formPhoto(ctx){
+  const nouvelles=[];
+  const zp=el("div",{class:"bande-photos",style:"margin-top:8px"});
+  const maj=()=>vignettesForm(zp,[],nouvelles,maj);
+  const c=el("div");
+  c.append(
+    el("p",{class:"meta"},ctx?.nom?`Photos rattachées à « ${ctx.nom} ».`
+      :"Sélectionne plusieurs photos d'un coup dans ta photothèque."),
+    el("label",{},"Photos"),
+    el("input",{type:"file",id:"ph-f",accept:"image/*",multiple:""}),
+    zp,
+    el("label",{},"Date"),
+    el("input",{type:"date",id:"ph-d",value:auj()}),
+    el("label",{},"Légende (commune à la sélection)"),
+    el("input",{id:"ph-l",placeholder:"Lever de soleil sur le Pelvoux"}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
+      if(!nouvelles.length) return toast("Choisis au moins une photo");
+      const date=$("#ph-d").value||auj(), legende=$("#ph-l").value.trim(), n=nouvelles.length;
+      nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),{data,legende,date,
+        rando:ctx?.type==="rando"?ctx.id:null, prise:ctx?.type==="prise"?ctx.id:null,
+        uid:auth.currentUser.uid,cree:serverTimestamp()})));
+      fermer(); toast(`${n} photo${n>1?"s":""} ajoutée${n>1?"s":""}`);
+    }},"Envoyer"));
+  feuille("Ajouter des photos",c,()=>{maj();selecteurPhotos($("#ph-f"),zp,nouvelles,maj);});
+}
+function formPhotoEdit(p){
+  const c=el("div");
+  c.append(
+    el("img",{src:p.data,style:"width:100%;border-radius:12px;margin-bottom:6px"}),
+    el("label",{},"Date"),
+    el("input",{type:"date",id:"pe-d",value:val(p.date)||auj()}),
+    el("label",{},"Légende"),
+    el("input",{id:"pe-l",value:val(p.legende)}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
+      ecrire(updateDoc(doc(db,"photos",p.id),{date:$("#pe-d").value,legende:$("#pe-l").value.trim()}),
+        "Photo mise à jour",fermer);}},"Enregistrer"),
+    el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
+      if(confirm("Supprimer cette photo ?"))ecrire(deleteDoc(doc(db,"photos",p.id)),"Photo supprimée",fermer);
+    }},"Supprimer la photo"));
+  feuille("Modifier la photo",c);
+}
+function rendrePhotos(){
+  const z=$("#liste-photos");if(!z)return;z.innerHTML="";
+  if(!S.photos.length){z.append(el("div",{class:"vide"},
+    el("b",{},"Mur vide"),"Ajoute-en plusieurs d'un coup avec le bouton +."));return;}
+  const parDate={};
+  S.photos.forEach(p=>{const k=val(p.date)||"—";(parDate[k]=parDate[k]||[]).push(p);});
+  Object.keys(parDate).sort().reverse().forEach(k=>{
+    z.append(el("div",{class:"titre-bloc"},k==="—"?"Sans date":jolie(k)));
+    const g=el("div",{class:"photos"});
+    parDate[k].forEach(p=>{
+      const v=el("div",{class:"vignette"},
+        el("img",{src:p.data,alt:val(p.legende),loading:"lazy",onclick:()=>ouvrirPhoto(p)}));
+      if(p.uid===auth.currentUser.uid)
+        v.append(el("button",{class:"sup",onclick:()=>formPhotoEdit(p)},"✎"));
+      g.append(v);});
+    z.append(g);});
+}
+function ouvrirPhoto(p){
+  const lb=$("#lb");$("#lb-img").src=p.data;
+  const t=$("#lb-txt");t.innerHTML="";
+  const rd=p.rando?S.randos.find(x=>x.id===p.rando):null;
+  const pk=p.prise?S.prises.find(x=>x.id===p.prise):null;
+  t.append([val(p.legende),rd?"« "+rd.nom+" »":null,pk?pk.espece:null,
+    p.date?jolie(p.date):null,membre(p.uid).nom].filter(Boolean).join(" — "));
+  if(p.uid===auth.currentUser.uid)
+    t.append(el("div",{style:"margin-top:14px"},
+      el("button",{class:"btn fant",onclick:()=>{lb.classList.remove("on");formPhotoEdit(p);}},"Modifier")));
+  lb.classList.add("on");
+}
+$("#lb").onclick=e=>{if(e.target.id==="lb"||e.target.id==="lb-img")$("#lb").classList.remove("on");};
+
+/* ═══════════════════════════════════════════════════════════
+   8. SÉJOURS
    ═══════════════════════════════════════════════════════════ */
 function consigne(){
   const z=$("#consigne");z.innerHTML="";z.className="consigne";
   if(!S.selMode){
     z.append(el("span",{},"Touche un jour pour voir qui est là"),
-      el("button",{onclick:demarrerSel},"Réserver"));
-    return;
-  }
+      el("button",{onclick:demarrerSel},"Réserver"));return;}
   z.classList.add("actif");
-  z.append(
-    S.selDeb
-      ? el("span",{},el("b",{},"Arrivée le "+jolieCourt(S.selDeb)),document.createElement("br"),"Touche maintenant le jour du départ")
-      : el("span",{},el("b",{},"Touche ton jour d'arrivée")),
-    el("button",{onclick:()=>{S.selMode=false;S.selDeb=null;dessinerCal();}},"Annuler")
-  );
+  z.append(S.selDeb
+    ? el("span",{},el("b",{},"Arrivée le "+jolieCourt(S.selDeb)),el("br"),"Touche maintenant le jour du départ")
+    : el("span",{},el("b",{},"Touche ton jour d'arrivée")),
+    el("button",{onclick:()=>{S.selMode=false;S.selDeb=null;dessinerCal();}},"Annuler"));
 }
 function demarrerSel(){S.selMode=true;S.selDeb=null;dessinerCal();
-  document.querySelector("#bloc-cal").scrollIntoView({behavior:"smooth",block:"center"});}
-
+  $("#bloc-cal").scrollIntoView({behavior:"smooth",block:"center"});}
 function dessinerCal(){
-  const c=$("#cal");c.innerHTML="";
+  const c=$("#cal");if(!c)return;c.innerHTML="";
   const d=S.curseur,an=d.getFullYear(),mo=d.getMonth();
   $("#mois").textContent=`${MOIS[mo]} ${an}`;
   $("#bloc-cal").classList.toggle("sel",S.selMode);
@@ -532,371 +793,487 @@ function dessinerCal(){
   $("#poser").disabled=S.selMode;
   consigne();
   JSEM.forEach(j=>c.append(el("div",{class:"jsem"},j)));
-
   const dec=(new Date(an,mo,1).getDay()+6)%7, fin=new Date(an,mo+1,0).getDate();
-  for(let i=0;i<dec;i++) c.append(el("div",{class:"jour hors"}));
-
+  for(let i=0;i<dec;i++) c.append(el("div",{class:"jour hors"},"·"));
   const uids=new Set();
   for(let j=1;j<=fin;j++){
     const date=iso(new Date(an,mo,j));
     const dessus=S.sejours.filter(s=>date>=s.debut&&date<s.fin);
     dessus.forEach(s=>uids.add(s.uid));
     const cl=["jour"];
-    if(date===auj()) cl.push("auj");
-    if(date<auj()) cl.push("passe");
-    if(!dessus.length) cl.push("libre");
-
+    if(date===auj())cl.push("auj");
+    if(date<auj())cl.push("passe");
+    if(!dessus.length)cl.push("libre");
     const cell=el("div",{class:cl.join(" "),onclick:()=>toucherJour(date,dessus)},String(j));
-
     if(dessus.length){
-      cell.style.background=membre(dessus[0].uid).couleur;
-      cell.classList.add("pris");
+      cell.style.background=membre(dessus[0].uid).couleur;cell.classList.add("pris");
       const av=dessus.some(x=>decale(date,-1)>=x.debut&&decale(date,-1)<x.fin);
       const ap=dessus.some(x=>decale(date,1)>=x.debut&&decale(date,1)<x.fin);
       const forme=av&&ap?"mil":av?"fin":ap?"deb":null;
-      if(forme) cell.classList.add(forme);
-      if(dessus.length>1){
-        const m=el("div",{class:"multi"});
-        dessus.slice(0,3).forEach(()=>m.append(document.createElement("i")));
-        cell.append(m);
-      }
-    }
-    // aperçu de la sélection en cours
-    if(S.selMode&&S.selDeb&&date===S.selDeb) cell.classList.add("choisi");
-    c.append(cell);
-  }
-
-  // légende : qui est là ce mois-ci
+      if(forme)cell.classList.add(forme);
+      if(dessus.length>1){const m=el("div",{class:"multi"});
+        dessus.slice(0,3).forEach(()=>m.append(document.createElement("i")));cell.append(m);}}
+    if(S.selMode&&S.selDeb&&date===S.selDeb)cell.classList.add("choisi");
+    c.append(cell);}
   const lg=$("#legende");lg.innerHTML="";
   [...uids].forEach(u=>{const m=membre(u);
     lg.append(el("span",{},el("i",{style:`background:${m.couleur}`}),m.nom));});
   lg.style.display=uids.size?"flex":"none";
 }
-
+function ligneSejour(s,dansFeuille){
+  const m=membre(s.uid), mien=s.uid===auth.currentUser.uid;
+  return el("div",{class:"carte"},
+    el("div",{class:"rangee"},pastille(s.uid),
+      el("div",{style:"flex:1"},el("h3",{},val(s.titre)||("Séjour de "+m.nom)),
+        el("div",{class:"meta"},`${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`))),
+    s.note?el("p",{class:"txt"},val(s.note)):null,
+    mien?el("div",{class:"rangee",style:"margin-top:10px"},
+      el("button",{class:"mini",onclick:()=>formSejour(s.debut,s.fin,s)},"Modifier"),
+      el("button",{class:"mini",onclick:()=>{
+        if(confirm("Annuler ce séjour ?"))
+          ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",dansFeuille?fermer:null);
+      }},"🗑 Annuler")):null);
+}
 function toucherJour(date,dessus){
   if(S.selMode){
-    if(date<auj()) return toast("Ce jour est déjà passé");
+    if(date<auj())return toast("Ce jour est déjà passé");
     if(!S.selDeb||date<=S.selDeb){S.selDeb=date;dessinerCal();return;}
-    const deb=S.selDeb,f=date;
-    S.selMode=false;S.selDeb=null;dessinerCal();
-    formSejour(deb,f);
-    return;
-  }
-  if(!dessus.length){
-    S.selMode=true;S.selDeb=date;dessinerCal();
-    toast("Touche maintenant le jour du départ");
-    return;
-  }
+    const deb=S.selDeb,f=date;S.selMode=false;S.selDeb=null;dessinerCal();formSejour(deb,f);return;}
+  if(!dessus.length){S.selMode=true;S.selDeb=date;dessinerCal();
+    toast("Touche maintenant le jour du départ");return;}
   const c=el("div");
   c.append(el("p",{class:"meta"},jolie(date)));
-  dessus.forEach(s=>{
-    const m=membre(s.uid);
-    c.append(el("div",{class:"carte"},
-      el("div",{class:"rangee"},pastille(s.uid),
-        el("div",{},el("h3",{},s.titre||("Séjour de "+m.nom)),
-          el("div",{class:"meta"},`${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`))),
-      s.note?el("p",{class:"txt"},s.note):null,
-      s.uid===auth.currentUser.uid
-        ? el("button",{class:"btn danger",onclick:()=>{
-            if(confirm("Annuler ce séjour ?"))
-              ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",fermer);}},"Annuler ce séjour")
-        : null));
-  });
+  dessus.forEach(s=>c.append(ligneSejour(s,true)));
   c.append(el("button",{class:"btn fant plein",style:"margin-top:10px",
     onclick:()=>{fermer();demarrerSel();}},"Poser mes dates"));
   feuille("Ce jour-là",c);
 }
-
-function formSejour(debut,fin){
+function formSejour(debut,fin,s){
   debut=debut||auj(); fin=fin||decale(debut,2);
+  const conflit=S.sejours.find(x=>x.id!==s?.id&&debut<x.fin&&fin>x.debut);
   const c=el("div");
-  const conflit=S.sejours.find(s=>debut<s.fin&&fin>s.debut);
   c.append(
-    el("div",{class:"recap"},
-      el("b",{},`${jolieCourt(debut)} → ${jolieCourt(fin)}`),
+    el("div",{class:"recap"},el("b",{},`${jolieCourt(debut)} → ${jolieCourt(fin)}`),
       el("span",{class:"meta"},nuitees(debut,fin))),
     conflit?el("p",{class:"meta",style:"color:var(--alerte);margin-top:10px"},
-      `Attention : ${membre(conflit.uid).nom} a déjà posé ces dates. Appelez-vous avant de valider.`):null,
+      `Attention : ${membre(conflit.uid).nom} a déjà posé ces dates.`):null,
     el("div",{class:"duo"},
       el("div",{},el("label",{},"Arrivée"),el("input",{type:"date",id:"f-deb",value:debut})),
       el("div",{},el("label",{},"Départ"),el("input",{type:"date",id:"f-fin",value:fin}))),
     el("label",{},"Intitulé"),
-    el("input",{id:"f-tit",placeholder:"Ski avec les enfants"}),
+    el("input",{id:"f-tit",placeholder:"Ski avec les enfants",value:val(s?.titre)}),
     el("label",{},"Note pour les autres"),
     el("textarea",{id:"f-note",placeholder:"On laisse les clés chez le voisin…"}),
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const deb=$("#f-deb").value,f=$("#f-fin").value;
-      if(!deb||!f||f<=deb) return toast("Le départ doit suivre l'arrivée");
-      ecrire(addDoc(collection(db,"sejours"),{debut:deb,fin:f,
-        titre:$("#f-tit").value.trim(),note:$("#f-note").value.trim(),
-        uid:auth.currentUser.uid,cree:serverTimestamp()}),"Séjour réservé",fermer);
-    }},"Réserver ces dates")
-  );
-  feuille("Nouveau séjour",c);
+      if(!deb||!f||f<=deb)return toast("Le départ doit suivre l'arrivée");
+      const d={debut:deb,fin:f,titre:$("#f-tit").value.trim(),note:$("#f-note").value.trim(),
+        uid:auth.currentUser.uid};
+      ecrire(s?updateDoc(doc(db,"sejours",s.id),d):addDoc(collection(db,"sejours"),{...d,cree:serverTimestamp()}),
+        s?"Séjour modifié":"Séjour réservé",fermer);
+    }},s?"Enregistrer":"Réserver ces dates"));
+  feuille(s?"Modifier le séjour":"Nouveau séjour",c,()=>{$("#f-note").value=val(s?.note);});
 }
-
 function rendreSejours(){
   dessinerCal();
-  const z=$("#liste-sejours");z.innerHTML="";
+  const z=$("#liste-sejours");if(!z)return;z.innerHTML="";
   const futurs=S.sejours.filter(s=>s.fin>=auj()).sort((a,b)=>a.debut<b.debut?-1:1);
-  if(!futurs.length){z.append(el("div",{class:"vide"},
-    el("b",{},"Personne d'annoncé"),"Appuie sur « Poser mes dates », puis touche ton jour d'arrivée et ton jour de départ."));return;}
-  futurs.forEach(s=>{
-    const m=membre(s.uid);
-    z.append(el("div",{class:"carte"},
-      el("div",{class:"rangee"},pastille(s.uid),
-        el("div",{style:"flex:1"},el("h3",{},s.titre||("Séjour de "+m.nom)),
-          el("div",{class:"meta"},`${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`))),
-      s.note?el("p",{class:"txt"},s.note):null,
-      s.uid===auth.currentUser.uid?el("button",{class:"btn danger",onclick:()=>{
-        if(confirm("Annuler ce séjour ?")) ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé");
-      }},"Annuler ce séjour"):null));
-  });
+  if(!futurs.length){z.append(el("div",{class:"vide"},el("b",{},"Personne d'annoncé"),
+    "Appuie sur « Poser mes dates », puis touche ton arrivée et ton départ."));return;}
+  futurs.forEach(s=>z.append(ligneSejour(s)));
 }
 
 /* ═══════════════════════════════════════════════════════════
-   6. RANDOS
+   9. RANDOS
    ═══════════════════════════════════════════════════════════ */
 const NIVEAUX=["Facile","Moyen","Sportif","Alpin"];
-
-/* ── Lecture d'un fichier GPX ────────────────────────────────
-   Export possible depuis HealthFit ou WorkOutDoors (qui lisent
-   les séances de l'app Exercice), Strava, Komoot, Visorando…    */
 function lireGPX(txt){
   const d=new DOMParser().parseFromString(txt,"application/xml");
-  if(d.querySelector("parsererror")) throw new Error("fichier GPX illisible");
+  if(d.querySelector("parsererror"))throw new Error("fichier GPX illisible");
   const bruts=[...d.querySelectorAll("trkpt,rtept")].map(p=>({
-    lat:+p.getAttribute("lat"), lon:+p.getAttribute("lon"),
-    ele:+(p.querySelector("ele")?.textContent||0)
-  })).filter(p=>isFinite(p.lat)&&isFinite(p.lon));
-  if(bruts.length<2) throw new Error("aucun point de trace dans ce fichier");
-
-  // distance (haversine) et dénivelé positif, lissé à 4 m pour absorber le bruit GPS
-  let km=0, dplus=0, ref=bruts[0].ele;
+    lat:+p.getAttribute("lat"),lon:+p.getAttribute("lon"),
+    ele:+(p.querySelector("ele")?.textContent||0)})).filter(p=>isFinite(p.lat)&&isFinite(p.lon));
+  if(bruts.length<2)throw new Error("aucun point de trace dans ce fichier");
+  let km=0,dplus=0,ref=bruts[0].ele;
   for(let i=1;i<bruts.length;i++){
-    const a=bruts[i-1], b=bruts[i], R=6371;
-    const dla=(b.lat-a.lat)*Math.PI/180, dlo=(b.lon-a.lon)*Math.PI/180;
+    const a=bruts[i-1],b=bruts[i],R=6371;
+    const dla=(b.lat-a.lat)*Math.PI/180,dlo=(b.lon-a.lon)*Math.PI/180;
     const h=Math.sin(dla/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dlo/2)**2;
     km+=2*R*Math.asin(Math.sqrt(h));
-    if(b.ele-ref>4){ dplus+=b.ele-ref; ref=b.ele; } else if(b.ele<ref) ref=b.ele;
-  }
-  // on ne garde que ~140 points : largement assez pour dessiner, et léger en base
+    if(b.ele-ref>4){dplus+=b.ele-ref;ref=b.ele;}else if(b.ele<ref)ref=b.ele;}
   const pas=Math.max(1,Math.ceil(bruts.length/140));
   const pts=bruts.filter((_,i)=>i%pas===0||i===bruts.length-1)
     .map(p=>[+p.lat.toFixed(5),+p.lon.toFixed(5),Math.round(p.ele)]);
   const eles=bruts.map(p=>p.ele).filter(e=>e);
-  return {pts, km:+km.toFixed(1), dplus:Math.round(dplus),
+  return {pts,km:+km.toFixed(1),dplus:Math.round(dplus),
     alt:eles.length?{min:Math.round(Math.min(...eles)),max:Math.round(Math.max(...eles))}:null};
 }
-
-/* Dessin de la trace : projection simple corrigée de la latitude */
-function dessinerTrace(t){
-  if(!t?.pts?.length) return null;
-  const lat=t.pts.map(p=>p[0]), lon=t.pts.map(p=>p[1]);
+function projeter(t,W,H,P){
+  const lat=t.pts.map(p=>p[0]),lon=t.pts.map(p=>p[1]);
   const k=Math.cos(lat[0]*Math.PI/180);
-  const xs=lon.map(v=>v*k), ys=lat.map(v=>-v);
+  const xs=lon.map(v=>v*k),ys=lat.map(v=>-v);
   const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
-  const W=300,H=150,P=12;
   const e=Math.max(x1-x0,y1-y0)||1e-6;
-  const px=v=>P+((v-x0)-( (x1-x0)-e )/2)/e*(W-2*P);
-  const py=v=>P+((v-y0)-( (y1-y0)-e )/2)/e*(H-2*P);
-  const d=xs.map((x,i)=>`${px(x).toFixed(1)},${py(ys[i]).toFixed(1)}`).join(" ");
+  return xs.map((x,i)=>[P+((x-x0)-((x1-x0)-e)/2)/e*(W-2*P), P+((ys[i]-y0)-((y1-y0)-e)/2)/e*(H-2*P)]);
+}
+function dessinerTrace(t){
+  if(!t?.pts?.length)return null;
+  const W=300,H=150,pts=projeter(t,W,H,12);
   const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
-  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("class","trace");
-  svg.innerHTML=`<polyline points="${d}" fill="none" stroke="#E07A1F" stroke-width="3"
-      stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${px(xs[0]).toFixed(1)}" cy="${py(ys[0]).toFixed(1)}" r="4.5" fill="#3F7D5A"/>
-    <circle cx="${px(xs.at(-1)).toFixed(1)}" cy="${py(ys.at(-1)).toFixed(1)}" r="4.5" fill="#C4472C"/>`;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.setAttribute("class","trace");
+  svg.innerHTML=`<polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}"
+      fill="none" stroke="#E07A1F" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${pts[0][0].toFixed(1)}" cy="${pts[0][1].toFixed(1)}" r="4.5" fill="#3F7D5A"/>
+    <circle cx="${pts.at(-1)[0].toFixed(1)}" cy="${pts.at(-1)[1].toFixed(1)}" r="4.5" fill="#C4472C"/>`;
   return svg;
 }
-
-/* Reconnaissance de la source d'un lien, pour nommer la puce */
 function sourceLien(u){
   const h=(()=>{try{return new URL(u).hostname.replace(/^www\./,"");}catch{return "";}})();
-  if(/visorando/.test(h))  return "Visorando";
-  if(/komoot/.test(h))     return "Komoot";
-  if(/strava/.test(h))     return "Strava";
-  if(/alltrails/.test(h))  return "AllTrails";
-  if(/maps\.apple/.test(h))return "Plans";
-  if(/google\./.test(h))   return "Google Maps";
-  if(/openrunner/.test(h)) return "Openrunner";
-  if(/ign|geoportail/.test(h)) return "IGN";
+  if(/visorando/.test(h))return "Visorando"; if(/komoot/.test(h))return "Komoot";
+  if(/strava/.test(h))return "Strava"; if(/alltrails/.test(h))return "AllTrails";
+  if(/maps\.apple/.test(h))return "Plans"; if(/google\./.test(h))return "Google Maps";
+  if(/openrunner/.test(h))return "Openrunner"; if(/ign|geoportail/.test(h))return "IGN";
   return h||"Lien";
 }
-const liensDe=r=>r.liens?.length?r.liens:(r.lien?[r.lien]:[]);
+const liensDe=r=>r?.liens?.length?r.liens:(r?.lien?[r.lien]:[]);
 
 function formRando(r){
-  let trace=r?.trace||null;
-  const nouvelles=[];   // photos choisies dans le formulaire, envoyées à l'enregistrement
-  const c=el("div");
-  const zoneGPX=el("div",{class:"recap",style:"margin-top:6px"});
-  const majGPX=()=>{
-    zoneGPX.innerHTML="";
-    zoneGPX.append(trace
+  let trace=r?.trace||null, gps=r?.gps||null;
+  const nouvelles=[];
+  const zGPX=el("div",{class:"recap",style:"margin-top:6px"});
+  const zGPS=el("div",{style:"margin-top:6px"});
+  const zPh =el("div",{class:"bande-photos",style:"margin-top:8px"});
+  const majGPX=()=>{zGPX.innerHTML="";
+    zGPX.append(trace
       ? el("div",{},el("b",{},`Trace : ${trace.km} km · ▲ ${nb(trace.dplus)} m`),
           el("span",{class:"meta"},`${trace.pts.length} points`+(trace.alt?` · ${nb(trace.alt.min)}–${nb(trace.alt.max)} m`:"")),
           el("button",{class:"btn danger",onclick:()=>{trace=null;majGPX();}},"Retirer la trace"))
-      : el("span",{class:"meta"},"Aucune trace. Importe un .gpx exporté depuis HealthFit, WorkOutDoors, Strava, Komoot…"));
-  };
-  majGPX();
+      : el("span",{class:"meta"},"Aucune trace. Importe un .gpx (HealthFit, WorkOutDoors, Strava, Komoot…)"));};
+  const majGPS=()=>{zGPS.innerHTML="";
+    zGPS.append(gps?blocCarte(gps,()=>{gps=null;majGPS();})
+      :el("span",{class:"meta"},"Aucun point de départ enregistré."));};
+  const majPh=()=>vignettesForm(zPh, r?S.photos.filter(p=>p.rando===r.id):[], nouvelles, majPh);
+  majGPX();majGPS();
 
+  const c=el("div");
   c.append(
-    el("label",{},"Nom de la course"),
-    el("input",{id:"r-nom",placeholder:"Lac de l'Eychauda",value:r?.nom||""}),
+    el("label",{},"Nom de la rando"),
+    el("input",{id:"r-nom",placeholder:"Lac de l'Eychauda",value:val(r?.nom)}),
     el("label",{},"Départ"),
-    el("input",{id:"r-dep",placeholder:"Parking de Chambran",value:r?.depart||""}),
+    el("input",{id:"r-dep",placeholder:"Parking de Chambran",value:val(r?.depart)}),
+    el("button",{class:"btn fant plein",id:"r-geo",style:"margin-top:8px"},"📍 Me géolocaliser"),
+    zGPS,
     el("div",{class:"duo"},
-      el("div",{},el("label",{},"Dénivelé (m)"),el("input",{id:"r-den",type:"number",inputmode:"numeric",value:r?.denivele||""})),
-      el("div",{},el("label",{},"Durée (h)"),el("input",{id:"r-dur",type:"number",step:"0.5",inputmode:"decimal",value:r?.duree||""}))),
+      el("div",{},el("label",{},"Dénivelé (m)"),el("input",{id:"r-den",type:"number",inputmode:"numeric",value:val(r?.denivele)})),
+      el("div",{},el("label",{},"Durée (h)"),el("input",{id:"r-dur",type:"number",step:"0.5",inputmode:"decimal",value:val(r?.duree)}))),
     el("label",{},"Niveau"),
     el("select",{id:"r-niv",html:NIVEAUX.map(n=>`<option ${r?.niveau===n?"selected":""}>${n}</option>`).join("")}),
     el("label",{},"Le mot du guide"),
     el("textarea",{id:"r-txt",placeholder:"Partir tôt l'été, l'ombre disparaît après 10 h…"}),
-
     el("label",{},"Photos"),
     el("input",{type:"file",id:"r-ph",accept:"image/*",multiple:""}),
-    el("div",{id:"r-phz",class:"bande-photos",style:"margin-top:8px"}),
-
+    zPh,
     el("label",{},"Trace GPX"),
     el("input",{type:"file",id:"r-gpx",accept:".gpx,application/gpx+xml,text/xml"}),
-    zoneGPX,
-
+    zGPX,
     el("label",{},"Liens (Visorando, Komoot, Plans…)"),
     el("div",{id:"r-liens"}),
     el("button",{class:"btn fant plein",style:"margin-top:8px",onclick:()=>ajoutLien("")},"+ Ajouter un lien"),
-
     el("button",{class:"btn accent plein",style:"margin-top:18px",onclick:()=>{
-      const nom=$("#r-nom").value.trim(); if(!nom) return toast("Il manque le nom");
+      const nom=$("#r-nom").value.trim();if(!nom)return toast("Il manque le nom");
       const liens=[...document.querySelectorAll("#r-liens input")].map(i=>i.value.trim()).filter(Boolean);
-      const d={nom,depart:$("#r-dep").value.trim(),denivele:$("#r-den").value,
-        duree:$("#r-dur").value,niveau:$("#r-niv").value,texte:$("#r-txt").value.trim(),
-        liens,lien:"",trace,uid:auth.currentUser.uid};
-      // pour une nouvelle rando on fabrique l'identifiant avant d'écrire :
-      // les photos peuvent ainsi s'y rattacher tout de suite, même hors ligne
-      const ref = r ? doc(db,"randos",r.id) : doc(collection(db,"randos"));
-      ecrire(r ? updateDoc(ref,d) : setDoc(ref,{...d,faite:[],cree:serverTimestamp()}),
+      const d={nom,depart:$("#r-dep").value.trim(),denivele:$("#r-den").value,duree:$("#r-dur").value,
+        niveau:$("#r-niv").value,texte:$("#r-txt").value.trim(),liens,trace,gps,uid:auth.currentUser.uid};
+      const ref=r?doc(db,"randos",r.id):doc(collection(db,"randos"));
+      ecrire(r?updateDoc(ref,d):setDoc(ref,{...d,faite:[],cree:serverTimestamp()}),
         r?"Fiche mise à jour":"Rando ajoutée",fermer);
       nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),
-        {data,legende:"",rando:ref.id,uid:auth.currentUser.uid,cree:serverTimestamp()})));
-    }},r?"Enregistrer":"Ajouter la rando")
-  );
+        {data,legende:"",date:auj(),rando:ref.id,prise:null,uid:auth.currentUser.uid,cree:serverTimestamp()})));
+    }},r?"Enregistrer":"Ajouter la rando"));
 
   function ajoutLien(v){
-    const z=$("#r-liens");
     const ligne=el("div",{class:"rangee",style:"margin-bottom:8px"});
-    ligne.append(el("input",{type:"url",placeholder:"https://",value:v}),
+    ligne.append(el("input",{type:"url",placeholder:"https://",value:val(v)}),
       el("button",{class:"mini",onclick:()=>ligne.remove()},"✕"));
-    z.append(ligne);
-  }
-
-  function majPhotos(){
-    const z=$("#r-phz"); z.innerHTML="";
-    (r?S.photos.filter(p=>p.rando===r.id):[]).forEach(p=>{
-      const v=el("div",{class:"vignette"},el("img",{src:p.data,alt:""}));
-      if(p.uid===auth.currentUser.uid)
-        v.append(el("button",{class:"sup",onclick:()=>{
-          if(confirm("Supprimer cette photo ?")){
-            ecrire(deleteDoc(doc(db,"photos",p.id)));
-            p.rando=null; majPhotos();
-          }}},"✕"));
-      z.append(v);
-    });
-    nouvelles.forEach((data,i)=>{
-      const v=el("div",{class:"vignette"},el("img",{src:data,alt:""}));
-      v.append(el("button",{class:"sup",onclick:()=>{nouvelles.splice(i,1);majPhotos();}},"✕"));
-      z.append(v);
-    });
-    z.style.display=z.children.length?"flex":"none";
-  }
+    $("#r-liens").append(ligne);}
 
   feuille(r?"Modifier la rando":"Nouvelle rando",c,()=>{
-    $("#r-txt").value=r?.texte||"";
-    liensDe(r||{}).forEach(l=>ajoutLien(l));
-    majPhotos();
-    $("#r-ph").onchange=async e=>{
-      const fichiers=[...e.target.files].slice(0,6);
-      e.target.value="";
-      for(const fi of fichiers){
-        try{
-          let data=await compresser(fi);
-          if(data.length>900000) data=await compresser(fi,1100,.55);
-          if(data.length>950000){ toast("Une photo est trop lourde même réduite",true); continue; }
-          nouvelles.push(data); majPhotos();
-        }catch(err){ toast("Photo illisible : "+err.message,true); }
-      }
-      if(nouvelles.length) toast(`${nouvelles.length} photo${nouvelles.length>1?"s":""} prête${nouvelles.length>1?"s":""}`);
-    };
+    $("#r-txt").value=val(r?.texte);
+    liensDe(r).forEach(l=>ajoutLien(l));
+    majPh();
+    selecteurPhotos($("#r-ph"),zPh,nouvelles,majPh);
+    $("#r-geo").onclick=e=>geolocaliser(e.currentTarget,p=>{gps=p;majGPS();});
     $("#r-gpx").onchange=async e=>{
-      const f=e.target.files[0]; if(!f) return;
-      try{
-        trace=lireGPX(await f.text());
-        if(!$("#r-den").value) $("#r-den").value=trace.dplus;
-        majGPX(); toast(`Trace lue : ${trace.km} km`);
-      }catch(err){ toast(err.message,true); }
-    };
+      const f=e.target.files[0];if(!f)return;
+      try{trace=lireGPX(await f.text());
+        if(!$("#r-den").value)$("#r-den").value=trace.dplus;
+        majGPX();toast(`Trace lue : ${trace.km} km`);}catch(err){toast(err.message,true);}};
   });
 }
-
 function rendreRandos(){
-  const z=$("#liste-randos");z.innerHTML="";
+  const z=$("#liste-randos");if(!z)return;z.innerHTML="";
   if(!S.randos.length){z.append(el("div",{class:"vide"},
-    el("b",{},"Le carnet de courses est vide"),"Ajoute la première avec le bouton + : celle que tu referais demain."));return;}
-  z.append(el("div",{class:"titre-bloc"},`${S.randos.length} course${S.randos.length>1?"s":""} au carnet`));
+    el("b",{},"Le carnet est vide"),"Ajoute la première avec le bouton + : celle que tu referais demain."));return;}
+  z.append(el("div",{class:"titre-bloc"},`${S.randos.length} rando${S.randos.length>1?"s":""} au carnet`));
   S.randos.forEach(r=>{
     const faite=(r.faite||[]).includes(auth.currentUser.uid);
     const mien=r.uid===auth.currentUser.uid;
     const photos=S.photos.filter(p=>p.rando===r.id);
     const carte=el("div",{class:"carte"},
-      el("div",{class:"entre"},el("h3",{},r.nom),el("span",{class:"puce o"},r.niveau||"—")),
+      el("div",{class:"entre"},el("h3",{},r.nom),el("span",{class:"puce o"},val(r.niveau)||"—")),
       el("div",{class:"meta",style:"margin-top:2px"},
-        [r.depart, r.trace?.km?`↔ ${r.trace.km} km`:null,
-         r.denivele?`▲ ${nb(r.denivele)} m`:null, r.duree?`⏱ ${r.duree} h`:null]
-        .filter(Boolean).join("  ·  ")),
+        [val(r.depart),r.trace?.km?`↔ ${r.trace.km} km`:null,
+         r.denivele?`▲ ${nb(r.denivele)} m`:null,r.duree?`⏱ ${r.duree} h`:null].filter(Boolean).join("  ·  ")),
       dessinerTrace(r.trace),
-      r.texte?el("p",{class:"txt"},r.texte):null
-    );
-
-    if(photos.length){
-      const bande=el("div",{class:"bande-photos"});
-      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:p.legende||"",loading:"lazy",
-        onclick:()=>ouvrirPhoto(p)})));
-      carte.append(bande);
-    }
-
+      r.texte?el("p",{class:"txt"},val(r.texte)):null);
+    if(photos.length){const bande=el("div",{class:"bande-photos"});
+      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",onclick:()=>ouvrirPhoto(p)})));
+      carte.append(bande);}
     const liens=liensDe(r);
-    if(liens.length){
+    if(liens.length||r.gps){
       const zl=el("div",{class:"rangee",style:"margin-top:10px;flex-wrap:wrap"});
-      liens.forEach(l=>zl.append(el("a",{class:"mini",href:l,target:"_blank",rel:"noopener"},
-        sourceLien(l)+" ↗")));
-      carte.append(zl);
-    }
-
+      liens.forEach(l=>zl.append(el("a",{class:"mini",href:l,target:"_blank",rel:"noopener"},sourceLien(l)+" ↗")));
+      if(r.gps)zl.append(el("a",{class:"mini",target:"_blank",rel:"noopener",
+        href:`https://www.google.com/maps/search/?api=1&query=${r.gps.lat},${r.gps.lon}`},"📍 Départ ↗"));
+      carte.append(zl);}
     carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
       el("button",{class:"mini",onclick:()=>{
         const l=new Set(r.faite||[]);
         faite?l.delete(auth.currentUser.uid):l.add(auth.currentUser.uid);
-        ecrire(updateDoc(doc(db,"randos",r.id),{faite:[...l]}));
-      }},faite?"✓ Tu l'as faite":"Marquer comme faite"),
+        ecrire(updateDoc(doc(db,"randos",r.id),{faite:[...l]}));}},faite?"✓ Tu l'as faite":"Marquer comme faite"),
       (r.faite||[]).length?el("span",{class:"meta"},
         (r.faite||[]).map(u=>membre(u).nom).join(", ")+" y "+((r.faite||[]).length>1?"sont allés":"est allé")):null,
-      el("button",{class:"mini",onclick:()=>formPhoto(r)},"📷 Photo"),
+      el("button",{class:"mini",onclick:()=>formPhoto({type:"rando",id:r.id,nom:r.nom})},"📷 Photo"),
+      el("button",{class:"mini",onclick:()=>partager(texteRando(r))},"Partager"),
+      el("button",{class:"mini",onclick:()=>pdfRando(r)},"PDF"),
       mien?el("button",{class:"mini",onclick:()=>formRando(r)},"Modifier"):null,
       mien?el("button",{class:"mini",onclick:()=>{
-        if(confirm("Supprimer cette rando ?")) ecrire(deleteDoc(doc(db,"randos",r.id)),"Supprimée");
-      }},"🗑"):null));
-    z.append(carte);
+        if(confirm("Supprimer cette rando ?"))ecrire(deleteDoc(doc(db,"randos",r.id)),"Supprimée");}},"🗑"):null));
+    z.append(carte);});
+}
+const texteRando=r=>[`🥾 ${r.nom}`,
+  [val(r.depart),r.trace?.km?r.trace.km+" km":null,r.denivele?"D+ "+r.denivele+" m":null,
+   r.duree?r.duree+" h":null].filter(Boolean).join(" · "),
+  val(r.texte), r.gps?`https://www.google.com/maps/search/?api=1&query=${r.gps.lat},${r.gps.lon}`:null,
+  ...liensDe(r)].filter(Boolean).join("\n");
+
+/* ═══════════════════════════════════════════════════════════
+   10. PÊCHE
+   ═══════════════════════════════════════════════════════════ */
+const ESPECES=["Truite fario","Truite arc-en-ciel","Omble chevalier","Saumon de fontaine",
+  "Cristivomer","Ombre commun","Chevesne","Vairon","Autre"];
+const TECHNIQUES=["Toc","Mouche sèche","Nymphe","Leurre / cuiller","Vairon manié","Appât naturel","Autre"];
+
+function formPrise(pr){
+  const nouvelles=[]; let gps=pr?.gps||null;
+  const zGPS=el("div",{style:"margin-top:6px"});
+  const zPh =el("div",{class:"bande-photos",style:"margin-top:8px"});
+  const majGPS=()=>{zGPS.innerHTML="";
+    zGPS.append(gps?blocCarte(gps,()=>{gps=null;majGPS();})
+      :el("span",{class:"meta"},"Aucun spot enregistré. La position reste privée au carnet familial."));};
+  const majPh=()=>vignettesForm(zPh, pr?S.photos.filter(p=>p.prise===pr.id):[], nouvelles, majPh);
+  majGPS();
+  const now=new Date();
+  const hDef=val(pr?.heure)||`${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+
+  const c=el("div");
+  c.append(
+    el("label",{},"Espèce"),
+    el("select",{id:"pk-esp",html:ESPECES.map(e=>`<option ${pr?.espece===e?"selected":""}>${e}</option>`).join("")}),
+    el("div",{class:"duo"},
+      el("div",{},el("label",{},"Taille (cm)"),el("input",{id:"pk-t",type:"number",inputmode:"decimal",step:"0.5",value:val(pr?.taille)})),
+      el("div",{},el("label",{},"Poids (g)"),el("input",{id:"pk-p",type:"number",inputmode:"numeric",value:val(pr?.poids)}))),
+    el("div",{class:"duo"},
+      el("div",{},el("label",{},"Date"),el("input",{type:"date",id:"pk-d",value:val(pr?.date)||auj()})),
+      el("div",{},el("label",{},"Heure"),el("input",{type:"time",id:"pk-h",value:hDef}))),
+    el("label",{},"Lieu"),
+    el("input",{id:"pk-l",placeholder:"La Gyronde, sous le pont",value:val(pr?.lieu)}),
+    el("button",{class:"btn fant plein",id:"pk-geo",style:"margin-top:8px"},"📍 Enregistrer le spot"),
+    zGPS,
+    el("label",{},"Technique"),
+    el("select",{id:"pk-tec",html:TECHNIQUES.map(t=>`<option ${pr?.technique===t?"selected":""}>${t}</option>`).join("")}),
+    el("label",{},"Leurre / appât"),
+    el("input",{id:"pk-lr",placeholder:"Cuiller Mepps n°2 argent",value:val(pr?.leurre)}),
+    el("label",{},"Devenir du poisson"),
+    el("select",{id:"pk-rel",html:["Remis à l'eau","Gardé"].map(v=>`<option ${pr?.devenir===v?"selected":""}>${v}</option>`).join("")}),
+    el("label",{},"Notes"),
+    el("textarea",{id:"pk-n",placeholder:"Eau claire, prise en fin de journée dans le courant…"}),
+    el("label",{},"Photos"),
+    el("input",{type:"file",id:"pk-ph",accept:"image/*",multiple:""}),
+    zPh,
+    el("button",{class:"btn accent plein",style:"margin-top:18px",onclick:()=>{
+      const taille=$("#pk-t").value;
+      if(!taille)return toast("Indique au moins la taille");
+      const d={espece:$("#pk-esp").value,taille:+taille,poids:$("#pk-p").value?+$("#pk-p").value:null,
+        date:$("#pk-d").value,heure:$("#pk-h").value,lieu:$("#pk-l").value.trim(),gps,
+        technique:$("#pk-tec").value,leurre:$("#pk-lr").value.trim(),devenir:$("#pk-rel").value,
+        notes:$("#pk-n").value.trim(),uid:auth.currentUser.uid};
+      const ref=pr?doc(db,"prises",pr.id):doc(collection(db,"prises"));
+      ecrire(pr?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
+        pr?"Prise mise à jour":"Prise enregistrée",fermer);
+      nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),
+        {data,legende:"",date:d.date,rando:null,prise:ref.id,uid:auth.currentUser.uid,cree:serverTimestamp()})));
+    }},pr?"Enregistrer":"Ajouter la prise"));
+
+  feuille(pr?"Modifier la prise":"Nouvelle prise",c,()=>{
+    $("#pk-n").value=val(pr?.notes); majPh();
+    selecteurPhotos($("#pk-ph"),zPh,nouvelles,majPh);
+    $("#pk-geo").onclick=e=>geolocaliser(e.currentTarget,p=>{gps=p;majGPS();});
   });
+}
+function rendrePeche(){
+  const z=$("#liste-peche");if(!z)return;z.innerHTML="";
+  if(!S.prises.length){z.append(el("div",{class:"vide"},el("b",{},"Aucune prise au carnet"),
+    "Taille, spot, leurre, photo : de quoi régler les débats à table."));return;}
+  const record=S.prises.reduce((a,b)=>(b.taille||0)>(a.taille||0)?b:a);
+  const mes=S.prises.filter(p=>p.taille);
+  z.append(el("div",{class:"carte",style:"border-left:3px solid var(--meleze)"},
+    el("div",{class:"entre"},
+      el("div",{},el("h3",{},"Le record"),
+        el("div",{class:"meta"},`${record.espece} · ${record.taille} cm · ${membre(record.uid).nom}`)),
+      el("div",{style:"text-align:right"},
+        el("b",{style:"font-family:var(--display);font-size:26px"},String(S.prises.length)),
+        el("div",{class:"meta"},"prise"+(S.prises.length>1?"s":"")))),
+    mes.length>1?el("div",{class:"meta",style:"margin-top:8px"},
+      "Taille moyenne "+(mes.reduce((s,p)=>s+p.taille,0)/mes.length).toFixed(1)+" cm"):null,
+    el("button",{class:"btn fant plein",style:"margin-top:12px",onclick:pdfPeche},"Exporter le carnet en PDF")));
+  z.append(el("div",{class:"titre-bloc"},"Le carnet de prises"));
+  [...S.prises].sort((a,b)=>((b.date||"")+(b.heure||""))<((a.date||"")+(a.heure||""))?-1:1).forEach(p=>{
+    const mien=p.uid===auth.currentUser.uid;
+    const photos=S.photos.filter(x=>x.prise===p.id);
+    const carte=el("div",{class:"carte"},
+      el("div",{class:"entre"},el("h3",{},p.espece),el("span",{class:"puce o"},p.taille+" cm")),
+      el("div",{class:"meta",style:"margin-top:2px"},
+        [jolie(p.date),val(p.heure),p.poids?`${nb(p.poids)} g`:null,val(p.lieu),
+         val(p.leurre)||val(p.technique)].filter(Boolean).join("  ·  ")),
+      p.notes?el("p",{class:"txt"},val(p.notes)):null);
+    if(photos.length){const bande=el("div",{class:"bande-photos"});
+      photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",onclick:()=>ouvrirPhoto(x)})));
+      carte.append(bande);}
+    carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
+      el("span",{class:"puce"},val(p.devenir)||"—"),
+      el("span",{class:"meta"},"par "+membre(p.uid).nom),
+      p.gps?el("a",{class:"mini",target:"_blank",rel:"noopener",
+        href:`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`},"📍 Le spot ↗"):null,
+      el("button",{class:"mini",onclick:()=>formPhoto({type:"prise",id:p.id,nom:p.espece})},"📷 Photo"),
+      el("button",{class:"mini",onclick:()=>partager(textePrise(p))},"Partager"),
+      mien?el("button",{class:"mini",onclick:()=>formPrise(p)},"Modifier"):null,
+      mien?el("button",{class:"mini",onclick:()=>{
+        if(confirm("Supprimer cette prise ?"))ecrire(deleteDoc(doc(db,"prises",p.id)),"Prise supprimée");}},"🗑"):null));
+    z.append(carte);});
+}
+const textePrise=p=>[`🎣 ${p.espece} — ${p.taille} cm`,
+  [jolie(p.date),val(p.heure),p.poids?p.poids+" g":null,val(p.lieu),val(p.leurre)].filter(Boolean).join(" · "),
+  val(p.notes), p.gps?`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`:null
+].filter(Boolean).join("\n");
+
+/* ═══════════════════════════════════════════════════════════
+   11. EXPORT PDF
+   ═══════════════════════════════════════════════════════════ */
+let jsPDFpret=null;
+function chargerJsPDF(){
+  if(jsPDFpret) return jsPDFpret;
+  jsPDFpret=new Promise((res,rej)=>{
+    if(window.jspdf) return res(window.jspdf.jsPDF);
+    const s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload=()=>res(window.jspdf.jsPDF);
+    s.onerror=()=>rej(new Error("Export PDF indisponible hors ligne"));
+    document.head.append(s);});
+  return jsPDFpret;
+}
+function entetePDF(d,titre,sous){
+  d.setFillColor(18,33,31); d.rect(0,0,595,74,"F");
+  d.setTextColor(224,122,31); d.setFontSize(8);
+  d.text("VALLOUISE · HAUTES-ALPES",40,30);
+  d.setTextColor(244,246,244); d.setFontSize(19);
+  d.text(d.splitTextToSize(titre,480)[0],40,54);
+  if(sous){d.setFontSize(9);d.setTextColor(180,190,186);d.text(sous,40,68);}
+  d.setTextColor(18,33,31);
+}
+function piedPDF(d){
+  const h=d.internal.pageSize.getHeight();
+  d.setFontSize(7);d.setTextColor(127,138,134);
+  d.text("Vallouise — le carnet de famille · "+new Date().toLocaleDateString("fr-FR"),40,h-24);
+}
+async function ajouterPhotoPDF(d,p,titre){
+  d.addPage(); entetePDF(d,titre,[val(p.legende),p.date?jolie(p.date):""].filter(Boolean).join(" · "));
+  try{const im=new Image();im.src=p.data;await im.decode();
+    const r=Math.min(515/im.width,640/im.height);
+    d.addImage(p.data,"JPEG",40,110,im.width*r,im.height*r);}catch(e){}
+}
+async function pdfRando(r){
+  try{
+    toast("Préparation du PDF…");
+    const jsPDF=await chargerJsPDF();
+    const d=new jsPDF({unit:"pt",format:"a4"});
+    entetePDF(d,r.nom,[val(r.depart),val(r.niveau)].filter(Boolean).join(" · "));
+    let y=108; d.setFontSize(10);
+    [["Distance",r.trace?.km?r.trace.km+" km":"—"],["Dénivelé +",r.denivele?nb(r.denivele)+" m":"—"],
+     ["Durée",r.duree?r.duree+" h":"—"],
+     ["Altitudes",r.trace?.alt?`${nb(r.trace.alt.min)} – ${nb(r.trace.alt.max)} m`:"—"]]
+    .forEach((m,i)=>{
+      const x=40+(i%2)*260, yy=y+Math.floor(i/2)*34;
+      d.setTextColor(127,138,134);d.setFontSize(8);d.text(m[0].toUpperCase(),x,yy);
+      d.setTextColor(18,33,31);d.setFontSize(13);d.text(String(m[1]),x,yy+16);});
+    y+=80;
+    if(r.trace?.pts?.length){
+      const W=515,H=230,pts=projeter(r.trace,W,H,20);
+      d.setDrawColor(228,233,230);d.setFillColor(250,251,250);d.roundedRect(40,y,W,H,8,8,"FD");
+      d.setDrawColor(224,122,31);d.setLineWidth(2);
+      for(let i=1;i<pts.length;i++) d.line(40+pts[i-1][0],y+pts[i-1][1],40+pts[i][0],y+pts[i][1]);
+      d.setFillColor(63,125,90);d.circle(40+pts[0][0],y+pts[0][1],4,"F");
+      d.setFillColor(196,71,44);d.circle(40+pts.at(-1)[0],y+pts.at(-1)[1],4,"F");
+      y+=H+26;}
+    if(r.gps){d.setFontSize(9);d.setTextColor(127,138,134);
+      d.text(`Départ GPS : ${r.gps.lat.toFixed(5)}, ${r.gps.lon.toFixed(5)}`,40,y);y+=22;}
+    if(r.texte){d.setTextColor(18,33,31);d.setFontSize(11);
+      d.splitTextToSize(val(r.texte),515).forEach(l=>{if(y>760){d.addPage();y=60;}d.text(l,40,y);y+=15;});y+=8;}
+    liensDe(r).forEach(l=>{if(y>770){d.addPage();y=60;}
+      d.setFontSize(9);d.setTextColor(62,124,155);d.text(String(l).slice(0,95),40,y);y+=13;});
+    for(const p of S.photos.filter(p=>p.rando===r.id)) await ajouterPhotoPDF(d,p,r.nom);
+    for(let i=1;i<=d.internal.getNumberOfPages();i++){d.setPage(i);piedPDF(d);}
+    d.save(`rando-${r.nom.replace(/[^\w\-]+/g,"-").toLowerCase()}.pdf`);
+  }catch(e){toast(e.message||"Export PDF impossible",true);}
+}
+async function pdfPeche(){
+  try{
+    toast("Préparation du PDF…");
+    const jsPDF=await chargerJsPDF();
+    const d=new jsPDF({unit:"pt",format:"a4"});
+    entetePDF(d,"Carnet de pêche",`${S.prises.length} prise${S.prises.length>1?"s":""}`);
+    let y=110; d.setFontSize(9);d.setTextColor(127,138,134);
+    ["Date","Espèce","Taille","Lieu","Par"].forEach((t,i)=>d.text(t,[40,120,250,320,480][i],y));
+    y+=8;d.setDrawColor(228,233,230);d.line(40,y,555,y);y+=16;
+    [...S.prises].sort((a,b)=>(b.date||"")<(a.date||"")?-1:1).forEach(p=>{
+      if(y>770){d.addPage();y=60;}
+      d.setTextColor(18,33,31);d.setFontSize(10);
+      d.text(jolie(p.date),40,y);
+      d.text(d.splitTextToSize(p.espece,120)[0],120,y);
+      d.text(p.taille+" cm"+(p.poids?` / ${p.poids} g`:""),250,y);
+      d.text(d.splitTextToSize(val(p.lieu)||"—",150)[0],320,y);
+      d.text(membre(p.uid).nom,480,y); y+=16;
+      const det=[p.gps?`GPS ${p.gps.lat.toFixed(5)}, ${p.gps.lon.toFixed(5)}`:null,
+                 val(p.leurre),val(p.devenir)].filter(Boolean).join(" · ");
+      if(det){d.setFontSize(8);d.setTextColor(127,138,134);d.text(det,40,y);y+=14;}
+    });
+    for(const p of S.prises)
+      for(const x of S.photos.filter(f=>f.prise===p.id))
+        await ajouterPhotoPDF(d,x,`${p.espece} — ${p.taille} cm`);
+    for(let i=1;i<=d.internal.getNumberOfPages();i++){d.setPage(i);piedPDF(d);}
+    d.save("carnet-de-peche.pdf");
+  }catch(e){toast(e.message||"Export PDF impossible",true);}
 }
 
 /* ═══════════════════════════════════════════════════════════
-   7. BONS PLANS
+   12. BONS PLANS
    ═══════════════════════════════════════════════════════════ */
 const CATS=["Restaurant","Commerce","Activité","Baignade","Pratique"];
 function formPlan(p){
   const c=el("div");
   c.append(
     el("label",{},"Nom"),
-    el("input",{id:"p-nom",placeholder:"La boulangerie des Vigneaux",value:p?.nom||""}),
+    el("input",{id:"p-nom",placeholder:"La boulangerie des Vigneaux",value:val(p?.nom)}),
     el("label",{},"Catégorie"),
     el("select",{id:"p-cat",html:CATS.map(x=>`<option ${p?.cat===x?"selected":""}>${x}</option>`).join("")}),
     el("label",{},"Note"),
@@ -904,20 +1281,18 @@ function formPlan(p){
     el("label",{},"Pourquoi c'est bien"),
     el("textarea",{id:"p-txt",placeholder:"Le pain au levain du samedi part avant 10 h."}),
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
-      const nom=$("#p-nom").value.trim(); if(!nom) return toast("Il manque le nom");
+      const nom=$("#p-nom").value.trim();if(!nom)return toast("Il manque le nom");
       const d={nom,cat:$("#p-cat").value,note:+$("#p-note").value,
         texte:$("#p-txt").value.trim(),uid:auth.currentUser.uid};
-      ecrire(p?updateDoc(doc(db,"plans",p.id),d)
-             :addDoc(collection(db,"plans"),{...d,cree:serverTimestamp()}),
+      ecrire(p?updateDoc(doc(db,"plans",p.id),d):addDoc(collection(db,"plans"),{...d,cree:serverTimestamp()}),
         p?"Bon plan mis à jour":"Bon plan partagé",fermer);
-    }},p?"Enregistrer":"Partager le bon plan")
-  );
-  feuille(p?"Modifier le bon plan":"Nouveau bon plan",c,()=>{$("#p-txt").value=p?.texte||"";});
+    }},p?"Enregistrer":"Partager le bon plan"));
+  feuille(p?"Modifier le bon plan":"Nouveau bon plan",c,()=>{$("#p-txt").value=val(p?.texte);});
 }
 function rendrePlans(){
-  const z=$("#liste-plans");z.innerHTML="";
-  if(!S.plans.length){z.append(el("div",{class:"vide"},
-    el("b",{},"Aucune adresse partagée"),"La bonne boulangerie, le bon garagiste, la bonne vasque : ajoute-les avec le bouton +."));return;}
+  const z=$("#liste-plans");if(!z)return;z.innerHTML="";
+  if(!S.plans.length){z.append(el("div",{class:"vide"},el("b",{},"Aucune adresse partagée"),
+    "La bonne boulangerie, le bon garagiste, la bonne vasque : bouton +."));return;}
   CATS.forEach(cat=>{
     const l=S.plans.filter(p=>p.cat===cat);if(!l.length)return;
     z.append(el("div",{class:"titre-bloc"},cat));
@@ -925,212 +1300,312 @@ function rendrePlans(){
       const mien=p.uid===auth.currentUser.uid;
       z.append(el("div",{class:"carte"},
         el("div",{class:"entre"},el("h3",{},p.nom),el("span",{class:"etoiles"},"★".repeat(p.note||0))),
-        p.texte?el("p",{class:"txt"},p.texte):null,
-        el("div",{class:"rangee",style:"margin-top:10px"},
+        p.texte?el("p",{class:"txt"},val(p.texte)):null,
+        el("div",{class:"rangee",style:"margin-top:10px;flex-wrap:wrap"},
           el("span",{class:"meta"},"par "+membre(p.uid).nom),
+          el("button",{class:"mini",onclick:()=>partager(`📍 ${p.nom}\n${val(p.texte)}`)},"Partager"),
           mien?el("button",{class:"mini",onclick:()=>formPlan(p)},"Modifier"):null,
           mien?el("button",{class:"mini",onclick:()=>{
-            if(confirm("Supprimer ?")) ecrire(deleteDoc(doc(db,"plans",p.id)),"Supprimé");
-          }},"🗑"):null)));
-    });
+            if(confirm("Supprimer ?"))ecrire(deleteDoc(doc(db,"plans",p.id)),"Supprimé");}},"🗑"):null)));});
   });
 }
 
 /* ═══════════════════════════════════════════════════════════
-   8. PHOTOS
-   ═══════════════════════════════════════════════════════════ */
-function compresser(file,max=1400,q=.68){
-  return new Promise((res,rej)=>{
-    const img=new Image(),fr=new FileReader();
-    fr.onload=()=>img.src=fr.result;fr.onerror=()=>rej(new Error("lecture impossible"));
-    img.onload=()=>{let{width:w,height:h}=img;
-      const r=Math.min(1,max/Math.max(w,h));w=Math.round(w*r);h=Math.round(h*r);
-      const cv=Object.assign(document.createElement("canvas"),{width:w,height:h});
-      cv.getContext("2d").drawImage(img,0,0,w,h);res(cv.toDataURL("image/jpeg",q));};
-    img.onerror=()=>rej(new Error("image illisible"));fr.readAsDataURL(file);
-  });
-}
-function formPhoto(rando){
-  const c=el("div");
-  c.append(
-    rando?el("p",{class:"meta"},"Photo rattachée à « "+rando.nom+" ». Elle apparaîtra sur la fiche de la rando et sur le mur."):
-      el("p",{class:"meta"},"Les photos sont réduites automatiquement avant l'envoi. Une à la fois, la meilleure."),
-    el("label",{},"Photo"),
-    el("input",{type:"file",id:"ph-f",accept:"image/*"}),
-    el("label",{},"Légende"),
-    el("input",{id:"ph-l",placeholder:"Lever de soleil sur le Pelvoux"}),
-    el("button",{class:"btn accent plein",style:"margin-top:16px",id:"ph-go"},"Envoyer la photo")
-  );
-  feuille(rando?"Photo de la rando":"Ajouter une photo",c,()=>{
-    $("#ph-go").onclick=async()=>{
-      const f=$("#ph-f").files[0]; if(!f) return toast("Choisis une photo");
-      const b=$("#ph-go");b.textContent="Réduction…";b.disabled=true;
-      try{
-        let data=await compresser(f);
-        if(data.length>900000) data=await compresser(f,1100,.55);
-        if(data.length>950000){b.textContent="Envoyer la photo";b.disabled=false;
-          return toast("Photo trop lourde même réduite",true);}
-        ecrire(addDoc(collection(db,"photos"),{data,legende:$("#ph-l").value.trim(),
-          rando:rando?.id||null,uid:auth.currentUser.uid,cree:serverTimestamp()}),"Photo ajoutée",fermer);
-      }catch(e){b.textContent="Envoyer la photo";b.disabled=false;
-        toast("Impossible de lire ce fichier : "+e.message,true);}
-    };
-  });
-}
-function rendrePhotos(){
-  const z=$("#liste-photos");z.innerHTML="";
-  if(!S.photos.length){z.append(el("div",{class:"vide"},
-    el("b",{},"Mur vide"),"La première photo donne le ton — ajoute-la avec le bouton +."));return;}
-  z.append(el("div",{class:"titre-bloc"},`${S.photos.length} photo${S.photos.length>1?"s":""}`));
-  const g=el("div",{class:"photos"});
-  S.photos.forEach(p=>{
-    const v=el("div",{class:"vignette"},
-      el("img",{src:p.data,alt:p.legende||"",loading:"lazy",onclick:()=>ouvrirPhoto(p)}));
-    if(p.uid===auth.currentUser.uid)
-      v.append(el("button",{class:"sup","aria-label":"Supprimer cette photo",onclick:e=>{
-        e.stopPropagation();
-        if(confirm("Supprimer cette photo ?")) ecrire(deleteDoc(doc(db,"photos",p.id)),"Photo supprimée");
-      }},"✕"));
-    g.append(v);
-  });
-  z.append(g);
-}
-function ouvrirPhoto(p){
-  const lb=$("#lb");$("#lb-img").src=p.data;
-  const t=$("#lb-txt");t.innerHTML="";
-  const rd=p.rando?S.randos.find(x=>x.id===p.rando):null;
-  t.append([p.legende,rd?"« "+rd.nom+" »":null,membre(p.uid).nom].filter(Boolean).join(" — "));
-  if(p.uid===auth.currentUser.uid)
-    t.append(el("div",{style:"margin-top:14px"},el("button",{class:"btn fant",onclick:()=>{
-      if(confirm("Supprimer cette photo ?")){lb.classList.remove("on");
-        ecrire(deleteDoc(doc(db,"photos",p.id)),"Photo supprimée");}
-    }},"Supprimer cette photo")));
-  lb.classList.add("on");
-}
-$("#lb").onclick=e=>{if(e.target.id==="lb"||e.target.id==="lb-img")$("#lb").classList.remove("on");};
-
-/* ═══════════════════════════════════════════════════════════
-   9. L'APPART
+   13. L'APPART
    ═══════════════════════════════════════════════════════════ */
 function formInfo(i){
   const c=el("div");
   c.append(
     el("label",{},"Titre"),
-    el("input",{id:"i-t",placeholder:"Wifi, chauffage, poubelles, clés…",value:i?.titre||""}),
+    el("input",{id:"i-t",placeholder:"Wifi, chauffage, poubelles, clés…",value:val(i?.titre)}),
     el("label",{},"Contenu"),
     el("textarea",{id:"i-c",style:"min-height:130px"}),
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
-      const t=$("#i-t").value.trim(); if(!t) return toast("Il manque le titre");
+      const t=$("#i-t").value.trim();if(!t)return toast("Il manque le titre");
       const d={titre:t,texte:$("#i-c").value.trim(),uid:auth.currentUser.uid};
-      ecrire(i?updateDoc(doc(db,"infos",i.id),d)
-             :addDoc(collection(db,"infos"),{...d,cree:serverTimestamp()}),
+      ecrire(i?updateDoc(doc(db,"infos",i.id),d):addDoc(collection(db,"infos"),{...d,cree:serverTimestamp()}),
         "Fiche enregistrée",fermer);
     }},i?"Enregistrer":"Ajouter la fiche"),
     i?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
-      if(confirm("Supprimer cette fiche ?")) ecrire(deleteDoc(doc(db,"infos",i.id)),"Fiche supprimée",fermer);
-    }},"Supprimer la fiche"):null
-  );
-  feuille(i?"Modifier la fiche":"Nouvelle fiche pratique",c,()=>{$("#i-c").value=i?.texte||"";});
+      if(confirm("Supprimer cette fiche ?"))ecrire(deleteDoc(doc(db,"infos",i.id)),"Fiche supprimée",fermer);
+    }},"Supprimer la fiche"):null);
+  feuille(i?"Modifier la fiche":"Nouvelle fiche pratique",c,()=>{$("#i-c").value=val(i?.texte);});
 }
 function rendreInfos(){
-  const z=$("#liste-infos");z.innerHTML="";
+  const z=$("#liste-infos");if(!z)return;z.innerHTML="";
   z.append(el("div",{class:"titre-bloc"},"Le mode d'emploi de l'appart"));
-  if(!S.infos.length) z.append(el("div",{class:"vide"},el("b",{},"Rien de noté"),
-    "Le code du wifi, la vanne d'eau, le jour des poubelles : tout ce qu'on redemande à chaque fois."));
+  if(!S.infos.length)z.append(el("div",{class:"vide"},el("b",{},"Rien de noté"),
+    "Le code du wifi, la vanne d'eau, le jour des poubelles."));
   S.infos.forEach(i=>z.append(el("div",{class:"carte"},
     el("div",{class:"entre"},el("h3",{},i.titre),
       el("button",{class:"mini",onclick:()=>formInfo(i)},"Modifier")),
-    el("p",{class:"txt"},i.texte))));
-  z.append(el("button",{class:"btn fant plein",style:"margin-top:6px",
-    onclick:()=>formInfo()},"+ Ajouter une fiche"));
+    el("p",{class:"txt"},val(i.texte)))));
+  z.append(el("button",{class:"btn fant plein",style:"margin-top:6px",onclick:()=>formInfo()},"+ Ajouter une fiche"));
 }
 
 /* ═══════════════════════════════════════════════════════════
-   10. NAVIGATION
+   14. ACCUEIL — météo, soleil, alertes, suggestions, village
+   ═══════════════════════════════════════════════════════════ */
+const LIENS_VILLAGE=[
+  {t:"Office de tourisme",u:"https://www.paysdesecrins.com/"},
+  {t:"Webcams du domaine",u:"https://www.paysdesecrins.com/webcams-vallouise-pelvoux/"},
+  {t:"Station Pelvoux-Vallouise",u:"https://www.ski-pelvoux.com/"},
+  {t:"Parc national des Écrins",u:"https://www.ecrins-parcnational.fr/"},
+  {t:"Vigilance Météo-France",u:"https://vigilance.meteofrance.fr/fr"}
+];
+const SUGGESTIONS=[
+  {n:"Refuge du Glacier Blanc",d:"Pré de Mme Carle",dp:600,h:3.5,km:6,niv:"Facile",t:["#3E7C9B","#8FB8CC"]},
+  {n:"Lac de l'Eychauda",d:"Chambran",dp:780,h:5,km:11,niv:"Moyen",t:["#3F7D5A","#8FC0A4"]},
+  {n:"Tête de Gaulent",d:"Puy-Aillaud",dp:1100,h:6,km:12,niv:"Sportif",t:["#B65D0F","#E0A26A"]},
+  {n:"Cascade de la Pisse",d:"Entre-les-Aigues",dp:350,h:2,km:5,niv:"Facile",t:["#2C4A47","#7F9E99"]},
+  {n:"Lac de Puy Aillaud",d:"Puy-Aillaud",dp:900,h:5,km:10,niv:"Sportif",t:["#8E5AA8","#BFA0D0"]}
+];
+const METEO={0:["Ciel clair","☀️"],1:["Peu nuageux","🌤"],2:["Nuages épars","⛅"],3:["Couvert","☁️"],
+  45:["Brouillard","🌫"],48:["Brouillard givrant","🌫"],51:["Bruine","🌦"],53:["Bruine","🌦"],55:["Bruine","🌦"],
+  61:["Pluie faible","🌧"],63:["Pluie","🌧"],65:["Forte pluie","🌧"],66:["Pluie verglaçante","🌧"],67:["Pluie verglaçante","🌧"],
+  71:["Neige faible","🌨"],73:["Neige","🌨"],75:["Forte neige","❄️"],77:["Grains de neige","❄️"],
+  80:["Averses","🌦"],81:["Averses","🌦"],82:["Fortes averses","⛈"],85:["Averses de neige","🌨"],86:["Averses de neige","🌨"],
+  95:["Orage","⛈"],96:["Orage grêleux","⛈"],99:["Orage grêleux","⛈"]};
+const jourCourt=s=>["dim","lun","mar","mer","jeu","ven","sam"][new Date(s+"T12:00:00").getDay()];
+
+function alertesDe(m){
+  const a=[], c=m.daily.weather_code, pl=m.daily.precipitation_sum||[],
+        ng=m.daily.snowfall_sum||[], vt=m.daily.wind_gusts_10m_max||[];
+  for(let i=0;i<Math.min(2,c.length);i++){
+    const q=i?"demain":"aujourd'hui";
+    if(c[i]>=95) a.push(`Orage annoncé ${q} — décale les sorties en altitude.`);
+    if(pl[i]>=25) a.push(`Fortes pluies ${q} (${Math.round(pl[i])} mm) — attention aux crues des torrents.`);
+    if(ng[i]>=10) a.push(`Chutes de neige ${q} (${Math.round(ng[i])} cm) — vérifie le risque d'avalanche.`);
+    if(vt[i]>=70) a.push(`Rafales jusqu'à ${Math.round(vt[i])} km/h ${q}.`);
+  }
+  return a;
+}
+async function chargerMeteo(){
+  const z=$("#meteo"), za=$("#vigilance");
+  if(!z)return;
+  try{
+    const u="https://api.open-meteo.com/v1/forecast?latitude="+VALLOUISE.lat+"&longitude="+VALLOUISE.lon
+      +"&current=temperature_2m,weather_code,wind_speed_10m,apparent_temperature"
+      +"&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,snowfall_sum,wind_gusts_10m_max,sunrise,sunset"
+      +"&timezone=Europe%2FParis&forecast_days=5";
+    const r=await fetch(u); if(!r.ok) throw new Error("indisponible");
+    const m=await r.json();
+    const [lib,ico]=METEO[m.current.weather_code]||["—","•"];
+    z.innerHTML="";
+    z.append(
+      el("div",{class:"meteo-auj"},
+        el("div",{class:"ico"},ico),
+        el("div",{},el("div",{class:"temp"},Math.round(m.current.temperature_2m)+"°"),
+          el("div",{class:"meta"},`${lib} · ressenti ${Math.round(m.current.apparent_temperature)}° · vent ${Math.round(m.current.wind_speed_10m)} km/h`)),
+        el("div",{class:"meta",style:"margin-left:auto;text-align:right"},"Vallouise",el("br"),"1 166 m")),
+      el("div",{class:"soleil"},
+        el("span",{},"🌅 Lever "+heure(m.daily.sunrise[0])),
+        el("span",{},"🌇 Coucher "+heure(m.daily.sunset[0]))),
+      el("div",{class:"meteo-jours"},
+        ...m.daily.time.slice(0,5).map((d,i)=>el("div",{class:"jm"},
+          el("span",{class:"meta"},i?jourCourt(d):"auj."),
+          el("span",{class:"ico"},(METEO[m.daily.weather_code[i]]||["","•"])[1]),
+          el("b",{},Math.round(m.daily.temperature_2m_max[i])+"°"),
+          el("span",{class:"meta"},Math.round(m.daily.temperature_2m_min[i])+"°")))));
+    if(za){
+      za.innerHTML="";
+      const al=alertesDe(m);
+      if(al.length) za.append(el("div",{class:"vigilance"},
+        el("b",{},"⚠️ Alertes & météo"),
+        ...al.map(x=>el("div",{class:"txt",style:"font-size:14px"},x)),
+        el("p",{class:"meta",style:"margin:8px 0 0"},"Estimation d'après les prévisions — la vigilance officielle fait foi."),
+        el("a",{class:"mini",style:"margin-top:8px",target:"_blank",rel:"noopener",
+          href:"https://vigilance.meteofrance.fr/fr"},"Vigilance Météo-France ↗")));
+    }
+  }catch(e){
+    z.innerHTML="";
+    z.append(el("div",{class:"meta"},"Météo indisponible (pas de réseau ?). Elle s'affichera au retour de la connexion."));
+  }
+}
+function visuelSugg(s){
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 240 100");svg.setAttribute("preserveAspectRatio","none");
+  const id="g"+Math.random().toString(36).slice(2,7);
+  svg.innerHTML=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${s.t[0]}"/><stop offset="1" stop-color="${s.t[1]}"/></linearGradient></defs>
+    <rect width="240" height="100" fill="url(#${id})"/>
+    <path d="M-10 100 L60 42 L96 74 L130 36 L190 100 Z" fill="rgba(255,255,255,.22)"/>
+    <path d="M100 100 L160 50 L200 82 L250 100 Z" fill="rgba(255,255,255,.16)"/>
+    <path d="M60 42 L48 58 L60 53 L72 60 Z" fill="rgba(255,255,255,.55)"/>`;
+  return svg;
+}
+function formLien(l){
+  const c=el("div");
+  c.append(
+    el("label",{},"Intitulé"),
+    el("input",{id:"l-t",placeholder:"Le Dauphiné — Vallouise",value:val(l?.titre)}),
+    el("label",{},"Adresse"),
+    el("input",{id:"l-u",type:"url",placeholder:"https://",value:val(l?.url)}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
+      const t=$("#l-t").value.trim(),u=$("#l-u").value.trim();
+      if(!t||!u)return toast("Intitulé et adresse obligatoires");
+      const d={titre:t,url:u,uid:auth.currentUser.uid};
+      ecrire(l?updateDoc(doc(db,"liens",l.id),d):addDoc(collection(db,"liens"),{...d,cree:serverTimestamp()}),
+        "Lien enregistré",fermer);
+    }},l?"Enregistrer":"Ajouter le lien"),
+    l?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
+      if(confirm("Supprimer ce lien ?"))ecrire(deleteDoc(doc(db,"liens",l.id)),"Lien supprimé",fermer);
+    }},"Supprimer"):null);
+  feuille(l?"Modifier le lien":"Nouveau lien",c);
+}
+function rendreAccueil(){
+  const z=$("#accueil");if(!z)return;
+  z.innerHTML="";
+  z.append(el("div",{id:"vigilance"}));
+
+  const futurs=S.sejours.filter(s=>s.fin>=auj()).sort((a,b)=>a.debut<b.debut?-1:1);
+  const enCours=futurs.find(s=>s.debut<=auj()), prochain=enCours||futurs[0];
+  z.append(el("div",{class:"titre-bloc"},enCours?"En ce moment à l'appart":"Prochain séjour"));
+  z.append(prochain?ligneSejour(prochain)
+    :el("div",{class:"vide"},el("b",{},"Personne d'annoncé"),"Va dans Séjours pour poser tes dates."));
+
+  z.append(el("div",{class:"titre-bloc"},"Météo du village"));
+  z.append(el("div",{class:"carte",id:"meteo"},el("div",{class:"meta"},"Chargement…")));
+
+  z.append(el("div",{class:"titre-bloc"},"Randonnée suggérée"));
+  const car=el("div",{class:"carrousel"});
+  SUGGESTIONS.forEach(s=>car.append(el("div",{class:"sugg"},
+    el("div",{class:"vis"},visuelSugg(s),el("span",{},s.niv)),
+    el("div",{class:"cnt"},
+      el("h4",{},s.n),
+      el("div",{class:"meta"},`${s.d} · ↔ ${s.km} km · ▲ ${nb(s.dp)} m · ⏱ ${s.h} h`),
+      el("div",{class:"rangee",style:"margin-top:9px;flex-wrap:wrap"},
+        el("a",{class:"mini",target:"_blank",rel:"noopener",
+          href:"https://www.google.com/search?q="+encodeURIComponent(s.n+" randonnée Vallouise visorando")},"Itinéraire ↗"),
+        el("button",{class:"mini",onclick:()=>{
+          ecrire(addDoc(collection(db,"randos"),{nom:s.n,depart:s.d,denivele:String(s.dp),
+            duree:String(s.h),niveau:s.niv,texte:"",liens:[],trace:null,gps:null,faite:[],
+            uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
+        }},"+ Mon carnet"))))));
+  z.append(car);
+  z.append(el("p",{class:"meta",style:"margin:6px 2px"},
+    "Repères indicatifs — vérifie l'itinéraire et les conditions avant de partir."));
+
+  z.append(el("div",{class:"titre-bloc"},"La vallée en direct"));
+  z.append(el("div",{class:"carte"},
+    el("p",{class:"txt",style:"margin:0 0 10px"},
+      "Webcams du domaine : enneigement, fréquentation et ciel en temps réel."),
+    el("a",{class:"btn accent plein",target:"_blank",rel:"noopener",
+      href:"https://www.paysdesecrins.com/webcams-vallouise-pelvoux/"},"Ouvrir les webcams ↗")));
+
+  z.append(el("div",{class:"titre-bloc"},"Actualités & village"));
+  const rang=el("div",{class:"rangee",style:"flex-wrap:wrap;gap:7px"});
+  LIENS_VILLAGE.forEach(l=>rang.append(el("a",{class:"mini",href:l.u,target:"_blank",rel:"noopener"},l.t+" ↗")));
+  S.liens.forEach(l=>{
+    const a=el("a",{class:"mini",href:l.url,target:"_blank",rel:"noopener"},l.titre+" ↗");
+    if(l.uid===auth.currentUser.uid)a.addEventListener("contextmenu",e=>{e.preventDefault();formLien(l);});
+    rang.append(a);});
+  z.append(el("div",{class:"carte"},rang,
+    el("button",{class:"btn fant plein",style:"margin-top:12px",onclick:()=>formLien()},"+ Ajouter un lien"),
+    S.liens.length?el("p",{class:"meta",style:"margin:8px 0 0"},"Appui long sur un lien que tu as ajouté pour le modifier."):null));
+
+  const gens=Object.entries(S.membres);
+  z.append(el("div",{class:"titre-bloc"},`Le carnet · ${gens.length} membre${gens.length>1?"s":""}`));
+  const rm=el("div",{class:"rangee",style:"flex-wrap:wrap;gap:10px"});
+  gens.forEach(([uid,m])=>rm.append(el("div",{class:"rangee",style:"gap:6px"},
+    el("div",{class:"pastille",style:`background:${m.couleur}`},m.nom[0]?.toUpperCase()||"?"),
+    el("span",{},m.nom+(uid===auth.currentUser.uid?" (toi)":"")))));
+  z.append(el("div",{class:"carte"},rm,
+    el("p",{class:"txt",style:"font-size:13.5px;color:var(--granit)"},
+      "Chacun apparaît ici dès qu'il a ouvert l'app et choisi son prénom."),
+    el("button",{class:"btn plein",onclick:()=>partager("Le carnet de famille de Vallouise : "+location.href)},
+      "Partager le lien de l'app")));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   15. NAVIGATION
    ═══════════════════════════════════════════════════════════ */
 function aller(v){
   S.vue=v;
   $$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.vue===v));
   $$(".vue").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));
-  const t={sejours:"Séjours",randos:"Randos",plans:"Bons plans",photos:"Photos",appart:"L'appart"};
+  const t={accueil:"Vallouise",sejours:"Séjours",sorties:"Sorties",plans:"Bons plans",
+    photos:"Photos",appart:"L'appart"};
   $("#titre").textContent=t[v];
   $("#alt").textContent=ALTITUDES[v][0];
   $("#sous").textContent=ALTITUDES[v][1];
-  $("#fab").style.display=(v==="appart"||v==="sejours")?"none":"grid";
+  $("#fab").style.display=(v==="appart"||v==="sejours"||v==="accueil")?"none":"grid";
+  if(v==="accueil") chargerMeteo();
   window.scrollTo({top:0});
 }
 $$("nav button").forEach(b=>b.onclick=()=>aller(b.dataset.vue));
+$$(".onglets button[data-sortie]").forEach(b=>b.onclick=()=>{
+  S.sortie=b.dataset.sortie;
+  $$(".onglets button[data-sortie]").forEach(x=>x.classList.toggle("on",x===b));
+  $("#liste-randos").hidden=S.sortie!=="randos";
+  $("#liste-peche").hidden=S.sortie!=="peche";
+});
 $("#prev").onclick=()=>{S.curseur.setMonth(S.curseur.getMonth()-1);dessinerCal();};
 $("#next").onclick=()=>{S.curseur.setMonth(S.curseur.getMonth()+1);dessinerCal();};
 $("#mois").onclick=()=>{S.curseur=new Date();dessinerCal();toast("Retour au mois en cours");};
 $("#poser").onclick=demarrerSel;
 $("#fab").onclick=()=>{
-  if(S.vue==="randos")  return formRando();
+  if(S.vue==="sorties") return S.sortie==="peche"?formPrise():formRando();
   if(S.vue==="plans")   return formPlan();
   if(S.vue==="photos")  return formPhoto();
 };
 $("#changer-nom").onclick=()=>demanderNom(false);
 $("#cfg-lien").onclick=()=>{
   if(confirm("Effacer la configuration Firebase enregistrée sur cet appareil ?")){
-    localStorage.removeItem("vl-config");location.reload();}
-};
+    localStorage.removeItem("vl-config");location.reload();}};
 
-// balayage horizontal pour changer de mois
 let x0=null;
 $("#bloc-cal").addEventListener("touchstart",e=>{x0=e.touches[0].clientX;},{passive:true});
 $("#bloc-cal").addEventListener("touchend",e=>{
-  if(x0===null) return;
-  const dx=e.changedTouches[0].clientX-x0; x0=null;
-  if(Math.abs(dx)<60) return;
-  S.curseur.setMonth(S.curseur.getMonth()+(dx<0?1:-1));dessinerCal();
-},{passive:true});
-
-addEventListener("online",()=>$("#off").classList.remove("on"));
-addEventListener("offline",()=>$("#off").classList.add("on"));
-if(!navigator.onLine) $("#off").classList.add("on");
+  if(x0===null)return;
+  const dx=e.changedTouches[0].clientX-x0;x0=null;
+  if(Math.abs(dx)<60)return;
+  S.curseur.setMonth(S.curseur.getMonth()+(dx<0?1:-1));dessinerCal();},{passive:true});
 
 /* ═══════════════════════════════════════════════════════════
-   11. SYNCHRONISATION
+   16. SYNCHRONISATION
    ═══════════════════════════════════════════════════════════ */
 function ecouter(nom,champ,tri,rendu){
   onSnapshot(query(collection(db,nom),...(tri?[orderBy(...tri)]:[])),
     snap=>{S[champ]=snap.docs.map(d=>({id:d.id,...d.data()}));rendu();},
     err=>{console.error(nom,err);
-      toast(`Lecture de « ${nom} » refusée — vérifie les règles Firestore.`,true);});
+      toast(`Lecture de « ${nom} » refusée — les règles Firestore doivent être mises à jour.`,true);});
 }
 onAuthStateChanged(auth,user=>{
   if(!user){
     signInAnonymously(auth).catch(e=>{
       $("#boot")?.remove();
       const p=$("#panne");p.classList.add("on");
-      p.textContent="Connexion refusée ("+(e.code||e.message)+"). Vérifie que la connexion anonyme est activée dans Firebase → Authentication, et que ton domaine figure dans Authentication → Settings → Domaines autorisés.";
-    });
-    return;
-  }
+      p.textContent="Connexion refusée ("+(e.code||e.message)+"). Vérifie la connexion anonyme dans Firebase → Authentication, et que ton domaine figure dans Authentication → Settings → Domaines autorisés.";});
+    return;}
   $("#boot")?.remove();
-  aller("sejours");
+  majUrgence(); majReseau(); aller("accueil");
 
   onSnapshot(collection(db,"membres"),snap=>{
     S.membres={};snap.forEach(d=>S.membres[d.id]=d.data());
     S.moi=S.membres[user.uid];
     if(S.moi){
       $("#mon-nom").textContent=S.moi.nom;
-      const p=$("#ma-pastille");p.style.background=S.moi.couleur;
-      p.textContent=S.moi.nom[0].toUpperCase();
+      const p=$("#ma-pastille");p.style.background=S.moi.couleur;p.textContent=S.moi.nom[0].toUpperCase();
       delete $("#voile").dataset.bloque;
     } else demanderNom(true);
-    rendreSejours();rendreRandos();rendrePlans();rendrePhotos();
-  },err=>{console.error(err);toast("Lecture des membres refusée — vérifie les règles Firestore.",true);});
+    rendreSejours();rendreRandos();rendrePlans();rendrePhotos();rendrePeche();rendreAccueil();
+    if(S.vue==="accueil") chargerMeteo();
+  },err=>{console.error(err);
+    toast("Lecture des membres refusée — les règles Firestore doivent être mises à jour.",true);});
 
-  ecouter("sejours","sejours",["debut","asc"],rendreSejours);
+  ecouter("sejours","sejours",["debut","asc"],()=>{rendreSejours();rendreAccueil();chargerMeteo();});
   ecouter("randos","randos",["nom","asc"],rendreRandos);
   ecouter("plans","plans",["nom","asc"],rendrePlans);
-  ecouter("photos","photos",["cree","desc"],()=>{rendrePhotos();rendreRandos();});
+  ecouter("photos","photos",["cree","desc"],()=>{rendrePhotos();rendreRandos();rendrePeche();});
   ecouter("infos","infos",["titre","asc"],rendreInfos);
+  ecouter("prises","prises",["date","desc"],rendrePeche);
+  ecouter("liens","liens",["titre","asc"],()=>{rendreAccueil();chargerMeteo();});
 });
 
 if("serviceWorker" in navigator)
   addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js").catch(()=>{}));
+
 </script>
 </body>
 </html>

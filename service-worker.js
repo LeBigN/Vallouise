@@ -1,6 +1,6 @@
 /* Vallouise — service worker
    Bump CACHE à chaque déploiement pour forcer la mise à jour des PWA installées. */
-const CACHE = "vallouise-v8";
+const CACHE = "vallouise-v9";
 const COQUILLE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -21,7 +21,7 @@ self.addEventListener("fetch", e => {
   if (/firestore|identitytoolkit|googleapis\.com\/google\.firestore/.test(url.href)) return;
 
   // Modules Firebase + polices : cache d'abord, puis réseau
-  if (/gstatic\.com|googleapis\.com/.test(url.hostname)) {
+  if (/gstatic\.com|googleapis\.com|cdnjs\.cloudflare\.com/.test(url.hostname)) {
     e.respondWith(caches.match(e.request).then(r => r ||
       fetch(e.request).then(res => {
         const copie = res.clone();
