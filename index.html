@@ -235,6 +235,7 @@ nav button.on span.l{color:var(--meleze)}
         <button class="btn fant" id="changer-nom">Modifier</button>
       </div>
     </div>
+    <button class="mini" id="cfg-lien" style="margin-top:4px">Configuration Firebase</button>
   </section>
 </main>
 
@@ -336,13 +337,74 @@ addEventListener("unhandledrejection",e=>{
 /* ═══════════════════════════════════════════════════════════
    3. DÉMARRAGE — avec garde-fou de configuration
    ═══════════════════════════════════════════════════════════ */
-if(firebaseConfig.apiKey==="À_REMPLIR"){
-  $("#boot").remove();
-  const p=$("#panne");p.classList.add("on");
-  p.textContent="Configuration Firebase absente. Ouvre index.html et remplis le bloc firebaseConfig avec les valeurs de ta console Firebase (voir README, étape 1). Tant que ce n'est pas fait, rien ne peut être enregistré.";
-  throw new Error("firebaseConfig non renseigné");
+const CLES=["apiKey","authDomain","projectId","storageBucket","messagingSenderId","appId"];
+
+/* La config peut venir de deux endroits :
+   1. le bloc firebaseConfig ci-dessus (permanent, valable pour tout le monde)
+   2. l'écran de configuration, enregistré dans ce navigateur (dépannage, un appareil) */
+function configLocale(){
+  try{const j=JSON.parse(localStorage.getItem("vl-config")||"null");return j?.apiKey?j:null;}
+  catch{return null;}
 }
-const app=initializeApp(firebaseConfig);
+function extraire(texte){
+  const c={};
+  for(const k of CLES){
+    const m=texte.match(new RegExp(k+'\\s*[:=]\\s*["\'`]([^"\'`]+)["\'`]'));
+    if(m) c[k]=m[1].trim();
+  }
+  return c;
+}
+function ecranConfig(msg){
+  $("#boot")?.remove();
+  const bloc=el("div",{class:"vue on",style:"max-width:560px;margin:0 auto"});
+  const zone=el("textarea",{id:"cfg",style:"min-height:170px;font-family:var(--cote);font-size:13px",
+    placeholder:'const firebaseConfig = {\n  apiKey: "AIza…",\n  authDomain: "…",\n  …\n};'});
+  const sortie=el("div",{style:"margin-top:14px"});
+  bloc.append(
+    el("div",{class:"carte",style:"border-left:3px solid var(--meleze)"},
+      el("h3",{},"Configuration Firebase"),
+      el("p",{class:"txt"}, msg||"L'app a besoin des identifiants de ton projet Firebase pour synchroniser les données entre les membres de la famille."),
+      el("p",{class:"txt",style:"font-size:13.5px;color:var(--granit)"},
+        "Console Firebase → ⚙ Paramètres du projet → Vos applications → icône </> → copie tout le bloc firebaseConfig affiché, et colle-le ci-dessous.")),
+    el("label",{},"Colle le bloc ici"),
+    zone,
+    el("button",{class:"btn accent plein",style:"margin-top:14px",onclick:()=>{
+      const c=extraire(zone.value);
+      const manque=CLES.filter(k=>!c[k]);
+      if(manque.length){
+        sortie.innerHTML="";
+        sortie.append(el("p",{class:"txt",style:"color:var(--alerte)"},
+          "Valeurs introuvables dans ce que tu as collé : "+manque.join(", ")+
+          ". Copie bien le bloc entier depuis la console Firebase."));
+        return;
+      }
+      localStorage.setItem("vl-config",JSON.stringify(c));
+      sortie.innerHTML="";
+      const perm='const firebaseConfig = {\n'+CLES.map(k=>`  ${k}: "${c[k]}",`).join("\n").replace(/,$/,"")+'\n};';
+      sortie.append(
+        el("div",{class:"carte"},
+          el("h3",{},"Configuration acceptée"),
+          el("p",{class:"txt"},"Elle est enregistrée dans CE navigateur uniquement. Pour que toute la famille en profite, colle le bloc ci-dessous dans index.html (il remplace celui du haut du fichier), puis redéploie."),
+          Object.assign(el("textarea",{style:"min-height:150px;font-family:var(--cote);font-size:12.5px",readonly:""}),{value:perm}),
+          el("button",{class:"btn fant plein",style:"margin-top:10px",onclick:()=>{
+            navigator.clipboard?.writeText(perm).then(()=>toast("Bloc copié"),()=>toast("Copie impossible, sélectionne le texte à la main"));
+          }},"Copier le bloc")),
+        el("button",{class:"btn accent plein",onclick:()=>location.reload()},"Démarrer l'app"));
+      sortie.scrollIntoView({behavior:"smooth"});
+    }},"Valider la configuration"),
+    sortie
+  );
+  const ex=configLocale();
+  if(ex) bloc.append(el("button",{class:"btn danger plein",style:"margin-top:18px",onclick:()=>{
+    localStorage.removeItem("vl-config");location.reload();}},"Effacer la configuration enregistrée"));
+  document.querySelector("main").append(bloc);
+  $("#fab").style.display="none";
+  document.querySelector("nav").style.display="none";
+}
+
+const CONF = firebaseConfig.apiKey!=="À_REMPLIR" ? firebaseConfig : configLocale();
+if(!CONF){ ecranConfig(); throw new Error("configuration Firebase absente"); }
+const app=initializeApp(CONF);
 const auth=getAuth(app);
 const db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
 
@@ -773,6 +835,10 @@ $("#fab").onclick=()=>{
   if(S.vue==="photos")  return formPhoto();
 };
 $("#changer-nom").onclick=()=>demanderNom(false);
+$("#cfg-lien").onclick=()=>{
+  if(confirm("Effacer la configuration Firebase enregistrée sur cet appareil ?")){
+    localStorage.removeItem("vl-config");location.reload();}
+};
 
 // balayage horizontal pour changer de mois
 let x0=null;

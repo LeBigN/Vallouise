@@ -12,7 +12,13 @@ Tout se synchronise en temps réel entre les membres, et reste consultable hors 
 3. **Firestore Database** → *Créer une base* → mode **production** → région `eur3 (europe-west)`.
 4. **Paramètres du projet** (roue crantée) → *Vos applications* → icône `</>` → nom `Vallouise` →
    copier l'objet `firebaseConfig` affiché.
-5. Coller ces valeurs dans `index.html`, tout en haut du `<script type="module">` (bloc « 1. CONFIGURATION FIREBASE »).
+5. Deux façons de renseigner ces valeurs :
+   - **Rapide, pour tester** : ouvrir l'app telle quelle — un écran « Configuration Firebase » s'affiche,
+     y coller le bloc copié, valider. Attention : c'est enregistré **dans ce navigateur uniquement**,
+     donc à refaire sur chaque téléphone de la famille.
+   - **Définitif** : coller le bloc dans `index.html`, tout en haut du `<script type="module">`
+     (bloc « 1. CONFIGURATION FIREBASE »), puis redéployer. L'écran de configuration ne s'affiche plus
+     pour personne. C'est la bonne solution une fois que ça marche.
 
 > Les clés Firebase côté web sont publiques par nature : ce ne sont pas des secrets.
 > C'est le rôle des règles ci-dessous de protéger les données.
