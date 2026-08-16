@@ -97,9 +97,9 @@ Les photos sont **réduites dans le navigateur** (1400 px max, JPEG qualité 0,6
 | Section | Ce qu'on y met |
 |---|---|
 | **Séjours** | Calendrier des présences, une couleur par membre. Alerte si les dates se chevauchent, sans bloquer. |
-| **Randos** | Fiches : départ, dénivelé, durée, niveau, conseil. **Import de trace GPX** (distance + D+ calculés, tracé dessiné), **plusieurs liens** par rando, **photos rattachées**. Chacun coche « faite ». |
+| **Randos** | Fiches : départ, dénivelé, durée, niveau, conseil. **Import de trace GPX** (distance + D+ calculés, tracé dessiné), **plusieurs liens** par rando, **photos rattachées** (dès la création). Chacun coche « faite ». |
 | **Bons plans** | Restaurants, commerces, activités, baignades, infos pratiques, notés sur 5. |
-| **Photos** | Mur commun, légende + auteur. Double-tap sur sa propre photo en plein écran pour la supprimer. |
+| **Photos** | Mur commun, légende + auteur. Croix de suppression sur ses propres vignettes. |
 | **L'appart** | Fiches pratiques éditables par tous : wifi, chauffage, poubelles, vanne d'eau, clés, voisins. |
 
 ---
