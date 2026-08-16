@@ -1,0 +1,42 @@
+/* Vallouise — service worker
+   Bump CACHE à chaque déploiement pour forcer la mise à jour des PWA installées. */
+const CACHE = "vallouise-v1";
+const COQUILLE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
+
+self.addEventListener("install", e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(COQUILLE)).then(() => self.skipWaiting()));
+});
+
+self.addEventListener("activate", e => {
+  e.waitUntil(caches.keys()
+    .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    .then(() => self.clients.claim()));
+});
+
+self.addEventListener("fetch", e => {
+  const url = new URL(e.request.url);
+  if (e.request.method !== "GET") return;
+
+  // Firestore / Auth : toujours le réseau (le cache hors ligne est géré par Firestore lui-même)
+  if (/firestore|identitytoolkit|googleapis\.com\/google\.firestore/.test(url.href)) return;
+
+  // Modules Firebase + polices : cache d'abord, puis réseau
+  if (/gstatic\.com|googleapis\.com/.test(url.hostname)) {
+    e.respondWith(caches.match(e.request).then(r => r ||
+      fetch(e.request).then(res => {
+        const copie = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copie));
+        return res;
+      })));
+    return;
+  }
+
+  // Fichiers de l'app : réseau d'abord, cache en secours
+  e.respondWith(
+    fetch(e.request).then(res => {
+      const copie = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copie));
+      return res;
+    }).catch(() => caches.match(e.request).then(r => r || caches.match("./index.html")))
+  );
+});

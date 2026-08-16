@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12211F">
+<title>Vallouise — le carnet de famille</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   VALLOUISE — jetons de design
+   Palette : nuit de vallée, granit, névé, mélèze (accent), glacier
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --nuit:#12211F;
+  --ardoise:#2C4A47;
+  --granit:#7F8A86;
+  --brume:#E4E9E6;
+  --neve:#F4F6F4;
+  --blanc:#FFFFFF;
+  --meleze:#E07A1F;
+  --meleze-sombre:#B65D0F;
+  --glacier:#3E7C9B;
+  --alerte:#C4472C;
+  --ok:#3F7D5A;
+
+  --display:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --corps:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --cote:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+
+  --r:14px;
+  --ombre:0 1px 2px rgba(18,33,31,.06),0 8px 24px rgba(18,33,31,.07);
+  --nav-h:calc(62px + env(safe-area-inset-bottom));
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--neve);color:var(--nuit);
+  font-family:var(--corps);font-size:15px;line-height:1.45;
+  padding-bottom:var(--nav-h);
+  overscroll-behavior-y:none;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+:focus-visible{outline:2.5px solid var(--meleze);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── Bandeau d'altitude : la signature de l'app ─────────────── */
+.borne{
+  position:relative;overflow:hidden;
+  background:var(--nuit);color:var(--neve);
+  padding:calc(14px + env(safe-area-inset-top)) 18px 16px;
+}
+.borne svg{position:absolute;inset:0;width:100%;height:100%;opacity:.28}
+.borne-in{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.borne h1{
+  font-family:var(--display);font-weight:800;
+  font-size:26px;line-height:1;margin:0;letter-spacing:-.02em;
+}
+.borne .lieu{
+  font-family:var(--cote);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--meleze);margin-bottom:6px;display:block;
+}
+.alt{
+  font-family:var(--cote);font-size:11px;text-align:right;
+  color:rgba(244,246,244,.55);white-space:nowrap;line-height:1.5;
+}
+.alt b{display:block;font-size:15px;color:var(--neve);font-weight:500}
+
+/* ── Contenu ────────────────────────────────────────────────── */
+main{padding:16px 14px 26px;max-width:760px;margin:0 auto}
+.vue{display:none;animation:monte .22s ease both}
+.vue.on{display:block}
+@keyframes monte{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.titre-bloc{
+  font-family:var(--cote);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--granit);margin:22px 0 9px;display:flex;align-items:center;gap:9px;
+}
+.titre-bloc::after{content:"";flex:1;height:1px;background:var(--brume)}
+.titre-bloc:first-child{margin-top:2px}
+
+.carte{
+  background:var(--blanc);border-radius:var(--r);padding:14px;
+  box-shadow:var(--ombre);margin-bottom:10px;
+}
+.carte h3{font-family:var(--display);font-size:17px;margin:0 0 3px;font-weight:700;letter-spacing:-.01em}
+.meta{font-family:var(--cote);font-size:11px;color:var(--granit)}
+.txt{margin:8px 0 0;white-space:pre-wrap;font-size:14.5px}
+
+.vide{
+  text-align:center;padding:34px 20px;color:var(--granit);
+  border:1.5px dashed var(--brume);border-radius:var(--r);background:var(--blanc);
+}
+.vide b{display:block;font-family:var(--display);font-size:16px;color:var(--ardoise);margin-bottom:4px}
+
+/* ── Boutons ────────────────────────────────────────────────── */
+.btn{
+  background:var(--nuit);color:var(--neve);border-radius:11px;
+  padding:11px 16px;font-weight:600;font-size:14.5px;
+  display:inline-flex;align-items:center;gap:7px;transition:transform .12s,filter .12s;
+}
+.btn:active{transform:scale(.97)}
+.btn.accent{background:var(--meleze)}
+.btn.plein{width:100%;justify-content:center}
+.btn.fant{background:var(--brume);color:var(--ardoise)}
+.btn.danger{background:transparent;color:var(--alerte);padding:6px 0;font-size:13px;font-weight:600}
+.mini{font-family:var(--cote);font-size:11px;color:var(--granit);padding:4px 8px;border-radius:8px;background:var(--brume)}
+
+/* ── Calendrier ─────────────────────────────────────────────── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+.cal-nav .mois{font-family:var(--display);font-size:19px;font-weight:700;text-transform:capitalize}
+.fleche{width:38px;height:38px;border-radius:11px;background:var(--blanc);box-shadow:var(--ombre);
+  display:grid;place-items:center;font-size:17px;color:var(--ardoise)}
+.grille{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;background:var(--blanc);
+  padding:10px;border-radius:var(--r);box-shadow:var(--ombre)}
+.jsem{font-family:var(--cote);font-size:9.5px;color:var(--granit);text-align:center;padding-bottom:5px;text-transform:uppercase}
+.jour{
+  aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;font-size:13.5px;position:relative;
+}
+.jour.hors{color:var(--brume)}
+.jour.auj{box-shadow:inset 0 0 0 1.5px var(--nuit);font-weight:700}
+.jour.pris{color:var(--blanc);font-weight:600}
+.jour.deb{border-radius:9px 3px 3px 9px}
+.jour.fin{border-radius:3px 9px 9px 3px}
+.jour.mil{border-radius:3px}
+.pts{display:flex;gap:2px;position:absolute;bottom:5px}
+.pt{width:4px;height:4px;border-radius:50%}
+
+/* ── Formulaires ────────────────────────────────────────────── */
+label{display:block;font-family:var(--cote);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--granit);margin:12px 0 5px}
+input,select,textarea{
+  width:100%;background:var(--neve);border:1.5px solid var(--brume);
+  border-radius:10px;padding:11px 12px;font-size:16px;
+}
+input:focus,select,textarea:focus{border-color:var(--ardoise)}
+textarea{min-height:78px;resize:vertical}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.duo label{margin-top:12px}
+
+/* ── Feuille modale ─────────────────────────────────────────── */
+.voile{position:fixed;inset:0;background:rgba(18,33,31,.55);z-index:60;
+  display:none;align-items:flex-end;backdrop-filter:blur(2px)}
+.voile.on{display:flex}
+.feuille{
+  background:var(--neve);width:100%;max-height:92vh;overflow-y:auto;
+  border-radius:20px 20px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom));
+  animation:monte-f .26s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes monte-f{from{transform:translateY(100%)}to{transform:none}}
+.poignee{width:38px;height:4px;border-radius:2px;background:var(--brume);margin:6px auto 12px}
+.feuille h2{font-family:var(--display);font-size:20px;margin:0 0 2px;font-weight:700}
+@media(min-width:640px){.voile{align-items:center;justify-content:center}
+  .feuille{max-width:520px;border-radius:20px;animation:none}}
+
+/* ── Navigation basse ───────────────────────────────────────── */
+nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
+  border-top:1px solid var(--brume);
+  display:grid;grid-template-columns:repeat(5,1fr);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+nav button{padding:9px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
+nav button svg.i{width:22px;height:22px}
+nav button span.l{font-family:var(--cote);font-size:9px;letter-spacing:.04em}
+nav button.on{color:var(--nuit)}
+nav button.on span.l{color:var(--meleze)}
+
+/* ── Divers ─────────────────────────────────────────────────── */
+.fab{position:fixed;right:16px;bottom:calc(var(--nav-h) + 14px);z-index:45;
+  width:54px;height:54px;border-radius:18px;background:var(--meleze);color:#fff;
+  font-size:26px;display:grid;place-items:center;box-shadow:0 6px 20px rgba(224,122,31,.4)}
+.puce{display:inline-flex;align-items:center;gap:5px;font-family:var(--cote);font-size:10.5px;
+  padding:3px 8px;border-radius:20px;background:var(--brume);color:var(--ardoise);
+  letter-spacing:.05em;text-transform:uppercase}
+.puce.o{background:rgba(224,122,31,.13);color:var(--meleze-sombre)}
+.puce.g{background:rgba(62,124,155,.13);color:var(--glacier)}
+.pastille{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  font-size:10px;font-weight:700;color:#fff;font-family:var(--cote);flex:none}
+.rangee{display:flex;align-items:center;gap:9px}
+.entre{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block;background:var(--brume)}
+.lb{position:fixed;inset:0;background:rgba(18,33,31,.96);z-index:70;display:none;
+  flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:74vh;border-radius:10px}
+.lb p{color:var(--neve);text-align:center;margin:14px 0 0;max-width:520px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 18px);
+  background:var(--nuit);color:var(--neve);padding:11px 17px;border-radius:11px;z-index:90;
+  font-size:14px;box-shadow:var(--ombre);opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+.chargement{text-align:center;padding:60px 20px;color:var(--granit);font-family:var(--cote);font-size:12px}
+.etoiles{color:var(--meleze);letter-spacing:1px}
+.bandeau-off{background:var(--ardoise);color:var(--neve);text-align:center;
+  font-family:var(--cote);font-size:11px;padding:6px;display:none}
+.bandeau-off.on{display:block}
+</style>
+</head>
+<body>
+
+<!-- ══ Bandeau d'altitude ═══════════════════════════════════ -->
+<header class="borne">
+  <svg viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="#E07A1F" stroke-width="1">
+      <path d="M-10 96 C 60 88, 90 66, 150 62 S 250 78, 300 58 S 380 34, 410 40"/>
+      <path d="M-10 82 C 60 74, 95 52, 152 48 S 248 64, 298 44 S 380 20, 410 26" stroke="#F4F6F4" opacity=".5"/>
+      <path d="M-10 108 C 60 102, 88 82, 148 78 S 252 92, 302 74 S 380 50, 410 56" stroke="#F4F6F4" opacity=".3"/>
+      <path d="M-10 66 C 65 58, 100 38, 155 34 S 245 50, 296 30 S 380 6, 410 12" opacity=".6"/>
+      <path d="M-10 52 C 70 44, 105 26, 158 22 S 242 38, 294 18" opacity=".35"/>
+    </g>
+  </svg>
+  <div class="borne-in">
+    <div>
+      <span class="lieu">Vallouise · Hautes-Alpes</span>
+      <h1 id="titre">Séjours</h1>
+    </div>
+    <div class="alt"><b id="alt">1 166 m</b><span id="sous">altitude du village</span></div>
+  </div>
+</header>
+<div class="bandeau-off" id="off">Hors ligne — tes modifications partiront à la reconnexion</div>
+
+<main>
+  <div class="chargement" id="boot">Connexion au carnet…</div>
+
+  <!-- ══ SÉJOURS ═════════════════════════════════════════════ -->
+  <section class="vue" id="v-sejours">
+    <div class="cal-nav">
+      <button class="fleche" id="prev" aria-label="Mois précédent">‹</button>
+      <div class="mois" id="mois"></div>
+      <button class="fleche" id="next" aria-label="Mois suivant">›</button>
+    </div>
+    <div class="grille" id="cal"></div>
+    <div class="titre-bloc">À venir</div>
+    <div id="liste-sejours"></div>
+  </section>
+
+  <!-- ══ RANDOS ══════════════════════════════════════════════ -->
+  <section class="vue" id="v-randos">
+    <div id="liste-randos"></div>
+  </section>
+
+  <!-- ══ BONS PLANS ══════════════════════════════════════════ -->
+  <section class="vue" id="v-plans">
+    <div id="liste-plans"></div>
+  </section>
+
+  <!-- ══ PHOTOS ══════════════════════════════════════════════ -->
+  <section class="vue" id="v-photos">
+    <div id="liste-photos"></div>
+  </section>
+
+  <!-- ══ L'APPART ════════════════════════════════════════════ -->
+  <section class="vue" id="v-appart">
+    <div id="liste-infos"></div>
+    <div class="titre-bloc">Toi</div>
+    <div class="carte">
+      <div class="entre">
+        <div class="rangee">
+          <div class="pastille" id="ma-pastille"></div>
+          <div><b id="mon-nom"></b><div class="meta">membre du carnet</div></div>
+        </div>
+        <button class="btn fant" id="changer-nom">Modifier</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<button class="fab" id="fab" aria-label="Ajouter">+</button>
+
+<nav>
+  <button data-vue="sejours" class="on"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h18M7 3v3M17 3v3M4 6h16a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"/><path d="M8 13h3v3H8z" fill="currentColor" stroke="none"/></svg><span class="l">SÉJOURS</span></button>
+  <button data-vue="randos"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3 6 21M13 3l3 6M16 9l5 12M16 9l-4 2M9 13l4 2M11.5 17l4 2"/></svg><span class="l">RANDOS</span></button>
+  <button data-vue="plans"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg><span class="l">BONS PLANS</span></button>
+  <button data-vue="photos"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.8l1.4-2.2h6.6L16.7 7h2.8A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-9Z"/><circle cx="12" cy="12.6" r="3.4"/></svg><span class="l">PHOTOS</span></button>
+  <button data-vue="appart"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 19 9 7l3.4 5.6L14.6 9 22 19H2Z"/><path d="M9 7l2.2 3.7-1.6 2.6"/></svg><span class="l">L'APPART</span></button>
+</nav>
+
+<div class="voile" id="voile"><div class="feuille" id="feuille"></div></div>
+<div class="lb" id="lb"><img id="lb-img" alt=""><p id="lb-txt"></p></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* ═══════════════════════════════════════════════════════════
+   1. CONFIGURATION FIREBASE  ← à remplir (voir README.md)
+   ═══════════════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey:            "À_REMPLIR",
+  authDomain:        "vallouise-xxxxx.firebaseapp.com",
+  projectId:         "vallouise-xxxxx",
+  storageBucket:     "vallouise-xxxxx.appspot.com",
+  messagingSenderId: "000000000000",
+  appId:             "1:000000000000:web:xxxxxxxxxxxx"
+};
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+         collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot,
+         query, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+});
+
+/* ═══════════════════════════════════════════════════════════
+   2. OUTILS
+   ═══════════════════════════════════════════════════════════ */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const el = (t,p={},...k)=>{const n=document.createElement(t);
+  for(const[a,v]of Object.entries(p)){
+    if(a==="class")n.className=v; else if(a==="html")n.innerHTML=v;
+    else if(a.startsWith("on"))n.addEventListener(a.slice(2),v); else n.setAttribute(a,v);}
+  k.flat().forEach(c=>c!=null&&n.append(c.nodeType?c:document.createTextNode(c)));
+  return n;};
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const COULEURS = ["#E07A1F","#3E7C9B","#3F7D5A","#8E5AA8","#C4472C","#B68A0F","#2C6E8E","#A8556B"];
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const MOIS_C = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const JSEM = ["L","M","M","J","V","S","D"];
+const ALTITUDES = {
+  sejours:["1 166 m","altitude du village"],
+  randos: ["4 102 m","Barre des Écrins"],
+  plans:  ["1 874 m","Pré de Mme Carle"],
+  photos: ["2 542 m","refuge du Glacier Blanc"],
+  appart: ["1 166 m","le pied-à-terre"]
+};
+
+const iso = d => d.toISOString().slice(0,10);
+const auj = () => iso(new Date());
+const jolie = s => { if(!s) return ""; const [a,m,j]=s.split("-");
+  return `${+j} ${MOIS_C[+m-1]} ${a}`; };
+const nb = n => new Intl.NumberFormat("fr-FR").format(n);
+const nuits = (a,b) => Math.round((new Date(b)-new Date(a))/864e5);
+const nuitees = (a,b) => { const n=nuits(a,b); return `${n} nuit${n>1?"s":""}`; };
+
+let toastT;
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),2600); }
+
+function feuille(titre, corps, apres){
+  const f=$("#feuille");
+  f.innerHTML='<div class="poignee"></div>';
+  f.append(el("h2",{},titre), corps);
+  $("#voile").classList.add("on");
+  apres?.();
+}
+const fermer = () => $("#voile").classList.remove("on");
+$("#voile").addEventListener("click", e => { if(e.target.id==="voile") fermer(); });
+
+/* ═══════════════════════════════════════════════════════════
+   3. ÉTAT
+   ═══════════════════════════════════════════════════════════ */
+const S = { moi:null, membres:{}, sejours:[], randos:[], plans:[], photos:[], infos:[],
+            curseur:new Date(), vue:"sejours" };
+
+/* ═══════════════════════════════════════════════════════════
+   4. IDENTITÉ — chacun choisit son prénom au 1er lancement
+   ═══════════════════════════════════════════════════════════ */
+function demanderNom(force){
+  const nomActuel = S.moi?.nom || "";
+  const c = el("div");
+  c.append(
+    el("p",{class:"meta"},"Ton prénom apparaîtra sur les séjours, les randos et les photos."),
+    el("label",{},"Prénom"),
+    el("input",{id:"f-nom",maxlength:"18",placeholder:"Nico"}),
+    el("label",{},"Ta couleur"),
+    el("div",{id:"f-coul",style:"display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"}),
+    el("button",{class:"btn accent plein",onclick:async()=>{
+      const nom=$("#f-nom").value.trim();
+      if(!nom) return toast("Il manque le prénom");
+      const couleur=$("#f-coul .sel")?.dataset.c || COULEURS[0];
+      await setDoc(doc(db,"membres",auth.currentUser.uid),{nom,couleur},{merge:true});
+      localStorage.setItem("vl-nom",nom);
+      fermer(); toast("C'est noté, "+nom);
+    }},"Entrer dans le carnet")
+  );
+  feuille(force?"Bienvenue au chalet":"Ton profil",c,()=>{
+    $("#f-nom").value = nomActuel;
+    const z=$("#f-coul");
+    COULEURS.forEach((col,i)=>{
+      const b=el("button",{class:"pastille","data-c":col,
+        style:`background:${col};width:34px;height:34px;border:3px solid transparent`});
+      if(col===(S.moi?.couleur||COULEURS[0])) b.classList.add("sel"), b.style.borderColor="var(--nuit)";
+      b.onclick=()=>{ z.querySelectorAll("button").forEach(x=>{x.classList.remove("sel");x.style.borderColor="transparent"});
+        b.classList.add("sel"); b.style.borderColor="var(--nuit)"; };
+      z.append(b);
+    });
+    if(force) $("#voile").onclick=null;
+  });
+}
+const membre = uid => S.membres[uid] || {nom:"?",couleur:"#7F8A86"};
+const pastille = uid => { const m=membre(uid);
+  return el("div",{class:"pastille",style:`background:${m.couleur}`}, m.nom[0]?.toUpperCase()||"?"); };
+
+/* ═══════════════════════════════════════════════════════════
+   5. SÉJOURS + calendrier
+   ═══════════════════════════════════════════════════════════ */
+function dessinerCal(){
+  const c=$("#cal"); c.innerHTML="";
+  const d=S.curseur, an=d.getFullYear(), mo=d.getMonth();
+  $("#mois").textContent = `${MOIS[mo]} ${an}`;
+  JSEM.forEach(j=>c.append(el("div",{class:"jsem"},j)));
+
+  const prem=new Date(an,mo,1), dec=(prem.getDay()+6)%7;
+  const nb=new Date(an,mo+1,0).getDate();
+
+  for(let i=0;i<dec;i++) c.append(el("div",{class:"jour hors"}));
+  for(let j=1;j<=nb;j++){
+    const date=iso(new Date(Date.UTC(an,mo,j)));
+    const dessus=S.sejours.filter(s=>date>=s.debut && date<s.fin);
+    const cl=["jour"];
+    if(date===auj()) cl.push("auj");
+    const cell=el("div",{class:cl.join(" "),onclick:()=>ouvrirJour(date,dessus)}, String(j));
+    if(dessus.length){
+      const s=dessus[0], col=membre(s.uid).couleur;
+      cell.style.background=col; cell.classList.add("pris");
+      const veille=iso(new Date(Date.UTC(an,mo,j-1))), lend=iso(new Date(Date.UTC(an,mo,j+1)));
+      const avant=date>veille && dessus.some(x=>veille>=x.debut&&veille<x.fin);
+      const apres=dessus.some(x=>lend>=x.debut&&lend<x.fin);
+      const forme = avant&&apres?"mil":avant?"fin":apres?"deb":null;
+      if(forme) cell.classList.add(forme);
+      if(dessus.length>1){
+        const p=el("div",{class:"pts"});
+        dessus.slice(0,3).forEach(x=>p.append(el("div",{class:"pt",style:`background:#fff`})));
+        cell.append(p);
+      }
+    }
+    c.append(cell);
+  }
+}
+function ouvrirJour(date, dessus){
+  const c=el("div");
+  c.append(el("p",{class:"meta"},jolie(date)));
+  if(dessus.length){
+    dessus.forEach(s=>{
+      const m=membre(s.uid);
+      c.append(el("div",{class:"carte"},
+        el("div",{class:"rangee"}, pastille(s.uid),
+          el("div",{}, el("h3",{},s.titre||("Séjour de "+m.nom)),
+            el("div",{class:"meta"}, `${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`))),
+        s.note?el("p",{class:"txt"},s.note):null,
+        s.uid===auth.currentUser.uid
+          ? el("button",{class:"btn danger",onclick:async()=>{
+              if(confirm("Annuler ce séjour ?")){ await deleteDoc(doc(db,"sejours",s.id)); fermer(); toast("Séjour annulé"); }}},"Annuler ce séjour")
+          : null
+      ));
+    });
+  }
+  c.append(el("button",{class:"btn accent plein",style:"margin-top:14px",
+    onclick:()=>formSejour(date)},"Réserver à partir de ce jour"));
+  feuille(dessus.length?"Ce jour-là":"Jour libre",c);
+}
+function formSejour(debut){
+  const fin=iso(new Date(new Date(debut).getTime()+2*864e5));
+  const c=el("div");
+  c.append(
+    el("p",{class:"meta"},"Le calendrier prévient tout le monde : premier arrivé, premier servi — parlez-vous avant de doubler quelqu'un."),
+    el("div",{class:"duo"},
+      el("div",{},el("label",{},"Arrivée"),el("input",{type:"date",id:"f-deb",value:debut})),
+      el("div",{},el("label",{},"Départ"),el("input",{type:"date",id:"f-fin",value:fin}))),
+    el("label",{},"Intitulé"),
+    el("input",{id:"f-tit",placeholder:"Ski avec les enfants"}),
+    el("label",{},"Note pour les autres"),
+    el("textarea",{id:"f-note",placeholder:"On laisse les clés chez le voisin…"}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:async()=>{
+      const deb=$("#f-deb").value, f=$("#f-fin").value;
+      if(!deb||!f||f<=deb) return toast("Le départ doit suivre l'arrivée");
+      const conflit=S.sejours.find(s=>deb<s.fin && f>s.debut);
+      if(conflit && !confirm(`${membre(conflit.uid).nom} est déjà là sur ces dates. On réserve quand même ?`)) return;
+      await addDoc(collection(db,"sejours"),{debut:deb,fin:f,titre:$("#f-tit").value.trim(),
+        note:$("#f-note").value.trim(),uid:auth.currentUser.uid,cree:serverTimestamp()});
+      fermer(); toast("Séjour réservé");
+    }},"Réserver")
+  );
+  feuille("Nouveau séjour",c);
+}
+function rendreSejours(){
+  dessinerCal();
+  const z=$("#liste-sejours"); z.innerHTML="";
+  const futurs=S.sejours.filter(s=>s.fin>=auj()).sort((a,b)=>a.debut<b.debut?-1:1);
+  if(!futurs.length){ z.append(el("div",{class:"vide"},
+    el("b",{},"Personne d'annoncé"),"Touche un jour du calendrier pour poser tes dates.")); return; }
+  futurs.forEach(s=>{
+    const m=membre(s.uid);
+    z.append(el("div",{class:"carte"},
+      el("div",{class:"rangee"}, pastille(s.uid),
+        el("div",{style:"flex:1"},
+          el("h3",{},s.titre||("Séjour de "+m.nom)),
+          el("div",{class:"meta"},`${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`))),
+      s.note?el("p",{class:"txt"},s.note):null));
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   6. RANDOS
+   ═══════════════════════════════════════════════════════════ */
+const NIVEAUX=["Facile","Moyen","Sportif","Alpin"];
+function formRando(r){
+  const c=el("div");
+  c.append(
+    el("label",{},"Nom de la course"),
+    el("input",{id:"r-nom",placeholder:"Lac de l'Eychauda",value:r?.nom||""}),
+    el("label",{},"Départ"),
+    el("input",{id:"r-dep",placeholder:"Parking de Chambran",value:r?.depart||""}),
+    el("div",{class:"duo"},
+      el("div",{},el("label",{},"Dénivelé (m)"),el("input",{id:"r-den",type:"number",inputmode:"numeric",value:r?.denivele||""})),
+      el("div",{},el("label",{},"Durée (h)"),el("input",{id:"r-dur",type:"number",step:"0.5",inputmode:"decimal",value:r?.duree||""}))),
+    el("label",{},"Niveau"),
+    el("select",{id:"r-niv",html:NIVEAUX.map(n=>`<option ${r?.niveau===n?"selected":""}>${n}</option>`).join("")}),
+    el("label",{},"Le mot du guide"),
+    el("textarea",{id:"r-txt",placeholder:"Partir tôt l'été, l'ombre disparaît après 10 h…"},r?.texte||""),
+    el("label",{},"Lien (trace GPX, Visorando…)"),
+    el("input",{id:"r-lien",type:"url",placeholder:"https://",value:r?.lien||""}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:async()=>{
+      const nom=$("#r-nom").value.trim(); if(!nom) return toast("Il manque le nom");
+      const d={nom,depart:$("#r-dep").value.trim(),denivele:$("#r-den").value,
+        duree:$("#r-dur").value,niveau:$("#r-niv").value,texte:$("#r-txt").value.trim(),
+        lien:$("#r-lien").value.trim(),uid:auth.currentUser.uid};
+      if(r) await updateDoc(doc(db,"randos",r.id),d);
+      else   await addDoc(collection(db,"randos"),{...d,faite:[],cree:serverTimestamp()});
+      fermer(); toast(r?"Fiche mise à jour":"Rando ajoutée");
+    }},r?"Enregistrer":"Ajouter la rando")
+  );
+  feuille(r?"Modifier la rando":"Nouvelle rando",c,()=>{ if(r) $("#r-txt").value=r.texte||""; });
+}
+function rendreRandos(){
+  const z=$("#liste-randos"); z.innerHTML="";
+  if(!S.randos.length){ z.append(el("div",{class:"vide"},
+    el("b",{},"Le carnet de courses est vide"),"Ajoute la première : celle que tu referais demain.")); return; }
+  z.append(el("div",{class:"titre-bloc"},`${S.randos.length} course${S.randos.length>1?"s":""} au carnet`));
+  S.randos.forEach(r=>{
+    const faite=(r.faite||[]).includes(auth.currentUser.uid);
+    z.append(el("div",{class:"carte"},
+      el("div",{class:"entre"},
+        el("h3",{},r.nom),
+        el("span",{class:"puce o"},r.niveau||"—")),
+      el("div",{class:"meta",style:"margin-top:2px"},
+        [r.depart, r.denivele?`▲ ${nb(r.denivele)} m`:null, r.duree?`⏱ ${r.duree} h`:null]
+          .filter(Boolean).join("  ·  ")),
+      r.texte?el("p",{class:"txt"},r.texte):null,
+      el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
+        el("button",{class:"mini",onclick:async()=>{
+          const l=new Set(r.faite||[]); faite?l.delete(auth.currentUser.uid):l.add(auth.currentUser.uid);
+          await updateDoc(doc(db,"randos",r.id),{faite:[...l]});
+        }}, faite?"✓ Tu l'as faite":"Marquer comme faite"),
+        (r.faite||[]).length?el("span",{class:"meta"},
+          (r.faite||[]).map(u=>membre(u).nom).join(", ")+" y "+((r.faite||[]).length>1?"sont allés":"est allé")):null,
+        r.lien?el("a",{class:"mini",href:r.lien,target:"_blank",rel:"noopener"},"Trace ↗"):null,
+        r.uid===auth.currentUser.uid?el("button",{class:"mini",onclick:()=>formRando(r)},"Modifier"):null,
+        r.uid===auth.currentUser.uid?el("button",{class:"mini",onclick:async()=>{
+          if(confirm("Supprimer cette rando ?")){await deleteDoc(doc(db,"randos",r.id));toast("Supprimée");}}},"🗑"):null
+      )));
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   7. BONS PLANS
+   ═══════════════════════════════════════════════════════════ */
+const CATS=["Restaurant","Commerce","Activité","Baignade","Pratique"];
+function formPlan(p){
+  const c=el("div");
+  c.append(
+    el("label",{},"Nom"),
+    el("input",{id:"p-nom",placeholder:"La boulangerie des Vigneaux",value:p?.nom||""}),
+    el("label",{},"Catégorie"),
+    el("select",{id:"p-cat",html:CATS.map(x=>`<option ${p?.cat===x?"selected":""}>${x}</option>`).join("")}),
+    el("label",{},"Note"),
+    el("select",{id:"p-note",html:[5,4,3,2,1].map(n=>`<option value="${n}" ${p?.note==n?"selected":""}>${"★".repeat(n)}</option>`).join("")}),
+    el("label",{},"Pourquoi c'est bien"),
+    el("textarea",{id:"p-txt",placeholder:"Le pain au levain du samedi part avant 10 h."},p?.texte||""),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:async()=>{
+      const nom=$("#p-nom").value.trim(); if(!nom) return toast("Il manque le nom");
+      const d={nom,cat:$("#p-cat").value,note:+$("#p-note").value,
+        texte:$("#p-txt").value.trim(),uid:auth.currentUser.uid};
+      if(p) await updateDoc(doc(db,"plans",p.id),d);
+      else   await addDoc(collection(db,"plans"),{...d,cree:serverTimestamp()});
+      fermer(); toast(p?"Bon plan mis à jour":"Bon plan partagé");
+    }},p?"Enregistrer":"Partager le bon plan")
+  );
+  feuille(p?"Modifier le bon plan":"Nouveau bon plan",c,()=>{ if(p) $("#p-txt").value=p.texte||""; });
+}
+function rendrePlans(){
+  const z=$("#liste-plans"); z.innerHTML="";
+  if(!S.plans.length){ z.append(el("div",{class:"vide"},
+    el("b",{},"Aucune adresse partagée"),"La bonne boulangerie, le bon garagiste, la bonne vasque : c'est ici.")); return; }
+  CATS.forEach(cat=>{
+    const l=S.plans.filter(p=>p.cat===cat); if(!l.length) return;
+    z.append(el("div",{class:"titre-bloc"},cat));
+    l.sort((a,b)=>(b.note||0)-(a.note||0)).forEach(p=>{
+      z.append(el("div",{class:"carte"},
+        el("div",{class:"entre"}, el("h3",{},p.nom),
+          el("span",{class:"etoiles"},"★".repeat(p.note||0))),
+        p.texte?el("p",{class:"txt"},p.texte):null,
+        el("div",{class:"rangee",style:"margin-top:10px"},
+          el("span",{class:"meta"},"par "+membre(p.uid).nom),
+          p.uid===auth.currentUser.uid?el("button",{class:"mini",onclick:()=>formPlan(p)},"Modifier"):null,
+          p.uid===auth.currentUser.uid?el("button",{class:"mini",onclick:async()=>{
+            if(confirm("Supprimer ?")){await deleteDoc(doc(db,"plans",p.id));toast("Supprimé");}}},"🗑"):null)));
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   8. PHOTOS  — compressées côté navigateur avant envoi
+   ═══════════════════════════════════════════════════════════ */
+function compresser(file,max=1400,q=.68){
+  return new Promise((res,rej)=>{
+    const img=new Image(), fr=new FileReader();
+    fr.onload=()=>img.src=fr.result; fr.onerror=rej;
+    img.onload=()=>{
+      let {width:w,height:h}=img;
+      const r=Math.min(1,max/Math.max(w,h)); w=Math.round(w*r); h=Math.round(h*r);
+      const cv=Object.assign(document.createElement("canvas"),{width:w,height:h});
+      cv.getContext("2d").drawImage(img,0,0,w,h);
+      res(cv.toDataURL("image/jpeg",q));
+    };
+    img.onerror=rej; fr.readAsDataURL(file);
+  });
+}
+function formPhoto(){
+  const c=el("div");
+  c.append(
+    el("p",{class:"meta"},"Les photos sont réduites automatiquement avant l'envoi. Une à la fois, la meilleure."),
+    el("label",{},"Photo"),
+    el("input",{type:"file",id:"ph-f",accept:"image/*"}),
+    el("label",{},"Légende"),
+    el("input",{id:"ph-l",placeholder:"Lever de soleil sur le Pelvoux"}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",id:"ph-go"},"Envoyer la photo")
+  );
+  feuille("Ajouter une photo",c,()=>{
+    $("#ph-go").onclick=async()=>{
+      const f=$("#ph-f").files[0]; if(!f) return toast("Choisis une photo");
+      const b=$("#ph-go"); b.textContent="Réduction…"; b.disabled=true;
+      try{
+        let data=await compresser(f);
+        if(data.length>900000) data=await compresser(f,1100,.55);
+        if(data.length>950000){ b.textContent="Envoyer la photo"; b.disabled=false;
+          return toast("Photo trop lourde même réduite"); }
+        b.textContent="Envoi…";
+        await addDoc(collection(db,"photos"),{data,legende:$("#ph-l").value.trim(),
+          uid:auth.currentUser.uid,cree:serverTimestamp()});
+        fermer(); toast("Photo ajoutée");
+      }catch(e){ b.textContent="Envoyer la photo"; b.disabled=false; toast("Échec de la lecture du fichier"); }
+    };
+  });
+}
+function rendrePhotos(){
+  const z=$("#liste-photos"); z.innerHTML="";
+  if(!S.photos.length){ z.append(el("div",{class:"vide"},
+    el("b",{},"Mur vide"),"La première photo du mur donne le ton — choisis-la bien.")); return; }
+  z.append(el("div",{class:"titre-bloc"},`${S.photos.length} photo${S.photos.length>1?"s":""}`));
+  const g=el("div",{class:"photos"});
+  S.photos.forEach(p=>{
+    g.append(el("img",{src:p.data,alt:p.legende||"",loading:"lazy",onclick:()=>{
+      $("#lb-img").src=p.data;
+      $("#lb-txt").textContent=(p.legende?p.legende+" — ":"")+membre(p.uid).nom;
+      $("#lb").classList.add("on");
+    }}));
+  });
+  z.append(g);
+}
+$("#lb").onclick=e=>{ if(e.target.id!=="lb-img") $("#lb").classList.remove("on"); };
+$("#lb-img").ondblclick=async()=>{ /* suppression rapide de sa propre photo */
+  const src=$("#lb-img").src, p=S.photos.find(x=>x.data===src);
+  if(p && p.uid===auth.currentUser.uid && confirm("Supprimer cette photo ?")){
+    await deleteDoc(doc(db,"photos",p.id)); $("#lb").classList.remove("on"); toast("Photo supprimée"); }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   9. L'APPART — fiches pratiques éditables par tous
+   ═══════════════════════════════════════════════════════════ */
+function formInfo(i){
+  const c=el("div");
+  c.append(
+    el("label",{},"Titre"),
+    el("input",{id:"i-t",placeholder:"Wifi, chauffage, poubelles, clés…",value:i?.titre||""}),
+    el("label",{},"Contenu"),
+    el("textarea",{id:"i-c",style:"min-height:130px"},i?.texte||""),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:async()=>{
+      const t=$("#i-t").value.trim(); if(!t) return toast("Il manque le titre");
+      const d={titre:t,texte:$("#i-c").value.trim(),uid:auth.currentUser.uid};
+      if(i) await updateDoc(doc(db,"infos",i.id),d);
+      else   await addDoc(collection(db,"infos"),{...d,cree:serverTimestamp()});
+      fermer(); toast("Fiche enregistrée");
+    }},i?"Enregistrer":"Ajouter la fiche")
+  );
+  feuille(i?"Modifier la fiche":"Nouvelle fiche pratique",c,()=>{ if(i) $("#i-c").value=i.texte||""; });
+}
+function rendreInfos(){
+  const z=$("#liste-infos"); z.innerHTML="";
+  z.append(el("div",{class:"titre-bloc"},"Le mode d'emploi de l'appart"));
+  if(!S.infos.length){
+    z.append(el("div",{class:"vide"},el("b",{},"Rien de noté"),
+      "Le code du wifi, la vanne d'eau, le jour des poubelles : tout ce qu'on redemande à chaque fois."));
+  }
+  S.infos.forEach(i=>{
+    z.append(el("div",{class:"carte"},
+      el("div",{class:"entre"}, el("h3",{},i.titre),
+        el("button",{class:"mini",onclick:()=>formInfo(i)},"Modifier")),
+      el("p",{class:"txt"},i.texte)));
+  });
+  z.append(el("button",{class:"btn fant plein",style:"margin-top:6px",onclick:()=>formInfo()},"+ Ajouter une fiche"));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   10. NAVIGATION
+   ═══════════════════════════════════════════════════════════ */
+function aller(v){
+  S.vue=v;
+  $$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.vue===v));
+  $$(".vue").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));
+  const t={sejours:"Séjours",randos:"Randos",plans:"Bons plans",photos:"Photos",appart:"L'appart"};
+  $("#titre").textContent=t[v];
+  $("#alt").textContent=ALTITUDES[v][0];
+  $("#sous").textContent=ALTITUDES[v][1];
+  $("#fab").style.display = v==="appart" ? "none" : "grid";
+  window.scrollTo({top:0});
+}
+$$("nav button").forEach(b=>b.onclick=()=>aller(b.dataset.vue));
+$("#prev").onclick=()=>{S.curseur.setMonth(S.curseur.getMonth()-1);dessinerCal();};
+$("#next").onclick=()=>{S.curseur.setMonth(S.curseur.getMonth()+1);dessinerCal();};
+$("#fab").onclick=()=>({sejours:()=>formSejour(auj()),randos:()=>formRando(),
+  plans:()=>formPlan(),photos:formPhoto}[S.vue]?.());
+$("#changer-nom").onclick=()=>demanderNom(false);
+addEventListener("online",()=>$("#off").classList.remove("on"));
+addEventListener("offline",()=>$("#off").classList.add("on"));
+if(!navigator.onLine) $("#off").classList.add("on");
+
+/* ═══════════════════════════════════════════════════════════
+   11. SYNCHRONISATION TEMPS RÉEL
+   ═══════════════════════════════════════════════════════════ */
+function ecouter(nom, champ, tri, rendu){
+  onSnapshot(query(collection(db,nom),...(tri?[orderBy(...tri)]:[])), snap=>{
+    S[champ]=snap.docs.map(d=>({id:d.id,...d.data()}));
+    rendu();
+  }, err=>{ console.error(nom,err); toast("Lecture impossible : vérifie les règles Firestore"); });
+}
+onAuthStateChanged(auth, async user=>{
+  if(!user){ try{ await signInAnonymously(auth); }catch(e){
+    $("#boot").textContent="Connexion refusée — active la connexion anonyme dans Firebase."; } return; }
+
+  $("#boot")?.remove();
+  aller("sejours");
+
+  onSnapshot(collection(db,"membres"), snap=>{
+    S.membres={}; snap.forEach(d=>S.membres[d.id]=d.data());
+    S.moi=S.membres[user.uid];
+    if(S.moi){ $("#mon-nom").textContent=S.moi.nom;
+      const p=$("#ma-pastille"); p.style.background=S.moi.couleur; p.textContent=S.moi.nom[0].toUpperCase(); }
+    else demanderNom(true);
+    rendreSejours(); rendreRandos(); rendrePlans(); rendrePhotos();
+  });
+
+  ecouter("sejours","sejours",["debut","asc"],rendreSejours);
+  ecouter("randos","randos",["nom","asc"],rendreRandos);
+  ecouter("plans","plans",["nom","asc"],rendrePlans);
+  ecouter("photos","photos",["cree","desc"],rendrePhotos);
+  ecouter("infos","infos",["titre","asc"],rendreInfos);
+});
+
+/* ── Service worker ─────────────────────────────────────────── */
+if("serviceWorker" in navigator)
+  addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js").catch(()=>{}));
+</script>
+</body>
+</html>

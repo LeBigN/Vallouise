@@ -1,1 +1,107 @@
-# Vallouise
+# Vallouise — le carnet de famille
+
+PWA mono-fichier (index.html) + Firebase. Séjours, randos, bons plans, photos, mode d'emploi de l'appart.
+Tout se synchronise en temps réel entre les membres, et reste consultable hors ligne (utile : le réseau est capricieux dans la vallée).
+
+---
+
+## 1. Créer le projet Firebase (10 min, gratuit)
+
+1. **console.firebase.google.com** → *Créer un projet* → nom `vallouise` → Analytics : non.
+2. **Authentication** → *Commencer* → onglet *Sign-in method* → activer **Anonyme**.
+3. **Firestore Database** → *Créer une base* → mode **production** → région `eur3 (europe-west)`.
+4. **Paramètres du projet** (roue crantée) → *Vos applications* → icône `</>` → nom `Vallouise` →
+   copier l'objet `firebaseConfig` affiché.
+5. Coller ces valeurs dans `index.html`, tout en haut du `<script type="module">` (bloc « 1. CONFIGURATION FIREBASE »).
+
+> Les clés Firebase côté web sont publiques par nature : ce ne sont pas des secrets.
+> C'est le rôle des règles ci-dessous de protéger les données.
+
+---
+
+## 2. Règles de sécurité Firestore
+
+Firestore → onglet **Règles** → coller ceci → *Publier* :
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function connecte()  { return request.auth != null; }
+    function proprio()   { return request.auth.uid == resource.data.uid; }
+
+    // Profils : chacun ne modifie que le sien
+    match /membres/{uid} {
+      allow read: if connecte();
+      allow write: if connecte() && request.auth.uid == uid;
+    }
+
+    // Contenus : tout le monde lit, l'auteur seul modifie et supprime
+    match /{col}/{id} {
+      allow read:   if connecte() && col in ['sejours','randos','plans','photos','infos'];
+      allow create: if connecte() && request.resource.data.uid == request.auth.uid;
+      allow update: if connecte() && (proprio()
+                      // les randos "faites" et les fiches pratiques sont collaboratives
+                      || col == 'randos' || col == 'infos');
+      allow delete: if connecte() && proprio();
+    }
+  }
+}
+```
+
+**Attention à un point** : l'authentification anonyme laisse entrer n'importe qui connaissant l'URL.
+Pour une app familiale sur une URL non référencée c'est généralement suffisant. Si tu veux vraiment verrouiller :
+
+- soit passer en **Authentification par e-mail** et n'inviter que les adresses de la famille ;
+- soit ajouter une **liste blanche d'UID** dans les règles (`request.auth.uid in ['abc…','def…']`) une fois que chacun s'est connecté une première fois.
+
+Dis-le-moi et je te fournis la variante.
+
+---
+
+## 3. Déploiement (GitHub Pages, comme tes autres apps)
+
+```bash
+git init && git add . && git commit -m "Vallouise v1"
+git branch -M main
+git remote add origin https://github.com/lebign/vallouise.git
+git push -u origin main
+```
+
+Puis *Settings → Pages → Deploy from a branch → main / (root)*.
+Ajouter le domaine `lebign.github.io` dans Firebase → **Authentication → Settings → Domaines autorisés**, sinon la connexion sera refusée.
+
+À chaque mise à jour : incrémenter `CACHE = "vallouise-v1"` dans `service-worker.js`, sinon les téléphones gardent l'ancienne version en cache.
+
+---
+
+## 4. Photos — comment c'est stocké
+
+Les photos sont **réduites dans le navigateur** (1400 px max, JPEG qualité 0,68) puis stockées en base64 directement dans Firestore, pour rester sur le forfait gratuit sans activer Firebase Storage (qui réclame une carte bancaire).
+
+- Limite technique : 1 Mo par document Firestore. Une photo compressée pèse 200 à 600 Ko.
+- Quota gratuit : 1 Gio de base + 50 000 lectures/jour. Compte environ **1 500 à 3 000 photos** avant de devoir migrer.
+- Au-delà, la bonne évolution est Firebase Storage (plan Blaze, quelques centimes par mois) ou Cloudinary en gratuit.
+
+---
+
+## 5. Contenu des sections
+
+| Section | Ce qu'on y met |
+|---|---|
+| **Séjours** | Calendrier des présences, une couleur par membre. Alerte si les dates se chevauchent, sans bloquer. |
+| **Randos** | Fiches : départ, dénivelé, durée, niveau, conseil, lien GPX. Chacun coche « faite ». |
+| **Bons plans** | Restaurants, commerces, activités, baignades, infos pratiques, notés sur 5. |
+| **Photos** | Mur commun, légende + auteur. Double-tap sur sa propre photo en plein écran pour la supprimer. |
+| **L'appart** | Fiches pratiques éditables par tous : wifi, chauffage, poubelles, vanne d'eau, clés, voisins. |
+
+---
+
+## 6. Idées pour la suite
+
+- Liste de courses partagée qui se vide à chaque séjour
+- Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
+- Export du calendrier en `.ics` pour l'agenda du téléphone
+- Notification quand quelqu'un réserve des dates
+- Carte des randos et des bons plans avec fond IGN
