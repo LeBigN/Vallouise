@@ -98,7 +98,26 @@ Les photos sont **réduites dans le navigateur** (1400 px max, JPEG qualité 0,6
 
 ---
 
-## 6. Idées pour la suite
+## 6. Dépannage
+
+**Un bouton ne fait rien / rien ne s'enregistre.** L'app affiche désormais un bandeau rouge ou un message
+d'erreur explicite dans les trois cas possibles :
+
+| Message | Cause | Correctif |
+|---|---|---|
+| « Configuration Firebase absente » | `firebaseConfig` pas rempli | étape 1 |
+| « Connexion refusée » | connexion anonyme désactivée, ou domaine absent des domaines autorisés | étapes 1.2 et 3 |
+| « Écriture refusée par Firestore » | règles de sécurité non publiées | étape 2 |
+
+Si rien ne s'affiche du tout : ouvrir la console du navigateur (sur Android, Chrome → `chrome://inspect`
+depuis le PC) et me transmettre le message d'erreur.
+
+**Après une mise à jour, le téléphone garde l'ancienne version.** Incrémenter `CACHE` dans
+`service-worker.js`, ou désinstaller/réinstaller la PWA.
+
+---
+
+## 7. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
