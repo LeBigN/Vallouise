@@ -25,11 +25,13 @@
   --cote:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
   --r:14px;
   --ombre:0 1px 2px rgba(18,33,31,.06),0 8px 24px rgba(18,33,31,.07);
-  --nav-h:calc(62px + env(safe-area-inset-bottom));
+  --marge-bas:min(env(safe-area-inset-bottom), 16px);
+  --nav-h:calc(62px + var(--marge-bas));
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--neve)}
 html,body{margin:0;padding:0}
-body{background:var(--neve);color:var(--nuit);font-family:var(--corps);
+body{background:var(--neve);min-height:100dvh;color:var(--nuit);font-family:var(--corps);
   font-size:15px;line-height:1.45;padding-bottom:var(--nav-h);overscroll-behavior-y:none}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -128,7 +130,7 @@ textarea{min-height:78px;resize:vertical}
   display:none;align-items:flex-end;backdrop-filter:blur(2px)}
 .voile.on{display:flex}
 .feuille{background:var(--neve);width:100%;max-height:92vh;overflow-y:auto;
-  border-radius:20px 20px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom));
+  border-radius:20px 20px 0 0;padding:8px 16px calc(20px + var(--marge-bas));
   animation:monte-f .26s cubic-bezier(.2,.8,.3,1) both}
 @keyframes monte-f{from{transform:translateY(100%)}to{transform:none}}
 .poignee{width:38px;height:4px;border-radius:2px;background:var(--brume);margin:6px auto 12px}
@@ -144,7 +146,7 @@ textarea{min-height:78px;resize:vertical}
 /* ── Navigation ─────────────────────────────────────────────── */
 nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.94);
   backdrop-filter:blur(12px);border-top:1px solid var(--brume);
-  display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
+  display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:var(--marge-bas);background:var(--blanc)}
 nav button{padding:9px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
 nav button svg.i{width:22px;height:22px}
 nav button span.l{font-family:var(--cote);font-size:9px;letter-spacing:.04em}
@@ -165,6 +167,11 @@ nav button.on span.l{color:var(--meleze)}
 .entre{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .photos{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block;background:var(--brume)}
+.vignette{position:relative}
+.vignette .sup{position:absolute;top:5px;right:5px;width:26px;height:26px;border-radius:50%;
+  background:rgba(18,33,31,.62);color:#fff;font-size:15px;line-height:1;display:grid;place-items:center;
+  backdrop-filter:blur(3px)}
+.vignette .sup:active{background:var(--alerte)}
 .lb{position:fixed;inset:0;background:rgba(18,33,31,.96);z-index:70;display:none;
   flex-direction:column;align-items:center;justify-content:center;padding:20px}
 .lb.on{display:flex}
@@ -761,8 +768,16 @@ function rendrePhotos(){
     el("b",{},"Mur vide"),"La première photo donne le ton — ajoute-la avec le bouton +."));return;}
   z.append(el("div",{class:"titre-bloc"},`${S.photos.length} photo${S.photos.length>1?"s":""}`));
   const g=el("div",{class:"photos"});
-  S.photos.forEach(p=>g.append(el("img",{src:p.data,alt:p.legende||"",loading:"lazy",
-    onclick:()=>ouvrirPhoto(p)})));
+  S.photos.forEach(p=>{
+    const v=el("div",{class:"vignette"},
+      el("img",{src:p.data,alt:p.legende||"",loading:"lazy",onclick:()=>ouvrirPhoto(p)}));
+    if(p.uid===auth.currentUser.uid)
+      v.append(el("button",{class:"sup","aria-label":"Supprimer cette photo",onclick:e=>{
+        e.stopPropagation();
+        if(confirm("Supprimer cette photo ?")) ecrire(deleteDoc(doc(db,"photos",p.id)),"Photo supprimée");
+      }},"✕"));
+    g.append(v);
+  });
   z.append(g);
 }
 function ouvrirPhoto(p){
@@ -770,7 +785,7 @@ function ouvrirPhoto(p){
   const t=$("#lb-txt");t.innerHTML="";
   t.append((p.legende?p.legende+" — ":"")+membre(p.uid).nom);
   if(p.uid===auth.currentUser.uid)
-    t.append(el("div",{},el("button",{class:"btn danger",style:"color:#E07A1F",onclick:()=>{
+    t.append(el("div",{style:"margin-top:14px"},el("button",{class:"btn fant",onclick:()=>{
       if(confirm("Supprimer cette photo ?")){lb.classList.remove("on");
         ecrire(deleteDoc(doc(db,"photos",p.id)),"Photo supprimée");}
     }},"Supprimer cette photo")));
