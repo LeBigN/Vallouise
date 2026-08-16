@@ -253,12 +253,51 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
   scroll-snap-type:x mandatory}
 .sugg{flex:none;width:238px;scroll-snap-align:start;background:var(--blanc);border-radius:var(--r);
   border:1px solid var(--bord);box-shadow:var(--ombre);overflow:hidden}
-.sugg .vis{height:100px;display:grid;place-items:end start;padding:10px;position:relative;overflow:hidden}
-.sugg .vis svg{position:absolute;inset:0;width:100%;height:100%}
-.sugg .vis span{position:relative;font-family:var(--cote);font-size:9.5px;letter-spacing:.12em;
-  color:#fff;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,.45)}
-.sugg .cnt{padding:11px 12px 13px}
-.sugg h4{font-family:var(--display);font-size:15.5px;margin:0 0 4px;font-weight:700;line-height:1.2}
+/* carte rando : photo pleine hauteur, texte en surimpression */
+.sugg{position:relative;height:250px;border:0}
+.sugg .vis{position:absolute;inset:0}
+.sugg .vis svg,.sugg .vis img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sugg .voile-p{position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(10,20,18,.90) 0%,rgba(10,20,18,.55) 38%,rgba(10,20,18,.06) 72%)}
+.sugg .badge{position:absolute;top:11px;left:11px;font-family:var(--cote);font-size:9.5px;
+  letter-spacing:.11em;text-transform:uppercase;color:#12211F;background:rgba(255,255,255,.93);
+  padding:5px 10px;border-radius:20px;font-weight:700}
+.sugg .cam{position:absolute;top:9px;right:9px;width:31px;height:31px;border-radius:50%;
+  background:rgba(18,33,31,.55);color:#fff;display:grid;place-items:center;font-size:14px;
+  backdrop-filter:blur(3px)}
+.sugg .cnt{position:absolute;left:0;right:0;bottom:0;padding:13px 14px 14px;color:#fff}
+.sugg h4{font-family:var(--display);font-size:17.5px;margin:0 0 5px;font-weight:700;
+  line-height:1.15;letter-spacing:-.02em;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.sugg .chiffres{display:flex;gap:11px;font-family:var(--cote);font-size:10.5px;
+  color:rgba(255,255,255,.92);margin-bottom:9px;flex-wrap:wrap}
+.sugg .cnt .mini{background:rgba(255,255,255,.18);color:#fff;backdrop-filter:blur(3px)}
+.sugg .cnt .mini:active{background:rgba(255,255,255,.3)}
+
+/* webcam */
+.cam-bloc{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);
+  overflow:hidden;box-shadow:var(--ombre)}
+.cam-onglets{display:flex;gap:4px;padding:10px 10px 0;overflow-x:auto}
+.cam-onglets button{flex:none;font-family:var(--cote);font-size:10.5px;letter-spacing:.05em;
+  padding:7px 11px;border-radius:9px;background:#EDF1EF;color:var(--ardoise);white-space:nowrap}
+.cam-onglets button.on{background:var(--nuit);color:var(--neve)}
+.cam-cadre{position:relative;margin:10px;border-radius:12px;overflow:hidden;background:var(--nuit);
+  aspect-ratio:16/10}
+.cam-cadre iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cam-secours{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  padding:18px;color:rgba(244,246,244,.75);font-size:13px;pointer-events:none}
+.cam-pied{padding:0 14px 14px}
+
+/* actualités */
+.actu{flex:none;width:252px;scroll-snap-align:start;background:var(--blanc);border-radius:var(--r);
+  border:1px solid var(--bord);box-shadow:var(--ombre);overflow:hidden;display:flex;flex-direction:column}
+.actu .img{height:118px;position:relative;background:var(--brume)}
+.actu .img img,.actu .img svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.actu .cnt{padding:12px 13px 14px;display:flex;flex-direction:column;gap:5px;flex:1}
+.actu h4{font-family:var(--display);font-size:15px;margin:0;font-weight:700;line-height:1.22;
+  letter-spacing:-.015em}
+.actu .res{font-size:13px;line-height:1.4;color:#3A4A47;display:-webkit-box;-webkit-line-clamp:3;
+  -webkit-box-orient:vertical;overflow:hidden}
+.actu .bas{margin-top:auto;padding-top:8px}
 .carte-embed{width:100%;height:210px;border:0;border-radius:10px;display:block;margin-top:10px;background:var(--brume)}
 .sos-gps{font-family:var(--cote);font-size:27px;font-weight:700;line-height:1.45;word-break:break-all}
 .sos-ligne{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
@@ -1412,11 +1451,22 @@ function rendreInfos(){
    14. ACCUEIL — météo, soleil, alertes, suggestions, village
    ═══════════════════════════════════════════════════════════ */
 const LIENS_VILLAGE=[
-  {t:"Office de tourisme",u:"https://www.paysdesecrins.com/"},
-  {t:"Webcams du domaine",u:"https://www.paysdesecrins.com/webcams-vallouise-pelvoux/"},
-  {t:"Station Pelvoux-Vallouise",u:"https://www.ski-pelvoux.com/"},
-  {t:"Parc national des Écrins",u:"https://www.ecrins-parcnational.fr/"},
-  {t:"Vigilance Météo-France",u:"https://vigilance.meteofrance.fr/fr"}
+  {t:"Office de tourisme",u:"https://www.paysdesecrins.com/",
+   r:"Animations, événements et bons plans du Pays des Écrins, mis à jour toute l'année."},
+  {t:"Station Pelvoux-Vallouise",u:"https://www.ski-pelvoux.com/",
+   r:"Ouverture des pistes et des remontées, tarifs et enneigement du domaine."},
+  {t:"Parc national des Écrins",u:"https://www.ecrins-parcnational.fr/",
+   r:"Réglementation, sentiers, faune et conditions d'accès au cœur du parc."},
+  {t:"Vigilance Météo-France",u:"https://vigilance.meteofrance.fr/fr",
+   r:"La vigilance officielle des Hautes-Alpes : orages, crues, avalanches."}
+];
+/* Lecteurs webcam publiés par l'office de tourisme du Pays des Écrins.
+   Ce sont des pages « player » prévues pour l'intégration. */
+const WEBCAMS=[
+  {n:"Front de neige", u:"https://vision-environnement.com/live/player/webcams-paris/pelvoux-base0.php"},
+  {n:"Secteur 1800 m", u:"https://www.vision-environnement.com/live/player/V3/pelvoux2/pelvoux20.php"},
+  {n:"Crête 2300 m",   u:"https://vision-environnement.com/live/player/webcams-paris/pelvoux30.php"},
+  {n:"Nordique",       u:"https://vision-environnement.com/live/player/pelvouxnordic0.php"}
 ];
 const SUGGESTIONS=[
   {n:"Refuge du Glacier Blanc",d:"Pré de Mme Carle",dp:600,h:3.5,km:6,niv:"Facile",t:["#3E7C9B","#8FB8CC"]},
@@ -1513,6 +1563,50 @@ async function chargerMeteo(){
     z.append(el("div",{class:"meta"},"Météo indisponible (pas de réseau ?). Elle s'affichera au retour de la connexion."));
   }
 }
+/* La photo de couverture vient du carnet de la famille :
+   soit choisie exprès (champ sugg), soit reprise d'une rando du même nom. */
+function couvertureDe(nom){
+  const v=photosVisibles();
+  const choisie=v.find(p=>p.sugg===nom);
+  if(choisie) return choisie;
+  const r=S.randos.find(x=>x.nom===nom);
+  if(r){ const p=v.find(x=>x.rando===r.id); if(p) return p; }
+  return null;
+}
+function choisirCouverture(nom){
+  const c=el("div");
+  const dispo=photosVisibles();
+  c.append(el("p",{class:"meta"},
+    `La photo de couverture de « ${nom} » vient de vos propres photos — rien n'est emprunté ailleurs.`));
+  if(dispo.length){
+    c.append(el("div",{class:"titre-bloc"},"Depuis le mur"));
+    const g=el("div",{class:"photos"});
+    dispo.forEach(p=>g.append(el("img",{src:p.data,alt:"",loading:"lazy",onclick:()=>{
+      ecrire(updateDoc(doc(db,"photos",p.id),{sugg:nom}),"Couverture mise à jour",fermer);}})));
+    c.append(g);
+  }
+  c.append(el("div",{class:"titre-bloc"},"Ou depuis le téléphone"),
+    el("input",{type:"file",id:"cv-f",accept:"image/*"}),
+    el("p",{class:"meta",style:"margin-top:8px"},"La photo rejoindra aussi le mur Photos."));
+  const actuelle=couvertureDe(nom);
+  if(actuelle&&actuelle.sugg===nom)
+    c.append(el("button",{class:"btn danger plein",style:"margin-top:14px",onclick:()=>{
+      ecrire(updateDoc(doc(db,"photos",actuelle.id),{sugg:null}),"Couverture retirée",fermer);
+    }},"Retirer la couverture actuelle"));
+  feuille("Photo de couverture",c,()=>{
+    $("#cv-f").onchange=async e=>{
+      const f=e.target.files[0]; if(!f) return;
+      toast("Préparation…");
+      try{
+        const data=await preparerPhoto(f);
+        if(!data) return toast("Photo trop lourde",true);
+        ecrire(addDoc(collection(db,"photos"),{data,legende:nom,date:auj(),
+          rando:null,prise:null,sugg:nom,uid:auth.currentUser.uid,cree:serverTimestamp()}),
+          "Couverture enregistrée",fermer);
+      }catch(err){toast("Photo illisible",true);}
+    };
+  });
+}
 function visuelSugg(s){
   const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
   svg.setAttribute("viewBox","0 0 240 100");svg.setAttribute("preserveAspectRatio","none");
@@ -1526,23 +1620,62 @@ function visuelSugg(s){
   return svg;
 }
 function formLien(l){
+  let image=l?.image||null;
+  const zi=el("div",{class:"bande-photos",style:"margin-top:8px"});
+  const majI=()=>{zi.innerHTML="";
+    if(image){const v=el("div",{class:"vignette"},el("img",{src:image,alt:""}));
+      v.append(el("button",{class:"sup",onclick:()=>{image=null;majI();}},"✕"));zi.append(v);}
+    zi.style.display=image?"flex":"none";};
+  majI();
   const c=el("div");
   c.append(
-    el("label",{},"Intitulé"),
-    el("input",{id:"l-t",placeholder:"Le Dauphiné — Vallouise",value:val(l?.titre)}),
-    el("label",{},"Adresse"),
+    el("label",{},"Titre"),
+    el("input",{id:"l-t",placeholder:"Fête du village le 15 août",value:val(l?.titre)}),
+    el("label",{},"Résumé"),
+    el("textarea",{id:"l-r",style:"min-height:64px",placeholder:"Bal, buvette et feu d'artifice sur la place."}),
+    el("label",{},"Date"),
+    el("input",{type:"date",id:"l-d",value:val(l?.date)||auj()}),
+    el("label",{},"Lien"),
     el("input",{id:"l-u",type:"url",placeholder:"https://",value:val(l?.url)}),
+    el("label",{},"Illustration"),
+    el("input",{type:"file",id:"l-i",accept:"image/*"}),
+    zi,
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
-      const t=$("#l-t").value.trim(),u=$("#l-u").value.trim();
-      if(!t||!u)return toast("Intitulé et adresse obligatoires");
-      const d={titre:t,url:u,uid:auth.currentUser.uid};
+      const t=$("#l-t").value.trim();
+      if(!t)return toast("Il manque le titre");
+      const d={titre:t,resume:$("#l-r").value.trim(),date:$("#l-d").value,
+        url:$("#l-u").value.trim(),image,uid:auth.currentUser.uid};
       ecrire(l?updateDoc(doc(db,"liens",l.id),d):addDoc(collection(db,"liens"),{...d,cree:serverTimestamp()}),
-        "Lien enregistré",fermer);
-    }},l?"Enregistrer":"Ajouter le lien"),
+        "Actualité enregistrée",fermer);
+    }},l?"Enregistrer":"Publier l'actualité"),
     l?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
-      if(confirm("Supprimer ce lien ?"))ecrire(deleteDoc(doc(db,"liens",l.id)),"Lien supprimé",fermer);
+      if(confirm("Supprimer cette actualité ?"))ecrire(deleteDoc(doc(db,"liens",l.id)),"Supprimée",fermer);
     }},"Supprimer"):null);
-  feuille(l?"Modifier le lien":"Nouveau lien",c);
+  feuille(l?"Modifier l'actualité":"Nouvelle actualité",c,()=>{
+    $("#l-r").value=val(l?.resume);
+    $("#l-i").onchange=async e=>{
+      const f=e.target.files[0];if(!f)return;
+      toast("Préparation…");
+      try{const d=await preparerPhoto(f);
+        if(!d)return toast("Image trop lourde",true);
+        image=d;majI();}catch(err){toast("Image illisible",true);}
+    };
+  });
+}
+/* Vignette générée quand l'actualité n'a pas d'illustration */
+function visuelActu(titre,teinte){
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 252 118");svg.setAttribute("preserveAspectRatio","none");
+  const id="a"+Math.random().toString(36).slice(2,7);
+  svg.innerHTML=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${teinte[0]}"/><stop offset="1" stop-color="${teinte[1]}"/></linearGradient></defs>
+    <rect width="252" height="118" fill="url(#${id})"/>
+    <g fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.4">
+      <path d="M-10 92 C 40 84, 70 62, 120 58 S 200 74, 262 46"/>
+      <path d="M-10 76 C 40 68, 72 48, 122 44 S 200 60, 262 32"/>
+      <path d="M-10 108 C 40 100, 68 80, 118 76 S 200 92, 262 62"/></g>
+    <path d="M-5 118 L70 56 L104 88 L138 50 L200 118 Z" fill="rgba(255,255,255,.20)"/>`;
+  return svg;
 }
 function rendreAccueil(){
   const z=$("#accueil");if(!z)return;
@@ -1560,46 +1693,101 @@ function rendreAccueil(){
 
   z.append(el("div",{class:"titre-bloc"},"Randonnée suggérée"));
   const car=el("div",{class:"carrousel"});
-  SUGGESTIONS.forEach(s=>car.append(el("div",{class:"sugg"},
-    el("div",{class:"vis"},visuelSugg(s),el("span",{},s.niv)),
-    el("div",{class:"cnt"},
-      el("h4",{},s.n),
-      el("div",{class:"meta"},`${s.d} · ↔ ${s.km} km · ▲ ${nb(s.dp)} m · ⏱ ${s.h} h`),
-      el("div",{class:"rangee",style:"margin-top:9px;flex-wrap:wrap"},
-        el("a",{class:"mini",target:"_blank",rel:"noopener",
-          href:"https://www.google.com/search?q="+encodeURIComponent(s.n+" randonnée Vallouise visorando")},"Itinéraire ↗"),
-        el("button",{class:"mini",onclick:()=>{
-          ecrire(addDoc(collection(db,"randos"),{nom:s.n,depart:s.d,denivele:String(s.dp),
-            duree:String(s.h),niveau:s.niv,texte:"",liens:[],trace:null,gps:null,faite:[],
-            uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
-        }},"+ Mon carnet"))))));
+  SUGGESTIONS.forEach(sg=>{
+    const cv=couvertureDe(sg.n);
+    const vis=el("div",{class:"vis"});
+    vis.append(cv?el("img",{src:cv.data,alt:sg.n,loading:"lazy"}):visuelSugg(sg));
+    vis.append(el("div",{class:"voile-p"}));
+    car.append(el("div",{class:"sugg"},
+      vis,
+      el("span",{class:"badge"},sg.niv),
+      el("button",{class:"cam",title:"Photo de couverture",
+        onclick:()=>choisirCouverture(sg.n)},cv?"⟳":"📷"),
+      el("div",{class:"cnt"},
+        el("h4",{},sg.n),
+        el("div",{class:"chiffres"},
+          el("span",{},"↔ "+sg.km+" km"),
+          el("span",{},"▲ "+nb(sg.dp)+" m"),
+          el("span",{},"⏱ "+sg.h+" h")),
+        el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px"},
+          el("a",{class:"mini",target:"_blank",rel:"noopener",
+            href:"https://www.google.com/search?q="+encodeURIComponent(sg.n+" randonnée Vallouise visorando")},"Itinéraire ↗"),
+          el("button",{class:"mini",onclick:()=>{
+            ecrire(addDoc(collection(db,"randos"),{nom:sg.n,depart:sg.d,denivele:String(sg.dp),
+              duree:String(sg.h),niveau:sg.niv,texte:"",liens:[],trace:null,gps:null,faite:[],
+              uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
+          }},"+ Mon carnet")))));
+  });
   z.append(car);
   z.append(el("p",{class:"meta",style:"margin:6px 2px"},
-    "Repères indicatifs — vérifie l'itinéraire et les conditions avant de partir."));
+    "Repères indicatifs — touche l'appareil photo pour mettre une de vos photos en couverture."));
 
+  /* ── Webcam en direct ─────────────────────────────────────── */
   z.append(el("div",{class:"titre-bloc"},"La vallée en direct"));
-  z.append(el("div",{class:"carte"},
-    el("p",{class:"txt",style:"margin:0 0 10px"},
-      "Webcams du domaine : enneigement, fréquentation et ciel en temps réel."),
-    el("a",{class:"btn accent plein",target:"_blank",rel:"noopener",
-      href:"https://www.paysdesecrins.com/webcams-vallouise-pelvoux/"},"Ouvrir les webcams ↗")));
+  const bloc=el("div",{class:"cam-bloc"});
+  const ongl=el("div",{class:"cam-onglets"});
+  const cadre=el("div",{class:"cam-cadre"});
+  const pied=el("div",{class:"cam-pied"});
+  let camI=+(localStorage.getItem("vl-cam")||0);
+  const majCam=()=>{
+    if(camI<0||camI>=WEBCAMS.length) camI=0;
+    localStorage.setItem("vl-cam",camI);
+    [...ongl.children].forEach((b,i)=>b.classList.toggle("on",i===camI));
+    cadre.innerHTML="";
+    cadre.append(
+      el("div",{class:"cam-secours"},"Si l'image ne s'affiche pas, ouvre le flux complet juste en dessous."),
+      el("iframe",{src:WEBCAMS[camI].u,loading:"lazy",allow:"fullscreen",
+        referrerpolicy:"no-referrer-when-downgrade",title:"Webcam "+WEBCAMS[camI].n}));
+    pied.innerHTML="";
+    pied.append(el("a",{class:"btn accent plein",target:"_blank",rel:"noopener",
+      href:WEBCAMS[camI].u},"Ouvrir le flux webcam complet ↗"),
+      el("p",{class:"meta",style:"margin:9px 2px 0"},
+        "Webcams de l'office de tourisme du Pays des Écrins · "+WEBCAMS[camI].n));
+  };
+  WEBCAMS.forEach((w,i)=>ongl.append(el("button",{onclick:()=>{camI=i;majCam();}},w.n)));
+  bloc.append(ongl,cadre,pied);
+  z.append(bloc);
+  majCam();
 
-  z.append(el("div",{class:"titre-bloc"},"Actualités & village"));
-  const rang=el("div",{class:"rangee",style:"flex-wrap:wrap;gap:7px"});
-  LIENS_VILLAGE.forEach(l=>rang.append(el("a",{class:"mini",href:l.u,target:"_blank",rel:"noopener"},l.t+" ↗")));
-  S.liens.forEach(l=>{
-    const a=el("a",{class:"mini",href:l.url,target:"_blank",rel:"noopener"},l.titre+" ↗");
-    if(l.uid===auth.currentUser.uid)a.addEventListener("contextmenu",e=>{e.preventDefault();formLien(l);});
-    rang.append(a);});
-  z.append(el("div",{class:"carte"},rang,
-    el("button",{class:"btn fant plein",style:"margin-top:12px",onclick:()=>formLien()},"+ Ajouter un lien"),
-    S.liens.length?el("p",{class:"meta",style:"margin:8px 0 0"},"Appui long sur un lien que tu as ajouté pour le modifier."):null));
-
+  /* ── Actualités ───────────────────────────────────────────── */
+  z.append(el("div",{class:"titre-bloc"},"Actualités"));
+  const ca=el("div",{class:"carrousel"});
+  const TEINTES=[["#3E7C9B","#8FB8CC"],["#3F7D5A","#8FC0A4"],["#B65D0F","#E0A26A"],
+                 ["#2C4A47","#7F9E99"],["#8E5AA8","#BFA0D0"]];
+  const actus=[...S.liens].sort((a,b)=>(val(b.date))<(val(a.date))?-1:1);
+  actus.forEach((a,i)=>{
+    const img=el("div",{class:"img"});
+    img.append(a.image?el("img",{src:a.image,alt:"",loading:"lazy"})
+                      :visuelActu(a.titre,TEINTES[i%TEINTES.length]));
+    const carte=el("div",{class:"actu"},img,
+      el("div",{class:"cnt"},
+        el("div",{class:"meta"},a.date?jolie(a.date):"—"),
+        el("h4",{},a.titre),
+        a.resume?el("div",{class:"res"},val(a.resume)):null,
+        el("div",{class:"bas"},
+          el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px"},
+            a.url?el("a",{class:"mini",href:a.url,target:"_blank",rel:"noopener"},"Lire ↗"):null,
+            a.uid===auth.currentUser.uid?el("button",{class:"mini",
+              onclick:()=>formLien(a)},"Modifier"):null))));
+    ca.append(carte);
+  });
+  /* sources permanentes, présentées comme des bulles */
+  LIENS_VILLAGE.forEach((l,i)=>{
+    const img=el("div",{class:"img"});
+    img.append(visuelActu(l.t,TEINTES[(i+2)%TEINTES.length]));
+    ca.append(el("div",{class:"actu"},img,
+      el("div",{class:"cnt"},
+        el("div",{class:"meta"},"source permanente"),
+        el("h4",{},l.t),
+        el("div",{class:"res"},l.r),
+        el("div",{class:"bas"},
+          el("a",{class:"mini",href:l.u,target:"_blank",rel:"noopener"},"Ouvrir ↗")))));
+  });
+  z.append(ca);
+  z.append(el("button",{class:"btn fant plein",style:"margin-top:10px",
+    onclick:()=>formLien()},"+ Publier une actualité"));
 }
 
-/* ═══════════════════════════════════════════════════════════
-   15. NAVIGATION
-   ═══════════════════════════════════════════════════════════ */
 function aller(v){
   S.vue=v;
   $$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.vue===v));

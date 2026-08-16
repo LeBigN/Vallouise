@@ -99,6 +99,7 @@ Les photos sont **réduites dans le navigateur** (1400 px max, JPEG qualité 0,6
 | **Séjours** | Calendrier des présences, une couleur par membre. Alerte si les dates se chevauchent, sans bloquer. |
 | **Randos** | Fiches : départ, dénivelé, durée, niveau, conseil. **Import de trace GPX** (distance + D+ calculés, tracé dessiné), **plusieurs liens** par rando, **photos rattachées** (dès la création). Chacun coche « faite ». |
 | **Bons plans** | Restaurants, commerces, activités, baignades, infos pratiques, notés sur 5. |
+| **Accueil** | Météo + soleil, alertes illustrées, cartes de randos avec photo de couverture prise dans vos propres photos, webcams intégrées (lecteurs de l'office de tourisme), actualités en cartes horizontales publiables par la famille. |
 | **Photos** | Mur commun, légende + auteur. Croix de suppression sur ses propres vignettes. |
 | **L'appart** | Fiches pratiques éditables par tous : wifi, chauffage, poubelles, vanne d'eau, clés, voisins. |
 
@@ -123,7 +124,25 @@ depuis le PC) et me transmettre le message d'erreur.
 
 ---
 
-## 7. Traces GPX et app Exercice d'Apple
+## 7. Photos de couverture, webcams, actualités
+
+**Couvertures de randos** : aucune image n'est empruntée à un site tiers — chaque carte de
+suggestion prend une photo de votre propre mur (icône appareil photo sur la carte). Techniquement
+la photo reçoit un champ `sugg` : aucune règle Firestore supplémentaire n'est nécessaire.
+
+**Webcams** : l'app intègre les lecteurs publiés par l'office de tourisme du Pays des Écrins
+(`vision-environnement.com/live/player/...`), sélectionnables entre Front de neige, Secteur 1800 m,
+Crête 2300 m et Nordique. Si un lecteur refuse l'intégration, le bouton « Ouvrir le flux webcam
+complet » prend le relais.
+
+**Actualités** : il n'existe pas de flux RSS local exploitable depuis un navigateur (les serveurs
+de presse bloquent les requêtes croisées). Les actualités sont donc publiées par la famille —
+titre, résumé, date, lien, illustration — et présentées en cartes horizontales, suivies des
+sources permanentes (office de tourisme, station, parc national, vigilance).
+
+---
+
+## 8. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -142,7 +161,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 8. Idées pour la suite
+## 9. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API

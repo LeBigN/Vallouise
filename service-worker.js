@@ -1,6 +1,6 @@
 /* Vallouise — service worker
    Bump CACHE à chaque déploiement pour forcer la mise à jour des PWA installées. */
-const CACHE = "vallouise-v10";
+const CACHE = "vallouise-v11";
 const COQUILLE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
