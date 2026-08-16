@@ -23,8 +23,13 @@
   --display:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
   --corps:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --cote:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
-  --r:14px;
-  --ombre:0 1px 2px rgba(18,33,31,.06),0 8px 24px rgba(18,33,31,.07);
+  --bord:#E8ECEA;
+  --r:16px; --r-s:11px; --r-xs:9px;
+  --ombre:0 1px 1px rgba(18,33,31,.03),0 4px 14px rgba(18,33,31,.05);
+  --ombre-h:0 2px 4px rgba(18,33,31,.05),0 10px 28px rgba(18,33,31,.08);
+  /* échelle typographique */
+  --t-h1:26px; --t-h2:20px; --t-h3:17px; --t-corps:15.5px; --t-p:14.5px;
+  --t-meta:11.5px; --t-micro:10px;
   --marge-bas:min(env(safe-area-inset-bottom), 16px);
   --nav-h:calc(62px + var(--marge-bas));
 }
@@ -44,7 +49,8 @@ button{cursor:pointer;border:none;background:none}
 .borne svg.fond{position:absolute;inset:0;width:100%;height:100%;opacity:.28}
 .borne-in{position:relative;display:flex;align-items:flex-end;justify-content:space-between;
   gap:12px;padding-right:58px}
-.borne h1{font-family:var(--display);font-weight:800;font-size:26px;line-height:1;margin:0;letter-spacing:-.02em}
+.borne h1{font-family:var(--display);font-weight:800;font-size:var(--t-h1);line-height:1.02;
+  margin:0;letter-spacing:-.03em}
 .borne .lieu{font-family:var(--cote);font-size:10px;letter-spacing:.13em;white-space:nowrap;
   text-transform:uppercase;color:var(--meleze);margin-bottom:6px;display:block}
 .alt{font-family:var(--cote);font-size:11px;text-align:right;color:rgba(244,246,244,.55);white-space:nowrap;line-height:1.5}
@@ -55,26 +61,31 @@ main{padding:16px 14px 26px;max-width:760px;margin:0 auto}
 .vue.on{display:block}
 @keyframes monte{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-.titre-bloc{font-family:var(--cote);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--granit);margin:22px 0 9px;display:flex;align-items:center;gap:9px}
-.titre-bloc::after{content:"";flex:1;height:1px;background:var(--brume)}
+.titre-bloc{font-family:var(--cote);font-size:var(--t-micro);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--granit);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+.titre-bloc::after{content:"";flex:1;height:1px;background:var(--bord)}
 .titre-bloc:first-child{margin-top:2px}
 
-.carte{background:var(--blanc);border-radius:var(--r);padding:14px;box-shadow:var(--ombre);margin-bottom:10px}
-.carte h3{font-family:var(--display);font-size:17px;margin:0 0 3px;font-weight:700;letter-spacing:-.01em}
-.meta{font-family:var(--cote);font-size:11px;color:var(--granit)}
-.txt{margin:8px 0 0;white-space:pre-wrap;font-size:14.5px}
+.carte{background:var(--blanc);border-radius:var(--r);padding:15px 16px;border:1px solid var(--bord);
+  box-shadow:var(--ombre);margin-bottom:10px}
+.carte h3{font-family:var(--display);font-size:var(--t-h3);margin:0 0 2px;font-weight:700;
+  letter-spacing:-.015em;line-height:1.25}
+.meta{font-family:var(--cote);font-size:var(--t-meta);color:var(--granit);line-height:1.5;letter-spacing:0}
+.txt{margin:9px 0 0;white-space:pre-wrap;font-size:var(--t-p);line-height:1.55;color:#243B38}
 
 .vide{text-align:center;padding:34px 20px;color:var(--granit);
   border:1.5px dashed var(--brume);border-radius:var(--r);background:var(--blanc)}
-.vide b{display:block;font-family:var(--display);font-size:16px;color:var(--ardoise);margin-bottom:4px}
+.vide b{display:block;font-family:var(--display);font-size:16.5px;color:var(--ardoise);
+  margin-bottom:5px;letter-spacing:-.015em}
 
 /* ── Boutons ────────────────────────────────────────────────── */
 .btn{background:var(--nuit);color:var(--neve);border-radius:11px;padding:11px 16px;
   font-weight:600;font-size:14.5px;display:inline-flex;align-items:center;gap:7px;
   transition:transform .12s,filter .12s}
-.btn:active{transform:scale(.97)}
+.btn:active{transform:scale(.975);filter:brightness(.94)}
 .btn.accent{background:var(--meleze)}
+.btn.rouge{background:var(--alerte)}
+a.btn,a.mini{text-decoration:none}
 .btn.plein{width:100%;justify-content:center}
 .btn.fant{background:var(--brume);color:var(--ardoise)}
 .btn.danger{background:transparent;color:var(--alerte);padding:6px 0;font-size:13px;font-weight:600}
@@ -83,10 +94,13 @@ main{padding:16px 14px 26px;max-width:760px;margin:0 auto}
 
 /* ── Calendrier ─────────────────────────────────────────────── */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
-.cal-nav .mois{font-family:var(--display);font-size:19px;font-weight:700;text-transform:capitalize}
-.fleche{width:38px;height:38px;border-radius:11px;background:var(--blanc);box-shadow:var(--ombre);
+.cal-nav .mois{font-family:var(--display);font-size:19px;font-weight:700;text-transform:capitalize;
+  letter-spacing:-.02em}
+.fleche{width:40px;height:40px;border-radius:var(--r-s);background:var(--blanc);
+  border:1px solid var(--bord);box-shadow:var(--ombre);
   display:grid;place-items:center;font-size:17px;color:var(--ardoise);flex:none}
-.bloc-cal{background:var(--blanc);border-radius:var(--r);box-shadow:var(--ombre);overflow:hidden}
+.bloc-cal{background:var(--blanc);border-radius:var(--r);border:1px solid var(--bord);
+  box-shadow:var(--ombre);overflow:hidden}
 .consigne{display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:11px 13px;background:var(--brume);font-size:13.5px;color:var(--ardoise)}
 .consigne.actif{background:var(--nuit);color:var(--neve)}
@@ -117,15 +131,16 @@ main{padding:16px 14px 26px;max-width:760px;margin:0 auto}
 .legende i{width:9px;height:9px;border-radius:3px;display:block;flex:none}
 
 /* ── Formulaires ────────────────────────────────────────────── */
-label{display:block;font-family:var(--cote);font-size:10.5px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--granit);margin:12px 0 5px}
-input,select,textarea{width:100%;background:var(--neve);border:1.5px solid var(--brume);
-  border-radius:10px;padding:11px 12px;font-size:16px}
-input:focus,select:focus,textarea:focus{border-color:var(--ardoise);outline:none}
+label{display:block;font-family:var(--cote);font-size:var(--t-micro);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--granit);margin:14px 0 6px}
+input,select,textarea{width:100%;background:var(--blanc);border:1.5px solid var(--bord);
+  border-radius:var(--r-s);padding:12px 13px;font-size:16px;transition:border-color .12s}
+input:focus,select:focus,textarea:focus{border-color:var(--ardoise);outline:none;
+  box-shadow:0 0 0 3px rgba(44,74,71,.07)}
 textarea{min-height:78px;resize:vertical}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.recap{background:var(--blanc);border-radius:11px;padding:12px 14px;margin-top:4px;
-  border-left:3px solid var(--meleze)}
+.recap{background:var(--blanc);border-radius:var(--r-s);padding:13px 15px;margin-top:4px;
+  border:1px solid var(--bord);border-left:3px solid var(--meleze)}
 .recap b{font-family:var(--display);font-size:16px;display:block}
 
 /* ── Feuille modale ─────────────────────────────────────────── */
@@ -139,7 +154,7 @@ textarea{min-height:78px;resize:vertical}
 .poignee{width:44px;height:5px;border-radius:3px;background:#D3DAD6;margin:6px auto 12px;
   cursor:grab;flex:none}
 .feuille{will-change:transform}
-.feuille h2{font-family:var(--display);font-size:20px;margin:0 0 2px;font-weight:700}
+.feuille h2{font-family:var(--display);font-size:var(--t-h2);margin:0 0 4px;font-weight:700;letter-spacing:-.02em}
 @media(max-height:520px){
   .borne{padding-top:calc(8px + env(safe-area-inset-top));padding-bottom:10px}
   .borne h1{font-size:20px}
@@ -160,7 +175,7 @@ nav button.on span.l{color:var(--meleze)}
 
 /* ── Divers ─────────────────────────────────────────────────── */
 .fab{position:fixed;right:16px;bottom:calc(var(--nav-h) + 14px);z-index:45;
-  width:54px;height:54px;border-radius:18px;background:var(--meleze);color:#fff;
+  width:56px;height:56px;border-radius:19px;background:var(--meleze);color:#fff;
   font-size:26px;display:grid;place-items:center;box-shadow:0 6px 20px rgba(224,122,31,.4)}
 .puce{display:inline-flex;align-items:center;gap:5px;font-family:var(--cote);font-size:10.5px;
   padding:3px 8px;border-radius:20px;background:var(--brume);color:var(--ardoise);
@@ -190,9 +205,9 @@ nav button.on span.l{color:var(--meleze)}
 .toast.mauvais{background:var(--alerte)}
 .chargement{text-align:center;padding:60px 20px;color:var(--granit);font-family:var(--cote);font-size:12px}
 .etoiles{color:var(--meleze);letter-spacing:1px}
-.onglets{display:flex;gap:4px;background:var(--brume);padding:4px;border-radius:12px;margin-bottom:14px}
+.onglets{display:flex;gap:4px;background:#E9EDEB;padding:4px;border-radius:13px;margin-bottom:16px}
 .onglets button{flex:1;padding:9px;border-radius:9px;font-weight:600;font-size:14.5px;color:var(--granit)}
-.onglets button.on{background:var(--blanc);color:var(--nuit);box-shadow:0 1px 3px rgba(18,33,31,.12)}
+.onglets button.on{background:var(--blanc);color:var(--nuit);box-shadow:0 1px 3px rgba(18,33,31,.10)}
 .meteo-auj{display:flex;align-items:center;gap:13px}
 .meteo-auj .ico{font-size:38px;line-height:1}
 .meteo-auj .temp{font-family:var(--display);font-size:32px;font-weight:700;line-height:1.1}
@@ -221,13 +236,23 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
   padding:6px 11px;border-radius:20px;font-weight:700}
 .soleil{display:flex;gap:18px;margin-top:12px;border-top:1px solid var(--brume);padding-top:11px;
   font-family:var(--cote);font-size:12px;color:var(--ardoise)}
-.vigilance{background:#FBEAE5;border-left:3px solid var(--alerte);border-radius:var(--r);
-  padding:13px 14px;margin-bottom:10px}
-.vigilance b{font-family:var(--display);font-size:15px;display:block;color:var(--alerte)}
+.alertes{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.alerte-c{display:flex;gap:13px;align-items:flex-start;border-radius:var(--r);padding:14px 15px;
+  border:1px solid;position:relative;overflow:hidden}
+.alerte-c .pic{width:44px;height:44px;flex:none;border-radius:13px;display:grid;place-items:center}
+.alerte-c .pic svg{width:27px;height:27px}
+.alerte-c h4{font-family:var(--display);font-size:15.5px;margin:0 0 2px;font-weight:700;letter-spacing:-.015em}
+.alerte-c p{margin:0;font-size:13.8px;line-height:1.45;color:#31423F}
+.a-orage{background:#F3EEFA;border-color:#E0D3F0}      .a-orage .pic{background:#E5D8F5;color:#6B3FA0}
+.a-pluie{background:#EAF1F6;border-color:#D2E1EC}      .a-pluie .pic{background:#D8E7F1;color:#2A6183}
+.a-neige{background:#EEF3F5;border-color:#DAE5E9}      .a-neige .pic{background:#DCE8EC;color:#3C6B7D}
+.a-vent {background:#FAF1E6;border-color:#F0E0C9}      .a-vent  .pic{background:#F5E4CC;color:#9C6412}
+.alertes .src{font-family:var(--cote);font-size:var(--t-micro);color:var(--granit);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 3px}
 .carrousel{display:flex;gap:10px;overflow-x:auto;padding:0 14px 6px;margin:0 -14px;
   scroll-snap-type:x mandatory}
 .sugg{flex:none;width:238px;scroll-snap-align:start;background:var(--blanc);border-radius:var(--r);
-  box-shadow:var(--ombre);overflow:hidden}
+  border:1px solid var(--bord);box-shadow:var(--ombre);overflow:hidden}
 .sugg .vis{height:100px;display:grid;place-items:end start;padding:10px;position:relative;overflow:hidden}
 .sugg .vis svg{position:absolute;inset:0;width:100%;height:100%}
 .sugg .vis span{position:relative;font-family:var(--cote);font-size:9.5px;letter-spacing:.12em;
@@ -312,6 +337,12 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
         <button class="btn fant" id="urg-btn">Définir</button>
       </div>
     </div>
+    <div class="titre-bloc">Maintenance</div>
+    <div class="carte">
+      <b>Réinitialiser l'application</b>
+      <p class="txt" style="white-space:normal">Vide le cache local de cet appareil : données hors ligne, prénom retenu, contact d'urgence et configuration. <b>Rien n'est supprimé pour les autres</b> — tout ce qui est déjà synchronisé revient au prochain lancement.</p>
+      <button class="btn rouge plein" id="reset-btn" style="margin-top:12px">Réinitialiser</button>
+    </div>
     <button class="mini" id="cfg-lien" style="margin-top:4px">Configuration Firebase</button>
   </section>
 </main>
@@ -349,7 +380,7 @@ import { getAuth, signInAnonymously, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
          collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot,
-         query, orderBy, serverTimestamp }
+         query, orderBy, serverTimestamp, terminate, clearIndexedDbPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ═══════════════════════════════════════════════════════════
@@ -683,11 +714,11 @@ function selecteurPhotos(input,zone,liste,apres){
 }
 function vignettesForm(zone,existantes,liste,apres){
   zone.innerHTML="";
-  existantes.forEach(p=>{
+  existantes.filter(p=>!supprimees.has(p.id)).forEach(p=>{
     const v=el("div",{class:"vignette"},el("img",{src:p.data,alt:""}));
-    if(p.uid===auth.currentUser.uid)
+    if(estMien(p))
       v.append(el("button",{class:"sup",onclick:()=>{
-        if(confirm("Supprimer cette photo ?")){ecrire(deleteDoc(doc(db,"photos",p.id)));p.rando=null;p.prise=null;apres();}
+        if(confirm("Supprimer cette photo ?")){supprimerPhoto(p);apres();}
       }},"✕"));
     zone.append(v);});
   liste.forEach((d,i)=>{
@@ -733,27 +764,58 @@ function formPhotoEdit(p){
       ecrire(updateDoc(doc(db,"photos",p.id),{date:$("#pe-d").value,legende:$("#pe-l").value.trim()}),
         "Photo mise à jour",fermer);}},"Enregistrer"),
     el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
-      if(confirm("Supprimer cette photo ?"))ecrire(deleteDoc(doc(db,"photos",p.id)),"Photo supprimée",fermer);
+      if(confirm("Supprimer cette photo ?")) supprimerPhoto(p,fermer);
     }},"Supprimer la photo"));
   feuille("Modifier la photo",c);
 }
 function rendrePhotos(){
   const z=$("#liste-photos");if(!z)return;z.innerHTML="";
-  if(!S.photos.length){z.append(el("div",{class:"vide"},
+  const visibles=photosVisibles();
+  if(!visibles.length){z.append(el("div",{class:"vide"},
     el("b",{},"Mur vide"),"Ajoute-en plusieurs d'un coup avec le bouton +."));return;}
   const parDate={};
-  S.photos.forEach(p=>{const k=val(p.date)||"—";(parDate[k]=parDate[k]||[]).push(p);});
+  visibles.forEach(p=>{const k=val(p.date)||"—";(parDate[k]=parDate[k]||[]).push(p);});
   Object.keys(parDate).sort().reverse().forEach(k=>{
     z.append(el("div",{class:"titre-bloc"},k==="—"?"Sans date":jolie(k)));
     const g=el("div",{class:"photos"});
     parDate[k].forEach(p=>{
       const v=el("div",{class:"vignette"},
         el("img",{src:p.data,alt:val(p.legende),loading:"lazy",onclick:()=>ouvrirPhoto(p)}));
-      if(p.uid===auth.currentUser.uid)
-        v.append(el("button",{class:"sup",onclick:()=>formPhotoEdit(p)},"✎"));
+      if(estMien(p)){
+        v.append(el("button",{class:"sup",style:"right:36px",
+          onclick:()=>formPhotoEdit(p)},"✎"));
+        v.append(el("button",{class:"sup",onclick:()=>{
+          if(confirm("Supprimer cette photo ?")) supprimerPhoto(p);}},"✕"));
+      }
       g.append(v);});
     z.append(g);});
 }
+/* Retrait optimiste : la photo disparaît tout de suite de l'écran ;
+   si Firestore refuse, on la remet et on explique pourquoi. */
+const supprimees=new Set();
+function estMien(p){
+  const u=auth.currentUser?.uid;
+  return !!u && (p.uid===u || p.uid===undefined || p.uid===null);
+}
+function supprimerPhoto(p,apres){
+  if(!estMien(p)) return toast("Cette photo a été publiée par "+membre(p.uid).nom
+    +" : elle ne peut être supprimée que par son auteur.",true);
+  supprimees.add(p.id);
+  rafraichirPhotos(); apres?.();
+  deleteDoc(doc(db,"photos",p.id))
+    .then(()=>toast("Photo supprimée"))
+    .catch(err=>{
+      supprimees.delete(p.id); rafraichirPhotos();
+      console.error(err);
+      const c=err?.code||"";
+      toast(c.includes("permission")
+        ? "Suppression refusée par Firestore. Republie les règles du README (bloc allow delete)."
+        : "Suppression impossible — "+(err?.message||c), true);
+    });
+}
+function photosVisibles(){ return S.photos.filter(p=>!supprimees.has(p.id)); }
+function rafraichirPhotos(){ rendrePhotos(); rendreRandos(); rendrePeche(); }
+
 function ouvrirPhoto(p){
   const lb=$("#lb");$("#lb-img").src=p.data;
   const t=$("#lb-txt");t.innerHTML="";
@@ -761,9 +823,12 @@ function ouvrirPhoto(p){
   const pk=p.prise?S.prises.find(x=>x.id===p.prise):null;
   t.append([val(p.legende),rd?"« "+rd.nom+" »":null,pk?pk.espece:null,
     p.date?jolie(p.date):null,membre(p.uid).nom].filter(Boolean).join(" — "));
-  if(p.uid===auth.currentUser.uid)
-    t.append(el("div",{style:"margin-top:14px"},
-      el("button",{class:"btn fant",onclick:()=>{lb.classList.remove("on");formPhotoEdit(p);}},"Modifier")));
+  if(estMien(p))
+    t.append(el("div",{class:"rangee",style:"margin-top:16px;justify-content:center"},
+      el("button",{class:"btn fant",onclick:()=>{lb.classList.remove("on");formPhotoEdit(p);}},"Modifier"),
+      el("button",{class:"btn rouge",onclick:()=>{
+        if(confirm("Supprimer cette photo ?")) supprimerPhoto(p,()=>lb.classList.remove("on"));
+      }},"Supprimer")));
   lb.classList.add("on");
 }
 $("#lb").onclick=e=>{if(e.target.id==="lb"||e.target.id==="lb-img")$("#lb").classList.remove("on");};
@@ -1018,7 +1083,7 @@ function rendreRandos(){
   S.randos.forEach(r=>{
     const faite=(r.faite||[]).includes(auth.currentUser.uid);
     const mien=r.uid===auth.currentUser.uid;
-    const photos=S.photos.filter(p=>p.rando===r.id);
+    const photos=photosVisibles().filter(p=>p.rando===r.id);
     const carte=el("div",{class:"carte"},
       el("div",{class:"entre"},el("h3",{},r.nom),el("span",{class:"puce o"},val(r.niveau)||"—")),
       el("div",{class:"meta",style:"margin-top:2px"},
@@ -1140,7 +1205,7 @@ function rendrePeche(){
   z.append(el("div",{class:"titre-bloc"},"Le carnet de prises"));
   [...S.prises].sort((a,b)=>((b.date||"")+(b.heure||""))<((a.date||"")+(a.heure||""))?-1:1).forEach(p=>{
     const mien=p.uid===auth.currentUser.uid;
-    const photos=S.photos.filter(x=>x.prise===p.id);
+    const photos=photosVisibles().filter(x=>x.prise===p.id);
     const carte=el("div",{class:"carte"},
       el("div",{class:"entre"},el("h3",{},p.espece),el("span",{class:"puce o"},p.taille+" cm")),
       el("div",{class:"meta",style:"margin-top:2px"},
@@ -1368,15 +1433,35 @@ const METEO={0:["Ciel clair","☀️"],1:["Peu nuageux","🌤"],2:["Nuages épar
   95:["Orage","⛈"],96:["Orage grêleux","⛈"],99:["Orage grêleux","⛈"]};
 const jourCourt=s=>["dim","lun","mar","mer","jeu","ven","sam"][new Date(s+"T12:00:00").getDay()];
 
+/* Pictogrammes d'alerte, dessinés au trait pour rester lisibles en petit */
+const NUAGE='<path d="M7 18h9.5a4 4 0 0 0 .4-8 6 6 0 0 0-11.4 1.6A3.6 3.6 0 0 0 7 18Z"/>';
+const PICTOS={
+  orage:`<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    ${NUAGE}<path d="M13 18l-2.6 4.2h3.4L11.6 27"/></g>`,
+  pluie:`<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    ${NUAGE}<path d="M8.5 21v2.6M12.5 21.5v3.4M16.5 21v2.6"/>
+    <path d="M3 27.5c2-1.4 3.6-1.4 5.6 0s3.6 1.4 5.6 0 3.6-1.4 5.6 0 3.6 1.4 5.6 0"/></g>`,
+  neige:`<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.5 25 12 7l5 9.2 3-4.4 8 13.2Z"/><path d="M12 7 9 12.4l3-1.4 2.8 1.6"/>
+    <path d="M18.5 22.5c1.6-1 2.8-1 4.4 0"/></g>`,
+  vent:`<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 11h13a3.2 3.2 0 1 0-3.2-3.2"/><path d="M3 17h18a3.2 3.2 0 1 1-3.2 3.2"/>
+    <path d="M3 23h9.5a2.6 2.6 0 1 1-2.6 2.6"/></g>`
+};
+
 function alertesDe(m){
   const a=[], c=m.daily.weather_code, pl=m.daily.precipitation_sum||[],
         ng=m.daily.snowfall_sum||[], vt=m.daily.wind_gusts_10m_max||[];
   for(let i=0;i<Math.min(2,c.length);i++){
     const q=i?"demain":"aujourd'hui";
-    if(c[i]>=95) a.push(`Orage annoncé ${q} — décale les sorties en altitude.`);
-    if(pl[i]>=25) a.push(`Fortes pluies ${q} (${Math.round(pl[i])} mm) — attention aux crues des torrents.`);
-    if(ng[i]>=10) a.push(`Chutes de neige ${q} (${Math.round(ng[i])} cm) — vérifie le risque d'avalanche.`);
-    if(vt[i]>=70) a.push(`Rafales jusqu'à ${Math.round(vt[i])} km/h ${q}.`);
+    if(c[i]>=95) a.push({t:"orage",titre:"Orage "+q,
+      txt:"Décale les sorties en altitude : les crêtes sont le pire endroit sous un orage."});
+    if(pl[i]>=25) a.push({t:"pluie",titre:`Fortes pluies ${q}`,
+      txt:`${Math.round(pl[i])} mm attendus — les torrents montent vite, méfiance près de la Gyronde.`});
+    if(ng[i]>=10) a.push({t:"neige",titre:`Chutes de neige ${q}`,
+      txt:`${Math.round(ng[i])} cm attendus — vérifie le bulletin avalanche avant toute course.`});
+    if(vt[i]>=70) a.push({t:"vent",titre:`Rafales ${q}`,
+      txt:`Jusqu'à ${Math.round(vt[i])} km/h — attention aux arêtes et aux remontées mécaniques.`});
   }
   return a;
 }
@@ -1410,12 +1495,18 @@ async function chargerMeteo(){
     if(za){
       za.innerHTML="";
       const al=alertesDe(m);
-      if(al.length) za.append(el("div",{class:"vigilance"},
-        el("b",{},"⚠️ Alertes & météo"),
-        ...al.map(x=>el("div",{class:"txt",style:"font-size:14px"},x)),
-        el("p",{class:"meta",style:"margin:8px 0 0"},"Estimation d'après les prévisions — la vigilance officielle fait foi."),
-        el("a",{class:"mini",style:"margin-top:8px",target:"_blank",rel:"noopener",
-          href:"https://vigilance.meteofrance.fr/fr"},"Vigilance Météo-France ↗")));
+      if(al.length){
+        const z=el("div",{class:"alertes"});
+        z.append(el("div",{class:"titre-bloc",style:"margin-top:2px"},"Vigilance"));
+        al.forEach(x=>z.append(el("div",{class:"alerte-c a-"+x.t},
+          el("div",{class:"pic",html:`<svg viewBox="0 0 32 32" aria-hidden="true">${PICTOS[x.t]}</svg>`}),
+          el("div",{},el("h4",{},x.titre),el("p",{},x.txt)))));
+        z.append(el("div",{class:"src"},
+          el("span",{},"Estimé d'après les prévisions"),
+          el("a",{class:"mini",target:"_blank",rel:"noopener",
+            href:"https://vigilance.meteofrance.fr/fr"},"Météo-France ↗")));
+        za.append(z);
+      }
     }
   }catch(e){
     z.innerHTML="";
@@ -1504,17 +1595,6 @@ function rendreAccueil(){
     el("button",{class:"btn fant plein",style:"margin-top:12px",onclick:()=>formLien()},"+ Ajouter un lien"),
     S.liens.length?el("p",{class:"meta",style:"margin:8px 0 0"},"Appui long sur un lien que tu as ajouté pour le modifier."):null));
 
-  const gens=Object.entries(S.membres);
-  z.append(el("div",{class:"titre-bloc"},`Le carnet · ${gens.length} membre${gens.length>1?"s":""}`));
-  const rm=el("div",{class:"rangee",style:"flex-wrap:wrap;gap:10px"});
-  gens.forEach(([uid,m])=>rm.append(el("div",{class:"rangee",style:"gap:6px"},
-    el("div",{class:"pastille",style:`background:${m.couleur}`},m.nom[0]?.toUpperCase()||"?"),
-    el("span",{},m.nom+(uid===auth.currentUser.uid?" (toi)":"")))));
-  z.append(el("div",{class:"carte"},rm,
-    el("p",{class:"txt",style:"font-size:13.5px;color:var(--granit)"},
-      "Chacun apparaît ici dès qu'il a ouvert l'app et choisi son prénom."),
-    el("button",{class:"btn plein",onclick:()=>partager("Le carnet de famille de Vallouise : "+location.href)},
-      "Partager le lien de l'app")));
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1550,6 +1630,37 @@ $("#fab").onclick=()=>{
   if(S.vue==="photos")  return formPhoto();
 };
 $("#changer-nom").onclick=()=>demanderNom(false);
+/* Remise à zéro locale : cache Firestore (IndexedDB), localStorage,
+   caches du service worker. Les données du serveur ne sont pas touchées. */
+async function reinitialiser(){
+  const b=$("#reset-btn"); b.disabled=true; b.textContent="Réinitialisation…";
+  try{
+    try{ await terminate(db); await clearIndexedDbPersistence(db); }
+    catch(e){ console.warn("cache Firestore :",e); }
+    ["vl-config","vl-urgence","vl-urgence-nom"].forEach(k=>localStorage.removeItem(k));
+    try{ localStorage.clear(); sessionStorage.clear(); }catch(e){}
+    if(window.caches) for(const k of await caches.keys()) await caches.delete(k);
+    if(navigator.serviceWorker){
+      const rs=await navigator.serviceWorker.getRegistrations();
+      for(const r of rs) await r.unregister();
+    }
+    if(indexedDB.databases){
+      for(const d of await indexedDB.databases())
+        if(d.name && /firestore|firebase/i.test(d.name)) indexedDB.deleteDatabase(d.name);
+    }
+    location.reload();
+  }catch(e){
+    b.disabled=false; b.textContent="Réinitialiser";
+    toast("Réinitialisation incomplète : "+(e.message||e),true);
+  }
+}
+$("#reset-btn").onclick=()=>{
+  if(!confirm("Réinitialiser l'application sur cet appareil ?\n\nTes données partagées sont conservées sur le serveur, mais les saisies pas encore synchronisées seront perdues."))
+    return;
+  if(enAttente>0 && !confirm(`${enAttente} saisie(s) ne sont pas encore synchronisées et seront perdues. Continuer ?`))
+    return;
+  reinitialiser();
+};
 $("#cfg-lien").onclick=()=>{
   if(confirm("Effacer la configuration Firebase enregistrée sur cet appareil ?")){
     localStorage.removeItem("vl-config");location.reload();}};
