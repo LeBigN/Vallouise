@@ -185,6 +185,12 @@ nav button.on span.l{color:var(--meleze)}
 .toast.mauvais{background:var(--alerte)}
 .chargement{text-align:center;padding:60px 20px;color:var(--granit);font-family:var(--cote);font-size:12px}
 .etoiles{color:var(--meleze);letter-spacing:1px}
+svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2px;
+  background:var(--neve);border-radius:10px}
+.bande-photos{display:flex;gap:6px;overflow-x:auto;margin-top:11px;padding-bottom:2px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.bande-photos img{height:88px;width:auto;border-radius:8px;flex:none;scroll-snap-align:start;
+  background:var(--brume)}
 .bandeau{color:var(--neve);text-align:center;font-family:var(--cote);font-size:11px;padding:7px 12px;display:none}
 .bandeau.on{display:block}
 #off{background:var(--ardoise)}
@@ -617,8 +623,87 @@ function rendreSejours(){
    6. RANDOS
    ═══════════════════════════════════════════════════════════ */
 const NIVEAUX=["Facile","Moyen","Sportif","Alpin"];
+
+/* ── Lecture d'un fichier GPX ────────────────────────────────
+   Export possible depuis HealthFit ou WorkOutDoors (qui lisent
+   les séances de l'app Exercice), Strava, Komoot, Visorando…    */
+function lireGPX(txt){
+  const d=new DOMParser().parseFromString(txt,"application/xml");
+  if(d.querySelector("parsererror")) throw new Error("fichier GPX illisible");
+  const bruts=[...d.querySelectorAll("trkpt,rtept")].map(p=>({
+    lat:+p.getAttribute("lat"), lon:+p.getAttribute("lon"),
+    ele:+(p.querySelector("ele")?.textContent||0)
+  })).filter(p=>isFinite(p.lat)&&isFinite(p.lon));
+  if(bruts.length<2) throw new Error("aucun point de trace dans ce fichier");
+
+  // distance (haversine) et dénivelé positif, lissé à 4 m pour absorber le bruit GPS
+  let km=0, dplus=0, ref=bruts[0].ele;
+  for(let i=1;i<bruts.length;i++){
+    const a=bruts[i-1], b=bruts[i], R=6371;
+    const dla=(b.lat-a.lat)*Math.PI/180, dlo=(b.lon-a.lon)*Math.PI/180;
+    const h=Math.sin(dla/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dlo/2)**2;
+    km+=2*R*Math.asin(Math.sqrt(h));
+    if(b.ele-ref>4){ dplus+=b.ele-ref; ref=b.ele; } else if(b.ele<ref) ref=b.ele;
+  }
+  // on ne garde que ~140 points : largement assez pour dessiner, et léger en base
+  const pas=Math.max(1,Math.ceil(bruts.length/140));
+  const pts=bruts.filter((_,i)=>i%pas===0||i===bruts.length-1)
+    .map(p=>[+p.lat.toFixed(5),+p.lon.toFixed(5),Math.round(p.ele)]);
+  const eles=bruts.map(p=>p.ele).filter(e=>e);
+  return {pts, km:+km.toFixed(1), dplus:Math.round(dplus),
+    alt:eles.length?{min:Math.round(Math.min(...eles)),max:Math.round(Math.max(...eles))}:null};
+}
+
+/* Dessin de la trace : projection simple corrigée de la latitude */
+function dessinerTrace(t){
+  if(!t?.pts?.length) return null;
+  const lat=t.pts.map(p=>p[0]), lon=t.pts.map(p=>p[1]);
+  const k=Math.cos(lat[0]*Math.PI/180);
+  const xs=lon.map(v=>v*k), ys=lat.map(v=>-v);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const W=300,H=150,P=12;
+  const e=Math.max(x1-x0,y1-y0)||1e-6;
+  const px=v=>P+((v-x0)-( (x1-x0)-e )/2)/e*(W-2*P);
+  const py=v=>P+((v-y0)-( (y1-y0)-e )/2)/e*(H-2*P);
+  const d=xs.map((x,i)=>`${px(x).toFixed(1)},${py(ys[i]).toFixed(1)}`).join(" ");
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("class","trace");
+  svg.innerHTML=`<polyline points="${d}" fill="none" stroke="#E07A1F" stroke-width="3"
+      stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${px(xs[0]).toFixed(1)}" cy="${py(ys[0]).toFixed(1)}" r="4.5" fill="#3F7D5A"/>
+    <circle cx="${px(xs.at(-1)).toFixed(1)}" cy="${py(ys.at(-1)).toFixed(1)}" r="4.5" fill="#C4472C"/>`;
+  return svg;
+}
+
+/* Reconnaissance de la source d'un lien, pour nommer la puce */
+function sourceLien(u){
+  const h=(()=>{try{return new URL(u).hostname.replace(/^www\./,"");}catch{return "";}})();
+  if(/visorando/.test(h))  return "Visorando";
+  if(/komoot/.test(h))     return "Komoot";
+  if(/strava/.test(h))     return "Strava";
+  if(/alltrails/.test(h))  return "AllTrails";
+  if(/maps\.apple/.test(h))return "Plans";
+  if(/google\./.test(h))   return "Google Maps";
+  if(/openrunner/.test(h)) return "Openrunner";
+  if(/ign|geoportail/.test(h)) return "IGN";
+  return h||"Lien";
+}
+const liensDe=r=>r.liens?.length?r.liens:(r.lien?[r.lien]:[]);
+
 function formRando(r){
+  let trace=r?.trace||null;
   const c=el("div");
+  const zoneGPX=el("div",{class:"recap",style:"margin-top:6px"});
+  const majGPX=()=>{
+    zoneGPX.innerHTML="";
+    zoneGPX.append(trace
+      ? el("div",{},el("b",{},`Trace : ${trace.km} km · ▲ ${nb(trace.dplus)} m`),
+          el("span",{class:"meta"},`${trace.pts.length} points`+(trace.alt?` · ${nb(trace.alt.min)}–${nb(trace.alt.max)} m`:"")),
+          el("button",{class:"btn danger",onclick:()=>{trace=null;majGPX();}},"Retirer la trace"))
+      : el("span",{class:"meta"},"Aucune trace. Importe un .gpx exporté depuis HealthFit, WorkOutDoors, Strava, Komoot…"));
+  };
+  majGPX();
+
   c.append(
     el("label",{},"Nom de la course"),
     el("input",{id:"r-nom",placeholder:"Lac de l'Eychauda",value:r?.nom||""}),
@@ -631,20 +716,49 @@ function formRando(r){
     el("select",{id:"r-niv",html:NIVEAUX.map(n=>`<option ${r?.niveau===n?"selected":""}>${n}</option>`).join("")}),
     el("label",{},"Le mot du guide"),
     el("textarea",{id:"r-txt",placeholder:"Partir tôt l'été, l'ombre disparaît après 10 h…"}),
-    el("label",{},"Lien (trace GPX, Visorando…)"),
-    el("input",{id:"r-lien",type:"url",placeholder:"https://",value:r?.lien||""}),
-    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
+
+    el("label",{},"Trace GPX"),
+    el("input",{type:"file",id:"r-gpx",accept:".gpx,application/gpx+xml,text/xml"}),
+    zoneGPX,
+
+    el("label",{},"Liens (Visorando, Komoot, Plans…)"),
+    el("div",{id:"r-liens"}),
+    el("button",{class:"btn fant plein",style:"margin-top:8px",onclick:()=>ajoutLien("")},"+ Ajouter un lien"),
+
+    el("button",{class:"btn accent plein",style:"margin-top:18px",onclick:()=>{
       const nom=$("#r-nom").value.trim(); if(!nom) return toast("Il manque le nom");
+      const liens=[...document.querySelectorAll("#r-liens input")].map(i=>i.value.trim()).filter(Boolean);
       const d={nom,depart:$("#r-dep").value.trim(),denivele:$("#r-den").value,
         duree:$("#r-dur").value,niveau:$("#r-niv").value,texte:$("#r-txt").value.trim(),
-        lien:$("#r-lien").value.trim(),uid:auth.currentUser.uid};
+        liens,lien:"",trace,uid:auth.currentUser.uid};
       ecrire(r?updateDoc(doc(db,"randos",r.id),d)
               :addDoc(collection(db,"randos"),{...d,faite:[],cree:serverTimestamp()}),
         r?"Fiche mise à jour":"Rando ajoutée",fermer);
     }},r?"Enregistrer":"Ajouter la rando")
   );
-  feuille(r?"Modifier la rando":"Nouvelle rando",c,()=>{$("#r-txt").value=r?.texte||"";});
+
+  function ajoutLien(v){
+    const z=$("#r-liens");
+    const ligne=el("div",{class:"rangee",style:"margin-bottom:8px"});
+    ligne.append(el("input",{type:"url",placeholder:"https://",value:v}),
+      el("button",{class:"mini",onclick:()=>ligne.remove()},"✕"));
+    z.append(ligne);
+  }
+
+  feuille(r?"Modifier la rando":"Nouvelle rando",c,()=>{
+    $("#r-txt").value=r?.texte||"";
+    liensDe(r||{}).forEach(l=>ajoutLien(l));
+    $("#r-gpx").onchange=async e=>{
+      const f=e.target.files[0]; if(!f) return;
+      try{
+        trace=lireGPX(await f.text());
+        if(!$("#r-den").value) $("#r-den").value=trace.dplus;
+        majGPX(); toast(`Trace lue : ${trace.km} km`);
+      }catch(err){ toast(err.message,true); }
+    };
+  });
 }
+
 function rendreRandos(){
   const z=$("#liste-randos");z.innerHTML="";
   if(!S.randos.length){z.append(el("div",{class:"vide"},
@@ -653,24 +767,46 @@ function rendreRandos(){
   S.randos.forEach(r=>{
     const faite=(r.faite||[]).includes(auth.currentUser.uid);
     const mien=r.uid===auth.currentUser.uid;
-    z.append(el("div",{class:"carte"},
+    const photos=S.photos.filter(p=>p.rando===r.id);
+    const carte=el("div",{class:"carte"},
       el("div",{class:"entre"},el("h3",{},r.nom),el("span",{class:"puce o"},r.niveau||"—")),
       el("div",{class:"meta",style:"margin-top:2px"},
-        [r.depart,r.denivele?`▲ ${nb(r.denivele)} m`:null,r.duree?`⏱ ${r.duree} h`:null].filter(Boolean).join("  ·  ")),
-      r.texte?el("p",{class:"txt"},r.texte):null,
-      el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
-        el("button",{class:"mini",onclick:()=>{
-          const l=new Set(r.faite||[]);
-          faite?l.delete(auth.currentUser.uid):l.add(auth.currentUser.uid);
-          ecrire(updateDoc(doc(db,"randos",r.id),{faite:[...l]}));
-        }},faite?"✓ Tu l'as faite":"Marquer comme faite"),
-        (r.faite||[]).length?el("span",{class:"meta"},
-          (r.faite||[]).map(u=>membre(u).nom).join(", ")+" y "+((r.faite||[]).length>1?"sont allés":"est allé")):null,
-        r.lien?el("a",{class:"mini",href:r.lien,target:"_blank",rel:"noopener"},"Trace ↗"):null,
-        mien?el("button",{class:"mini",onclick:()=>formRando(r)},"Modifier"):null,
-        mien?el("button",{class:"mini",onclick:()=>{
-          if(confirm("Supprimer cette rando ?")) ecrire(deleteDoc(doc(db,"randos",r.id)),"Supprimée");
-        }},"🗑"):null)));
+        [r.depart, r.trace?.km?`↔ ${r.trace.km} km`:null,
+         r.denivele?`▲ ${nb(r.denivele)} m`:null, r.duree?`⏱ ${r.duree} h`:null]
+        .filter(Boolean).join("  ·  ")),
+      dessinerTrace(r.trace),
+      r.texte?el("p",{class:"txt"},r.texte):null
+    );
+
+    if(photos.length){
+      const bande=el("div",{class:"bande-photos"});
+      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:p.legende||"",loading:"lazy",
+        onclick:()=>ouvrirPhoto(p)})));
+      carte.append(bande);
+    }
+
+    const liens=liensDe(r);
+    if(liens.length){
+      const zl=el("div",{class:"rangee",style:"margin-top:10px;flex-wrap:wrap"});
+      liens.forEach(l=>zl.append(el("a",{class:"mini",href:l,target:"_blank",rel:"noopener"},
+        sourceLien(l)+" ↗")));
+      carte.append(zl);
+    }
+
+    carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
+      el("button",{class:"mini",onclick:()=>{
+        const l=new Set(r.faite||[]);
+        faite?l.delete(auth.currentUser.uid):l.add(auth.currentUser.uid);
+        ecrire(updateDoc(doc(db,"randos",r.id),{faite:[...l]}));
+      }},faite?"✓ Tu l'as faite":"Marquer comme faite"),
+      (r.faite||[]).length?el("span",{class:"meta"},
+        (r.faite||[]).map(u=>membre(u).nom).join(", ")+" y "+((r.faite||[]).length>1?"sont allés":"est allé")):null,
+      el("button",{class:"mini",onclick:()=>formPhoto(r)},"📷 Photo"),
+      mien?el("button",{class:"mini",onclick:()=>formRando(r)},"Modifier"):null,
+      mien?el("button",{class:"mini",onclick:()=>{
+        if(confirm("Supprimer cette rando ?")) ecrire(deleteDoc(doc(db,"randos",r.id)),"Supprimée");
+      }},"🗑"):null));
+    z.append(carte);
   });
 }
 
@@ -736,17 +872,18 @@ function compresser(file,max=1400,q=.68){
     img.onerror=()=>rej(new Error("image illisible"));fr.readAsDataURL(file);
   });
 }
-function formPhoto(){
+function formPhoto(rando){
   const c=el("div");
   c.append(
-    el("p",{class:"meta"},"Les photos sont réduites automatiquement avant l'envoi. Une à la fois, la meilleure."),
+    rando?el("p",{class:"meta"},"Photo rattachée à « "+rando.nom+" ». Elle apparaîtra sur la fiche de la rando et sur le mur."):
+      el("p",{class:"meta"},"Les photos sont réduites automatiquement avant l'envoi. Une à la fois, la meilleure."),
     el("label",{},"Photo"),
     el("input",{type:"file",id:"ph-f",accept:"image/*"}),
     el("label",{},"Légende"),
     el("input",{id:"ph-l",placeholder:"Lever de soleil sur le Pelvoux"}),
     el("button",{class:"btn accent plein",style:"margin-top:16px",id:"ph-go"},"Envoyer la photo")
   );
-  feuille("Ajouter une photo",c,()=>{
+  feuille(rando?"Photo de la rando":"Ajouter une photo",c,()=>{
     $("#ph-go").onclick=async()=>{
       const f=$("#ph-f").files[0]; if(!f) return toast("Choisis une photo");
       const b=$("#ph-go");b.textContent="Réduction…";b.disabled=true;
@@ -756,7 +893,7 @@ function formPhoto(){
         if(data.length>950000){b.textContent="Envoyer la photo";b.disabled=false;
           return toast("Photo trop lourde même réduite",true);}
         ecrire(addDoc(collection(db,"photos"),{data,legende:$("#ph-l").value.trim(),
-          uid:auth.currentUser.uid,cree:serverTimestamp()}),"Photo ajoutée",fermer);
+          rando:rando?.id||null,uid:auth.currentUser.uid,cree:serverTimestamp()}),"Photo ajoutée",fermer);
       }catch(e){b.textContent="Envoyer la photo";b.disabled=false;
         toast("Impossible de lire ce fichier : "+e.message,true);}
     };
@@ -783,7 +920,8 @@ function rendrePhotos(){
 function ouvrirPhoto(p){
   const lb=$("#lb");$("#lb-img").src=p.data;
   const t=$("#lb-txt");t.innerHTML="";
-  t.append((p.legende?p.legende+" — ":"")+membre(p.uid).nom);
+  const rd=p.rando?S.randos.find(x=>x.id===p.rando):null;
+  t.append([p.legende,rd?"« "+rd.nom+" »":null,membre(p.uid).nom].filter(Boolean).join(" — "));
   if(p.uid===auth.currentUser.uid)
     t.append(el("div",{style:"margin-top:14px"},el("button",{class:"btn fant",onclick:()=>{
       if(confirm("Supprimer cette photo ?")){lb.classList.remove("on");
@@ -909,7 +1047,7 @@ onAuthStateChanged(auth,user=>{
   ecouter("sejours","sejours",["debut","asc"],rendreSejours);
   ecouter("randos","randos",["nom","asc"],rendreRandos);
   ecouter("plans","plans",["nom","asc"],rendrePlans);
-  ecouter("photos","photos",["cree","desc"],rendrePhotos);
+  ecouter("photos","photos",["cree","desc"],()=>{rendrePhotos();rendreRandos();});
   ecouter("infos","infos",["titre","asc"],rendreInfos);
 });
 

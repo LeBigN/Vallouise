@@ -97,7 +97,7 @@ Les photos sont **réduites dans le navigateur** (1400 px max, JPEG qualité 0,6
 | Section | Ce qu'on y met |
 |---|---|
 | **Séjours** | Calendrier des présences, une couleur par membre. Alerte si les dates se chevauchent, sans bloquer. |
-| **Randos** | Fiches : départ, dénivelé, durée, niveau, conseil, lien GPX. Chacun coche « faite ». |
+| **Randos** | Fiches : départ, dénivelé, durée, niveau, conseil. **Import de trace GPX** (distance + D+ calculés, tracé dessiné), **plusieurs liens** par rando, **photos rattachées**. Chacun coche « faite ». |
 | **Bons plans** | Restaurants, commerces, activités, baignades, infos pratiques, notés sur 5. |
 | **Photos** | Mur commun, légende + auteur. Double-tap sur sa propre photo en plein écran pour la supprimer. |
 | **L'appart** | Fiches pratiques éditables par tous : wifi, chauffage, poubelles, vanne d'eau, clés, voisins. |
@@ -123,7 +123,26 @@ depuis le PC) et me transmettre le message d'erreur.
 
 ---
 
-## 7. Idées pour la suite
+## 7. Traces GPX et app Exercice d'Apple
+
+L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
+image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
+
+- **HealthFit** (payant, ~5 €) ou **WorkOutDoors** : lisent les séances de l'app Exercice et exportent
+  en `.gpx`. C'est la voie la plus fiable.
+- **Strava** : si la séance y est synchronisée, export GPX depuis la page de l'activité.
+- Sinon : **Komoot**, **Visorando**, **Openrunner** téléchargent directement du GPX.
+
+Dans la fiche rando, le champ *Trace GPX* accepte ces fichiers. L'app calcule la distance et le dénivelé
+positif (lissé à 4 m pour absorber le bruit GPS), dessine le tracé et ne conserve que ~140 points —
+quelques kilo-octets, aucun impact sur le quota Firestore.
+
+Les liens Plans (`maps.apple.com`), Komoot, Strava, AllTrails, IGN sont reconnus automatiquement et
+affichés avec le nom de leur source.
+
+---
+
+## 8. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
