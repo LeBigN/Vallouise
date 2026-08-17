@@ -329,8 +329,24 @@ nav button.on span.l{color:var(--meleze)}
 .lb{position:fixed;inset:0;background:rgba(18,33,31,.96);z-index:70;display:none;
   flex-direction:column;align-items:center;justify-content:center;padding:20px}
 .lb.on{display:flex}
-.lb img{max-width:100%;max-height:70vh;border-radius:10px}
-.lb p{color:var(--neve);text-align:center;margin:14px 0 0;max-width:520px}
+.lb img{max-width:100%;max-height:68vh;border-radius:10px;transition:opacity .16s ease}
+.lb-x{position:absolute;top:calc(16px + env(safe-area-inset-top, 0px));right:16px;z-index:9999;
+  width:42px;height:42px;border-radius:50%;background:rgba(244,246,244,.16);color:#fff;
+  font-size:18px;display:grid;place-items:center;backdrop-filter:blur(4px)}
+.lb-x:active{background:rgba(244,246,244,.3)}
+.lb-compteur{position:absolute;top:calc(24px + env(safe-area-inset-top, 0px));left:0;right:0;
+  text-align:center;font-family:var(--corps);font-size:13px;font-weight:500;
+  color:rgba(244,246,244,.7);pointer-events:none}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:9998;
+  width:46px;height:46px;border-radius:50%;background:rgba(244,246,244,.14);color:#fff;
+  font-size:26px;line-height:1;display:grid;place-items:center;backdrop-filter:blur(4px)}
+.lb-nav:active{background:rgba(244,246,244,.3)}
+.lb-prev{left:10px} .lb-next{right:10px}
+@media(max-width:400px){.lb-nav{width:40px;height:40px;font-size:23px}
+  .lb-prev{left:4px} .lb-next{right:4px}}
+.lb p{color:var(--neve);text-align:center;margin:14px 0 0;max-width:520px;
+  padding:0 60px}   /* on dégage les flèches latérales */
+.lb img{min-height:120px;object-fit:contain}
 .ptr{position:fixed;top:0;left:0;right:0;z-index:55;display:flex;justify-content:center;
   pointer-events:none;opacity:0;transform:translateY(0)}
 .ptr-rond{width:34px;height:34px;border-radius:50%;background:var(--blanc);
@@ -372,8 +388,12 @@ nav button.on span.l{color:var(--meleze)}
   color:var(--ardoise);margin:9px 0 10px}
 .rd-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .rd-actions .btn{font-size:14px}
-.so-onglets button{flex-direction:column;gap:4px;padding:9px 4px;font-size:13px}
-.so-i{width:20px;height:20px}
+.so-onglets button{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;padding:10px 4px;font-size:13px;line-height:1.2;
+  transition:background .15s ease,color .15s ease}
+.so-i{width:21px;height:21px;display:block;flex:none;stroke-width:1.7;
+  transition:color .15s ease,opacity .15s ease;opacity:.75}
+.so-onglets button.on .so-i{opacity:1}
 .vt-niv{flex:none;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
   padding:5px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
 .vt-mesures{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-weight:500;
@@ -548,7 +568,7 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
   <section class="vue" id="v-sorties">
     <div class="onglets so-onglets">
       <button class="on" data-sortie="randos"><svg class="so-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 6 21M13 3l3 6M16 9l5 12M16 9l-4 2M9 13l4 2M11.5 17l4 2"/></svg><span>Randos</span></button>
-      <button data-sortie="vtt"><svg class="so-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17" r="3.6"/><circle cx="18.5" cy="17" r="3.6"/><path d="M5.5 17l4-8h5l-3 8h7"/><path d="M14.5 9l-2-3h-2"/><circle cx="16.5" cy="5.5" r="1.1"/></svg><span>VTT</span></button>
+      <button data-sortie="vtt"><svg class="so-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg><span>VTT</span></button>
       <button data-sortie="peche"><svg class="so-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3-4 7-6 11-6 4 0 6 3 7 6-1 3-3 6-7 6-4 0-8-2-11-6Z"/><path d="M17 10.5h.01"/><path d="M3 12c-.6-1.6-.6-3.4 0-5M3 12c-.6 1.6-.6 3.4 0 5"/></svg><span>Pêche</span></button>
     </div>
     <div id="liste-randos"></div>
@@ -602,7 +622,14 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 </nav>
 
 <div class="voile" id="voile"><div class="feuille" id="feuille"></div></div>
-<div class="lb" id="lb"><img id="lb-img" alt=""><p id="lb-txt"></p></div>
+<div class="lb" id="lb">
+  <button class="lb-x" id="lb-x" aria-label="Fermer">✕</button>
+  <div class="lb-compteur" id="lb-n"></div>
+  <button class="lb-nav lb-prev" id="lb-prev" aria-label="Photo précédente">‹</button>
+  <img id="lb-img" alt="">
+  <button class="lb-nav lb-next" id="lb-next" aria-label="Photo suivante">›</button>
+  <p id="lb-txt"></p>
+</div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -1098,7 +1125,7 @@ function rendrePhotos(){
     const g=el("div",{class:"photos"});
     parDate[k].forEach(p=>{
       const v=el("div",{class:"vignette"},
-        el("img",{src:p.data,alt:val(p.legende),loading:"lazy",onclick:()=>ouvrirPhoto(p)}));
+        el("img",{src:p.data,alt:val(p.legende),loading:"lazy",onclick:()=>ouvrirPhoto(p,visibles)}));
       v.append(el("button",{class:"sup",style:"right:36px",onclick:()=>formPhotoEdit(p)},"✎"));
       v.append(el("button",{class:"sup",onclick:()=>{
         if(confirm("Supprimer cette photo ?")) supprimerPhoto(p);}},"✕"));
@@ -1124,7 +1151,6 @@ function supprimerPhoto(p,apres){
   // 1. disparition immédiate, avant toute réponse du serveur
   memoriserMasquee(id);
   S.photos=S.photos.filter(x=>x.id!==id);
-  $("#lb").classList.remove("on");
   rendrePhotos(); rafraichirPhotos(); apres?.();
 
   // 2. suppression réelle, sans aucune condition préalable
@@ -1151,24 +1177,85 @@ function telechargerPhoto(p){
   document.body.append(a); a.click(); a.remove();
   toast("Photo enregistrée");
 }
-function ouvrirPhoto(p){
-  const lb=$("#lb");$("#lb-img").src=p.data;
-  const t=$("#lb-txt");t.innerHTML="";
+/* ═══════════════════════════════════════════════════════════
+   VISIONNEUSE PLEIN ÉCRAN — flèches, balayage, boucle
+   ═══════════════════════════════════════════════════════════ */
+let lbListe=[], lbIndex=0;
+
+function ouvrirPhoto(p,liste){
+  lbListe=(liste&&liste.length?liste:photosVisibles()).filter(x=>!supprimees.has(x.id));
+  lbIndex=Math.max(0,lbListe.findIndex(x=>x.id===p.id));
+  if(lbIndex<0) {lbListe=[p];lbIndex=0;}
+  afficherLB();
+  $("#lb").classList.add("on");
+}
+function naviguerLB(pas){
+  if(lbListe.length<2) return;
+  lbIndex=(lbIndex+pas+lbListe.length)%lbListe.length;   // boucle dans les deux sens
+  afficherLB();
+}
+function afficherLB(){
+  const p=lbListe[lbIndex];
+  if(!p){ $("#lb").classList.remove("on"); return; }
+  const img=$("#lb-img");
+  img.style.opacity="0";
+  img.src=p.data;
+  img.onload=()=>{img.style.opacity="1";};
+
   const rd=p.rando?S.randos.find(x=>x.id===p.rando):null;
   const pk=p.prise?S.prises.find(x=>x.id===p.prise):null;
-  const pl=p.plan?S.plans.find(x=>x.id===p.plan):null;
-  t.append([val(p.legende),rd?"« "+rd.nom+" »":null,pk?pk.espece:null,pl?pl.nom:null,
-    p.date?jolie(p.date):null,membre(p.uid).nom].filter(Boolean).join(" — "));
-  t.append(el("div",{class:"rangee",style:"margin-top:16px;justify-content:center;flex-wrap:wrap"},
-    el("button",{class:"btn fant",onclick:()=>telechargerPhoto(p)},"Télécharger")));
-  t.append(el("div",{class:"rangee",style:"margin-top:10px;justify-content:center"},
-      el("button",{class:"btn fant",onclick:()=>{lb.classList.remove("on");formPhotoEdit(p);}},"Modifier"),
-      el("button",{class:"btn rouge",onclick:()=>{
-        if(confirm("Supprimer cette photo ?")) supprimerPhoto(p);
-      }},"Supprimer")));
-  lb.classList.add("on");
+  const pl=p.plan ?S.plans.find(x=>x.id===p.plan) :null;
+  const vt=p.vtt  ?S.vtt.find(x=>x.id===p.vtt)    :null;
+  // un même intitulé peut venir de la légende ET du parent : on ne l'affiche qu'une fois
+  const parts=[val(p.legende), rd?rd.nom:null, pk?pk.espece:null, pl?pl.nom:null, vt?vt.nom:null,
+               p.date?jolie(p.date):null, membre(p.uid).nom].filter(Boolean);
+  const vus=new Set(), titre=[];
+  parts.forEach(x=>{const k=x.trim().toLowerCase(); if(!vus.has(k)){vus.add(k);titre.push(x);}});
+
+  const t=$("#lb-txt"); t.innerHTML="";
+  t.append(titre.join(" — "));
+  t.append(el("div",{class:"rangee",style:"margin-top:16px;justify-content:center;flex-wrap:wrap;gap:8px"},
+    el("button",{class:"btn fant",onclick:()=>telechargerPhoto(p)},"Télécharger"),
+    el("button",{class:"btn fant",onclick:()=>{fermerLB();formPhotoEdit(p);}},"Modifier"),
+    el("button",{class:"btn rouge",onclick:()=>{
+      if(confirm("Supprimer cette photo ?")){
+        const suivante=lbListe.length>1;
+        supprimerPhoto(p);
+        lbListe=lbListe.filter(x=>x.id!==p.id);
+        if(suivante&&lbListe.length){ lbIndex=lbIndex%lbListe.length; afficherLB(); $("#lb").classList.add("on"); }
+        else fermerLB();
+      }}},"Supprimer")));
+
+  const n=$("#lb-n");
+  n.textContent=lbListe.length>1?`${lbIndex+1} / ${lbListe.length}`:"";
+  const multi=lbListe.length>1;
+  $("#lb-prev").style.display=multi?"grid":"none";
+  $("#lb-next").style.display=multi?"grid":"none";
 }
-$("#lb").onclick=e=>{if(e.target.id==="lb"||e.target.id==="lb-img")$("#lb").classList.remove("on");};
+const fermerLB=()=>$("#lb").classList.remove("on");
+
+$("#lb-x").onclick=fermerLB;
+$("#lb-prev").onclick=e=>{e.stopPropagation();naviguerLB(-1);};
+$("#lb-next").onclick=e=>{e.stopPropagation();naviguerLB(1);};
+$("#lb").onclick=e=>{ if(e.target.id==="lb") fermerLB(); };
+addEventListener("keydown",e=>{
+  if(!$("#lb").classList.contains("on")) return;
+  if(e.key==="Escape") fermerLB();
+  if(e.key==="ArrowLeft") naviguerLB(-1);
+  if(e.key==="ArrowRight") naviguerLB(1);
+});
+/* Balayage : horizontal pour changer de photo, vers le bas pour fermer */
+(()=>{
+  const z=$("#lb"); let x0=0,y0=0,actif=false;
+  z.addEventListener("touchstart",e=>{
+    if(e.target.closest(".lb-nav,.lb-x,button,a")) return;
+    x0=e.touches[0].clientX; y0=e.touches[0].clientY; actif=true;},{passive:true});
+  z.addEventListener("touchend",e=>{
+    if(!actif) return; actif=false;
+    const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)) naviguerLB(dx<0?1:-1);
+    else if(dy>110 && Math.abs(dy)>Math.abs(dx)) fermerLB();},{passive:true});
+})();
 
 /* ═══════════════════════════════════════════════════════════
    8. SÉJOURS
@@ -1497,7 +1584,8 @@ function rendreRandos(){
       dessinerTrace(r.trace),
       r.texte?el("p",{class:"txt"},val(r.texte)):null);
     if(photos.length){const bande=el("div",{class:"bande-photos"});
-      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",onclick:()=>ouvrirPhoto(p)})));
+      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",
+        onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
     const liens=liensDe(r);
     if(liens.length||r.gps){
@@ -1664,7 +1752,8 @@ function rendreVTT(){
       dessinerTrace(v.trace),
       v.texte?el("p",{class:"txt"},val(v.texte)):null);
     if(photos.length){const bande=el("div",{class:"bande-photos"});
-      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",onclick:()=>ouvrirPhoto(p)})));
+      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",
+        onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
     carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
       el("button",{class:"mini",onclick:()=>formPhoto({type:"vtt",id:v.id,nom:v.nom})},"Photo"),
@@ -1995,7 +2084,8 @@ function rendrePeche(){
          val(p.leurre)||val(p.technique)].filter(Boolean).join("  ·  ")),
       p.notes?el("p",{class:"txt"},val(p.notes)):null);
     if(photos.length){const bande=el("div",{class:"bande-photos"});
-      photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",onclick:()=>ouvrirPhoto(x)})));
+      photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",
+        onclick:()=>ouvrirPhoto(x,photos)})));
       carte.append(bande);}
     carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
       el("span",{class:"puce"},val(p.devenir)||"—"),
@@ -2224,7 +2314,7 @@ function rendrePlans(){
       if(photos.length){
         const bande=el("div",{class:"bande-photos"});
         photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",
-          onclick:()=>ouvrirPhoto(x)})));
+          onclick:()=>ouvrirPhoto(x,photos)})));
         carte.append(bande);}
       if(p.gps||p.adresse){
         const cible=p.gps?`${p.gps.lat},${p.gps.lon}`
