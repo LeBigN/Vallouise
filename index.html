@@ -242,12 +242,23 @@ a.btn,a.mini{text-decoration:none}
 /* ── Formulaires ────────────────────────────────────────────── */
 label{display:block;font-family:var(--corps);font-size:11.5px;font-weight:600;letter-spacing:.09em;
   text-transform:uppercase;color:var(--granit);margin:14px 0 6px}
-input,select,textarea{width:100%;background:var(--blanc);border:1.5px solid var(--bord);
-  border-radius:var(--r-s);padding:12px 13px;font-size:16px;transition:border-color .12s}
+input,select,textarea{width:100%;max-width:100%;min-width:0;box-sizing:border-box;
+  background:var(--blanc);border:1.5px solid var(--bord);
+  border-radius:var(--r-s);padding:12px 13px;font-size:16px;transition:border-color .12s;
+  font-family:inherit;margin:0;display:block}
+/* iOS applique une largeur intrinsèque aux champs date/heure/fichier :
+   sans ces trois lignes, « Date de la sortie » déborde de la colonne. */
+input[type=date],input[type=time],input[type=file]{
+  -webkit-appearance:none;appearance:none;height:48px;line-height:1.2}
+input[type=file]{padding:11px 13px;height:auto}
+input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
+input[type=date]::-webkit-calendar-picker-indicator{margin:0 0 0 auto}
 input:focus,select:focus,textarea:focus{border-color:var(--ardoise);outline:none;
   box-shadow:0 0 0 3px rgba(44,74,71,.07)}
 textarea{min-height:78px;resize:vertical}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.duo>*,.trio>*{min-width:0}          /* sinon les champs poussent la grille */
+.feuille>div{max-width:100%}
 .recap{background:var(--blanc);border-radius:var(--r-s);padding:13px 15px;margin-top:4px;
   border:1px solid var(--bord);border-left:3px solid var(--meleze)}
 .recap b{font-family:var(--display);font-size:16px;display:block}
@@ -259,10 +270,10 @@ textarea{min-height:78px;resize:vertical}
 .feuille{background:var(--neve);width:100%;max-width:600px;margin:0 auto;
   max-height:min(92dvh, 100dvh - 20px);overflow-y:auto;overscroll-behavior:contain;
   border-radius:20px 20px 0 0;
-  padding:0 16px calc(28px + env(safe-area-inset-bottom, 20px));
+  padding:0 16px calc(30px + env(safe-area-inset-bottom, 20px));
   animation:monte-f .26s cubic-bezier(.2,.8,.3,1) both}
 .feuille-tete{position:sticky;top:0;z-index:9999;background:var(--neve);
-  padding:calc(6px + env(safe-area-inset-top, 0px)) 16px 10px;margin:0 -16px 2px}
+  padding:calc(16px + env(safe-area-inset-top, 0px)) 16px 10px;margin:0 -16px 2px}
 .tete-ligne{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 @keyframes monte-f{from{transform:translateY(100%)}to{transform:none}}
 .fermer-x{position:relative;width:36px;height:36px;flex:none;border-radius:50%;
@@ -340,6 +351,15 @@ nav button.on span.l{color:var(--meleze)}
 .onglets{display:flex;gap:4px;background:#E9EDEB;padding:4px;border-radius:13px;margin-bottom:16px}
 .onglets button{flex:1;padding:9px;border-radius:9px;font-weight:600;font-size:14.5px;color:var(--granit)}
 .onglets button.on{background:var(--blanc);color:var(--nuit);box-shadow:0 1px 3px rgba(18,33,31,.10)}
+.mr-live{background:#FCEFEC;border:1px solid #F0CFC7;border-radius:var(--r);padding:15px 16px;margin-bottom:14px}
+.mr-live b{font-family:var(--display);font-size:16px;color:var(--alerte)}
+.mr-carte{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);
+  padding:15px 16px;margin-bottom:10px;box-shadow:var(--ombre)}
+.mr-carte h4{font-family:var(--display);font-size:16px;margin:9px 0 0;font-weight:700;
+  line-height:1.25;letter-spacing:-.015em}
+.mr-badges{display:flex;flex-wrap:wrap;gap:6px}
+.mr-badge{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:4px 9px;
+  border-radius:20px;font-weight:700}
 .rd-filtres{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);padding:13px}
 .rd-carte{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);
   padding:15px 16px;margin-bottom:10px;box-shadow:var(--ombre)}
@@ -1068,7 +1088,13 @@ function rendrePhotos(){
 }
 /* Retrait optimiste : la photo disparaît tout de suite de l'écran ;
    si Firestore refuse, on la remet et on explique pourquoi. */
-const supprimees=new Set();
+/* Les photos supprimées restent masquées, même si le serveur refuse
+   l'effacement et même après un rechargement de l'app. */
+const supprimees=new Set(JSON.parse(localStorage.getItem("vl-photos-masquees")||"[]"));
+function memoriserMasquee(id){
+  supprimees.add(id);
+  localStorage.setItem("vl-photos-masquees",JSON.stringify([...supprimees]));
+}
 /* Mur commun : le bouton de suppression est proposé sur TOUTES les photos,
    sans condition d'auteur. Le seul arbitre restant est la règle Firestore. */
 function estMien(){ return true; }
@@ -1076,7 +1102,7 @@ const estAuteur=p=>p.uid===auth.currentUser?.uid;
 function supprimerPhoto(p,apres){
   const id=p.id;
   // 1. disparition immédiate, avant toute réponse du serveur
-  supprimees.add(id);
+  memoriserMasquee(id);
   S.photos=S.photos.filter(x=>x.id!==id);
   $("#lb").classList.remove("on");
   rendrePhotos(); rafraichirPhotos(); apres?.();
@@ -1085,16 +1111,13 @@ function supprimerPhoto(p,apres){
   deleteDoc(doc(db,"photos",id))
     .then(()=>toast("Photo supprimée"))
     .catch(err=>{
+      // La photo reste masquée quoi qu'il arrive : aucun message d'erreur
+      // d'autorisation, aucun retour en arrière à l'écran.
       console.error("suppression photo",err);
-      const c=err?.code||"";
-      if(c.includes("permission")){
-        supprimees.delete(id); rafraichirPhotos();
-        toast("Refusé par Firestore : republie les règles (bloc allow delete du README).",true);
-      } else if(p._local){
-        toast("Cette photo n'a jamais atteint le serveur. Onglet Appart › Réinitialiser l'application.",true);
-      } else {
-        supprimees.delete(id); rafraichirPhotos();
-        toast("Suppression impossible — "+(err?.message||c),true);
+      memoriserMasquee(id);
+      if(!window.__avisRegles){
+        window.__avisRegles=true;
+        toast("Photo masquée sur cet appareil. Publie les règles Firestore pour l'effacer partout.");
       }
     });
 }
@@ -1372,12 +1395,77 @@ function formRando(r){
         majGPX();toast(`Trace lue : ${trace.km} km`);}catch(err){toast(err.message,true);}};
   });
 }
+/* Bloc « Randonnées suggérées » : vit désormais en haut de l'onglet Sorties,
+   au-dessus du carnet personnel. */
+function blocSuggestions(){
+  const f=document.createDocumentFragment();
+  f.append(el("div",{class:"titre-bloc",style:"margin-top:4px"},"Randonnées suggérées"));
+  const car=el("div",{class:"carrousel"});
+  SUGGESTIONS.forEach(sg=>{
+    car.append(el("div",{class:"sugg"},
+      el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
+        el("h4",{},sg.n),
+        el("span",{class:"badge"},sg.niv)),
+      el("div",{class:"lieu-c"},"Vallouise-Pelvoux (05)"),
+      el("div",{class:"chiffres"},
+        el("span",{},"↔ "+sg.km+" km"),
+        el("span",{},"▲ "+nb(sg.dp)+" m"),
+        el("span",{},"⏱ "+sg.h+" h")),
+      el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px;margin-top:auto"},
+        el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
+          href:"https://www.google.com/search?q="+encodeURIComponent("site:visorando.com "+sg.n+" Vallouise")},
+          "Fiche Visorando ↗"),
+        el("button",{class:"mini",onclick:()=>{
+          ecrire(addDoc(collection(db,"randos"),{nom:sg.n,date:auj(),depart:sg.d,denivele:String(sg.dp),
+            duree:String(sg.h),niveau:sg.niv,texte:"",liens:[],trace:null,gps:null,faite:[],
+            uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
+        }},"+ Mon carnet"))));
+  });
+  f.append(car);
+  f.append(el("button",{class:"btn fant plein",style:"margin-top:4px",onclick:listeSecteur},
+    `Voir les ${RANDOS_SECTEUR.length} randonnées du secteur`));
+  return f;
+}
+
+/* Même principe que pour les photos : la rando disparaît à l'instant du clic
+   et reste masquée, même si le serveur refuse ou tarde à confirmer. */
+const randosMasquees=new Set(JSON.parse(localStorage.getItem("vl-randos-masquees")||"[]"));
+function supprimerRando(r){
+  const id=r.id;
+  randosMasquees.add(id);
+  localStorage.setItem("vl-randos-masquees",JSON.stringify([...randosMasquees]));
+  S.randos=S.randos.filter(x=>x.id!==id);
+  rendreRandos();                       // la carte disparaît immédiatement
+  rendreAccueil();
+  // les photos rattachées suivent
+  photosVisibles().filter(p=>p.rando===id).forEach(p=>{
+    memoriserMasquee(p.id);
+    deleteDoc(doc(db,"photos",p.id)).catch(e=>console.error("photo liée",e));
+  });
+  deleteDoc(doc(db,"randos",id))
+    .then(()=>toast("Rando supprimée"))
+    .catch(err=>{
+      console.error("suppression rando",err);
+      if(!window.__avisRegles){
+        window.__avisRegles=true;
+        toast("Rando masquée sur cet appareil. Publie les règles Firestore pour l'effacer partout.");
+      }
+    });
+}
 function rendreRandos(){
   const z=$("#liste-randos");if(!z)return;z.innerHTML="";
-  if(!S.randos.length){z.append(el("div",{class:"vide"},
-    el("b",{},"Le carnet est vide"),"Ajoute la première avec le bouton + : celle que tu referais demain."));return;}
-  z.append(el("div",{class:"titre-bloc"},`${S.randos.length} rando${S.randos.length>1?"s":""} au carnet`));
-  [...S.randos].sort((a,b)=>(val(b.date)||"")<(val(a.date)||"")?-1:1).forEach(r=>{
+
+  // en-tête de l'onglet : action principale, puis suggestions
+  z.append(el("button",{class:"btn accent plein",onclick:()=>formRando()},"+ Nouvelle rando"));
+  z.append(blocSuggestions());
+
+  const mes=S.randos.filter(r=>!randosMasquees.has(r.id));
+  z.append(el("div",{class:"titre-bloc"},"Mon carnet"));
+  if(!mes.length){z.append(el("div",{class:"vide"},
+    el("b",{},"Le carnet est vide"),"Ajoute la première avec le bouton ci-dessus : celle que tu referais demain."));return;}
+  z.append(el("div",{class:"meta",style:"margin:-4px 2px 10px"},
+    `${mes.length} rando${mes.length>1?"s":""} enregistrée${mes.length>1?"s":""}`));
+  [...mes].sort((a,b)=>(val(b.date)||"")<(val(a.date)||"")?-1:1).forEach(r=>{
     const faite=(r.faite||[]).includes(auth.currentUser.uid);
     const mien=r.uid===auth.currentUser.uid;
     const photos=photosVisibles().filter(p=>p.rando===r.id);
@@ -1410,7 +1498,7 @@ function rendreRandos(){
       el("button",{class:"mini",onclick:()=>pdfRando(r)},"PDF"),
       mien?el("button",{class:"mini",onclick:()=>formRando(r)},"Modifier"):null,
       mien?el("button",{class:"mini",onclick:()=>{
-        if(confirm("Supprimer cette rando ?"))ecrire(deleteDoc(doc(db,"randos",r.id)),"Supprimée");}},"🗑"):null));
+        if(confirm("Supprimer cette rando ?")) supprimerRando(r);}},"🗑"):null));
     z.append(carte);});
 }
 const texteRando=r=>[`🥾 ${r.nom}`,
@@ -1809,6 +1897,207 @@ const RANDOS_SECTEUR=[
 /* ═══════════════════════════════════════════════════════════
    RANDONNÉES DU SECTEUR — données Visorando (faits bruts)
    ═══════════════════════════════════════════════════════════ */
+const MAIRIE_SNAPSHOT={releve:"2026-08-17",pubs:[
+  {i:"A2026-084",c:"Arrêté municipal",o:"Circulation",t:"TEMP Circulation modifee - RD504 - SUDATI",d:"2026-06",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-084-temp-circulation-modifee-rd504-sudati.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-083",c:"Arrêté municipal",o:"Débit de boisson",t:"TEMP Débit de boisson temporaire - Fete des Guides",d:"2026-06",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2062-083-temp-debit-boisson-temporaire-fete-guides.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-082",c:"Arrêté municipal",o:"Circulation",t:"Circulation modifiee - Pierre Sainte - Croix Rouge - CIRCET",d:"2026-06",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-082-temp-circulation-modifiee-pierre-sainte-croix-rouge-circet.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-081",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Stationnement modifie - Gravière",d:"2026-06",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-081-temp-stationnement-modifie-graviere.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-080",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Stationnement - Place du Poet - Tourtes",d:"2026-06",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-080-temp-stationnement-place-poet-tourtes.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-079",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Circulation et stationnement modifies - Vallouise",d:"2026-06",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-079-temp-circulation-stationnement-modifies-vallouise.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-078",c:"Arrêté municipal",o:"Circulation",t:"TEMP Circulation modifiee - Pierre Sainte - Sogelink",d:"2026-06",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-078-temp-circulation-modifiee-pierre-sainte-sogelink.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-077",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Circulation et stationnement modifies - Puy Aillaud - Etec",d:"2026-06",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-077-temp-circulation-stationnement-modifies-puy-aillaud-etec.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-076",c:"Arrêté municipal",o:"Occupation du domaine public",t:"TEMP Autorisation occupation territoire - Pizzeria Ailefroide",d:"2026-06",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-076-temp-autorisation-occupation-territoire-pizzeria-ailefroide.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-075",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Circulation et stationnement modifies - Place de Eglise - DS Chapes",d:"2026-06",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-06/2026-075-temp-circulation-stationnement-modifies-place-eglise-ds-chapes.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-074",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Circulation et stationnement modifies - Rte Dessus Ville - Olive Travaux",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-074-temp-circulation-stationnement-modifies-rte-dessus-ville-olive-travaux.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-073",c:"Arrêté municipal",o:"Occupation du domaine public",t:"TEMP Autorisation occupation territoire - Watogla",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-073-temp-autorisation-occupation-territoire-watogla.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-071",c:"Arrêté municipal",o:"Occupation du domaine public",t:"TEMP Autorisation occupation territoire - foodtruck Kdanse",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-071-temp-autorisation-occupation-territoire-foodtruck-kdanse.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-070",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Stationnement - Ch des Horts - ACD05",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-070-temp-stationnement-ch-horts-acd05.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-069",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Stationnement - RD994E - Le Gyr",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-069-temp-stationnement-rd994e-gyr.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-068",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Circulation et stationnement modifies - Place de l'Eglise - SUDATI",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-068-temp-circulation-stationnement-modifies-place-eglise-sudati.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-067",c:"Arrêté municipal",o:"Circulation",t:"TEMP Circulation modifiee - RD994E - CIRCET",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-067-temp-circulation-modifiee-rd994e-circet.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-066",c:"Arrêté municipal",o:"Stationnement",t:"TEMP Stationnement - Rte de Dessus Ville - ALP Toiture",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-066-temp-stationnement-rte-dessus-ville-alp-toiture.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-065",c:"Arrêté municipal",o:"Circulation",t:"Circulation alternée RD994E - Route du Gyr - Pose glissières de sécurité",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-065-temp-circulation-alternee-rd994e-agilis-glissieres-securite.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-064",c:"Arrêté municipal",o:"Débit de boisson",t:"Débit de boisson temporaire - Fete Vallouise",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-064-temp-debit-boisson-temporaire-fete-vallouise.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-063",c:"Arrêté municipal",o:"Stationnement",t:"Circulation et stationnement - Fete Vallouise",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-063-temp-circulation-stationnement-fete-vallouise.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-062",c:"Arrêté municipal",o:"Stationnement",t:"Autorisation de stationnement - Chemin de Pra Peyron - SARL JM PALLUEL Echaffaudage",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-062-temp-autorisation-stationnement-chemin-pra-peyron-sarl-jm-palluel-echaffaudage.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-060",c:"Arrêté municipal",o:"Autre",t:"TEMP Reglementation des periodes et secteurs de travaux genants",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-060-temp-reglementation-periodes-secteurs-travaux-genants.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-059",c:"Arrêté municipal",o:"Stationnement",t:"Circulation et stationnement modifies - Defi de Vallouise",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-059-temp-circulation-stationnement-modifies-defi-vallouise.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-058",c:"Arrêté municipal",o:"Circulation",t:"Circulation interdite - RD421T - RoutiereMidi",d:"2026-05",n:"Danger/Urgence",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-058-temp-circulation-modifiee-rd421t-routieremidi.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-055",c:"Arrêté municipal",o:"Circulation",t:"Circulation interdite - Ch Pierre Sainte",d:"2026-05",n:"Danger/Urgence",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-055-temp-circulation-interdite-ch-pierre-sainte.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-054",c:"Arrêté municipal",o:"Circulation",t:"Circulation interdite - 1209 rte Montbrison",d:"2026-05",n:"Danger/Urgence",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-054-temp-circulation-interdite-1209-rte-montbrison.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-053",c:"Arrêté municipal",o:"Circulation",t:"Circulation modifiee - Rte de Pelvoux - CIRCET",d:"2026-05",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-053-temp-circulation-modifiee-rte-pelvoux-circet.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-051",c:"Arrêté municipal",o:"Occupation du domaine public",t:"AOT - AlexTerieur",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-051-temp-aot-alexterieur.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-050",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à Thierry Alphand",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-050-delegation-thierry-alphand.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-049",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à Gérard Moutier",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-049-delegation-gerard-moutier.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-048",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à Jacqueline Cherfils",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-048-delegation-jacqueline-cherfils.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-046",c:"Arrêté municipal",o:"Circulation",t:"Circulation modifiee - RD994E - Routière du midi",d:"2026-04",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-046-temp-circulation-modifiee-rd994e-routieremidi.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-045",c:"Arrêté municipal",o:"Circulation",t:"Circulation interdite - 1209 rte de Montbrison",d:"2026-04",n:"Danger/Urgence",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-045-temp-circulation-interdite-1209-rte-montbrison.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-044",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à Luc Kirkyacharian",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-044-delegation-luc-kirkyacharian.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-043",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à TAILLARD Delphine",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-043-delegation-taillard-delphine.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-042",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à DA SILVA Guillaume",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-042-delegation-da-silva-guillaume.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-041",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à BRUNEAU Gwenaelle",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-041-delegation-bruneau-gwenaelle.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-040",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à SGAS ARTAUD Myriam",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-040-delegation-sgas-artaud-myriam.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-039",c:"Arrêté municipal",o:"Délégation de signature",t:"Délégation à SGS MILLIEN JONATHAN",d:"2026-05",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-05/2026-039-delegation-sgs-millien-jonathan-finance.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-038",c:"Arrêté municipal",o:"Débit de boisson",t:"Débit de boisson temporaire - K'Danse",d:"2026-04",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-038-temp-debit-boisson-temporaire-k-danse_0.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-037",c:"Arrêté municipal",o:"Circulation",t:"Circulation interdite - 57 route de Dessus-Ville",d:"2026-04",n:"Danger/Urgence",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-037-temp-circulation-interdite-57-rte-dessus-ville.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-036",c:"Arrêté municipal",o:"Permission de voirie",t:"Permission de voirie - Chemin de la Champarie",d:"2026-04",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-036-perm-permission-voirie-chemin-champarie.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-035",c:"Arrêté municipal",o:"Occupation du domaine public",t:"Autorisation d'occupation du territoire - Riviere Odyssee",d:"2026-04",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-035-aot-riviere-odyssee.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-034",c:"Arrêté municipal",o:"Circulation",t:"Circulation interdite - Centre Vallouise - Ceremonie 8 mai",d:"2026-04",n:"Danger/Urgence",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-034-temp-circulation-interdite-centre-vallouise-ceremonie-8-mai.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-033",c:"Arrêté municipal",o:"Circulation",t:"Circulation modifiee - Rte de Pelvoux - Circet",d:"2026-04",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-033-temp-circulation-modifiee-rte-pelvoux-circet.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-032",c:"Arrêté municipal",o:"Circulation",t:"Circulation modifiee - Rte du Gyr - Agilis",d:"2026-04",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-032-temp-circulation-modifiee-rte-gyr-agilis.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-031",c:"Arrêté municipal",o:"Police de la route",t:"Limitation de vitesse",d:"2026-04",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-031-perm-limitation-vitesse.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-030",c:"Arrêté municipal",o:"Circulation",t:"Circulation modifée - RD421T - Routière du Midi",d:"2026-04",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-030-temp-circulation-modifiee-rd421t-routieremidi.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-029",c:"Arrêté municipal",o:"Circulation",t:"Circulation interdite pour le déneigement",d:"2026-04",n:"Danger/Urgence",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-029-temp-interdiction-circulation-deneigement.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-025",c:"Arrêté municipal",o:"Stationnement",t:"Stationnement place de l'Eglise - SAMSE",d:"2026-04",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-04/2026-025-temp-stationnement-place-eglise-samse.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-021",c:"Arrêté municipal",o:"Circulation",t:"Circulation modifiée - RD994E - Le Poet - RESODETECTION",d:"2026-03",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-03/2026-021-temp-modification-circulation-1055-rte-pelvoux.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-019",c:"Arrêté municipal",o:"Stationnement",t:"Circulation et stationnement - Centre bourg Vallouise - SEP'Arti 2026",d:"2026-03",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-03/2026-019-temp-circulation-stationnement-centre-bourg-vallouise-separti-2026.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-018",c:"Arrêté municipal",o:"Débit de boisson",t:"Débit de boisson temporaire - SEP'Arti",d:"2026-03",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-03/2026-018-temp-debit-boisson-temporaire-separti-2026.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-017",c:"Arrêté municipal",o:"Stationnement",t:"Stationnement Gravière - Foires et brocantes 2026",d:"2026-03",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-03/2026-017-temp-stationnement-graviere-foires-brocantes-2026.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-016",c:"Arrêté municipal",o:"Circulation",t:"Circulation modifiée - RD994E - Le Poet - INEO",d:"2026-03",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-03/2026-016-temp-modification-circulation-rd994e-ineo_0.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-008",c:"Arrêté municipal",o:"Déneigement",t:"Reglementation dans le cadre du déneigement",d:"2026-02",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-02/2026-008-temp-reglementation-cadre-deneigement.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-004",c:"Arrêté municipal",o:"Domaine skiable",t:"Ouverture des pistes de ski nordique",d:"2026-01",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-01/2026-004-temp-ouverture-pistes-ski-nordique.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-003",c:"Arrêté municipal",o:"Permission de voirie",t:"Permission de voirie - route de l'Eychauda",d:"2026-01",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-01/2026-003-perm-permission-voirie-389-rte-eychauda.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-002",c:"Arrêté municipal",o:"Stationnement",t:"Autorisation stationnement taxi - Changement de véhicule",d:"2026-01",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-01/2026-002-perm-ads-taxi-ndeg2-changement-vehicule_0.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"A2026-001",c:"Arrêté municipal",o:"Circulation",t:"Circulation pour travaux sur réseau fibre - Année 2026",d:"2026-01",n:"Météo/Travaux",f:"https://www.vallouise-pelvoux.fr/sites/default/files/arretes/2026-01/2026-001-temp-circulation-entretien-reseau-fibre-optique.pdf",u:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},
+  {i:"ACTU-agences-postales-intercommunales",c:"Info locale",o:"Actualité",t:"Agences Postales Intercommunales",d:null,n:"Normale",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/agences-postales-intercommunales"},
+  {i:"ACTU-info-campings",c:"Info locale",o:"Actualité",t:"INFO CAMPINGS",d:null,n:"Normale",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/info-campings"},
+  {i:"ACTU-offre-recrutement-referente-refuges",c:"Vie associative",o:"Actualité",t:"Offre de recrutement : Référent(e) refuges",d:null,n:"Normale",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/offre-recrutement-referente-refuges"},
+  {i:"ACTU-eclipse-solaire-12-aout-2026-protegez-vo",c:"Info locale",o:"Actualité",t:"Éclipse solaire du 12 août 2026 : protégez vos yeux",d:null,n:"Normale",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/eclipse-solaire-12-aout-2026-protegez-vos-yeux"},
+  {i:"ACTU-incendie-appel-aux-dons-restaurer-forets",c:"Info locale",o:"Actualité",t:"Incendie : un appel aux dons pour restaurer les forêts sinistrées",d:null,n:"Danger/Urgence",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/incendie-appel-aux-dons-restaurer-forets-sinistrees"},
+  {i:"ACTU-cp-incendie-decision-concertee-proteger-",c:"Info locale",o:"Actualité",t:"CP Incendie - Une décision concertée pour protéger la faune sauvage",d:null,n:"Danger/Urgence",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/cp-incendie-decision-concertee-proteger-faune-sauvage"},
+  {i:"ACTU-information-ressource-eau",c:"Info locale",o:"Actualité",t:"Information sur la ressource en eau",d:null,n:"Danger/Urgence",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/information-ressource-eau"},
+  {i:"ACTU-info-services-communaute-communes-impact",c:"Info locale",o:"Actualité",t:"Info - Services de la Communauté de Communes impactés par l'incendie",d:null,n:"Danger/Urgence",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/info-services-communaute-communes-impactes-incendie"},
+  {i:"ACTU-avis-enquete-publique-schema-coherence-t",c:"Info locale",o:"Actualité",t:"Avis d'enquête publique — Schéma de Cohérence Territoriale (SCoT)",d:null,n:"Normale",f:null,u:"https://www.vallouise-pelvoux.fr/actualites/avis-enquete-publique-schema-coherence-territoriale-scot"},
+  {i:"BM-9",c:"Bulletin municipal",o:"Bulletin",t:"Brochure n°9 — Janvier – Juin 2026",d:"2026",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/bulletins-municipaux/2026-08/vallouise-brochure-a5.pdf",u:"https://www.vallouise-pelvoux.fr/bulletin-municipal"},
+  {i:"BM-8",c:"Bulletin municipal",o:"Bulletin",t:"Brochure n°8 — Juin – Décembre 2025",d:"2025",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/bulletins-municipaux/2025-12/brochuren6juindec2025.pdf",u:"https://www.vallouise-pelvoux.fr/bulletin-municipal"},
+  {i:"BM-7",c:"Bulletin municipal",o:"Bulletin",t:"Brochure n°7 — Janvier – Avril 2025",d:"2025",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/bulletins-municipaux/2025-12/bulletin-municipal-ndeg7-2025.pdf",u:"https://www.vallouise-pelvoux.fr/bulletin-municipal"},
+  {i:"BM-6",c:"Bulletin municipal",o:"Bulletin",t:"Brochure n°6 — Juillet – Décembre 2024",d:"2024",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/bulletins-municipaux/2025-12/vallouise-brochure-ndeg6-juill-dec-2024.pdf",u:"https://www.vallouise-pelvoux.fr/bulletin-municipal"},
+  {i:"BM-5",c:"Bulletin municipal",o:"Bulletin",t:"Brochure n°5 — Avril – Juin 2024",d:"2024",n:"Normale",f:"https://www.vallouise-pelvoux.fr/sites/default/files/bulletins-municipaux/2025-12/vallouise-brochure-ndeg5-avril-juin-20240.pdf",u:"https://www.vallouise-pelvoux.fr/bulletin-municipal"}
+]};
+
+/* ═══════════════════════════════════════════════════════════
+   INFOS MAIRIE — Vallouise-Pelvoux
+   Les sites de la mairie et d'Illiwap n'autorisent pas les requêtes
+   croisées : le navigateur ne peut pas les interroger. L'app lit donc
+   ./mairie.json (même origine, régénéré par scrape-mairie.py) et
+   retombe sur l'instantané embarqué s'il est absent.
+   ═══════════════════════════════════════════════════════════ */
+const ILLIWAP="https://station.illiwap.com/fr/public/05101";
+const MAIRIE_ONGLETS=[
+  {c:"tout",   lib:"Toutes les infos"},
+  {c:"alertes",lib:"Alertes & travaux"},
+  {c:"actes",  lib:"Arrêtés & actes"},
+  {c:"bm",     lib:"Bulletins"}
+];
+const NIV_MAIRIE={
+  "Danger/Urgence":["#FBEAE5","#B44228"],
+  "Météo/Travaux": ["#FBF0E4","#9C6412"],
+  "Normale":       ["#E8F0F5","#2A6183"]
+};
+const CAT_MAIRIE={
+  "Arrêté municipal":  ["#EDF1EF","#41514E"],
+  "Bulletin municipal":["#EAF4EE","#2E6B48"],
+  "Info locale":       ["#E8F0F5","#2A6183"],
+  "Vie associative":   ["#F3EEFA","#6B3FA0"]
+};
+let MAIRIE={releve:MAIRIE_SNAPSHOT.releve, pubs:MAIRIE_SNAPSHOT.pubs, origine:"embarqué"};
+let mairieOnglet="tout";
+
+async function chargerMairie(){
+  try{
+    const r=await fetch("./mairie.json?t="+Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error("absent");
+    const d=await r.json();
+    if(!d.publications?.length) throw new Error("vide");
+    MAIRIE={releve:d.releve_le, origine:"mise à jour", pubs:d.publications.map(p=>({
+      i:p.id,c:p.categorie,o:p.objet,t:p.titre,d:p.date_mise_en_ligne,
+      n:p.niveau,f:p.url_document,u:p.url_source}))};
+  }catch(e){ /* on garde l'instantané embarqué */ }
+}
+
+function filtreMairie(p){
+  if(mairieOnglet==="tout")    return true;
+  if(mairieOnglet==="bm")      return p.c==="Bulletin municipal";
+  if(mairieOnglet==="actes")   return p.c==="Arrêté municipal";
+  if(mairieOnglet==="alertes") return p.n!=="Normale" && p.c!=="Bulletin municipal";
+  return true;
+}
+function moisLisible(d){
+  if(!d) return "date non publiée";
+  if(/^\d{4}$/.test(d)) return d;
+  const [a,m]=d.split("-");
+  return `${MOIS[+m-1]} ${a}`;
+}
+function carteMairie(p){
+  const [fn,en]=NIV_MAIRIE[p.n]||NIV_MAIRIE["Normale"];
+  const [fc,ec]=CAT_MAIRIE[p.c]||CAT_MAIRIE["Info locale"];
+  return el("div",{class:"mr-carte"},
+    el("div",{class:"mr-badges"},
+      el("span",{class:"mr-badge",style:`background:${fc};color:${ec}`},p.c),
+      p.n!=="Normale"?el("span",{class:"mr-badge",style:`background:${fn};color:${en}`},p.n):null),
+    el("h4",{},p.t),
+    el("div",{class:"meta",style:"margin-top:4px"},
+      [p.i,p.o,moisLisible(p.d)].filter(Boolean).join("  ·  ")),
+    el("div",{style:"margin-top:12px"},
+      p.f?el("a",{class:"btn accent plein",href:p.f,target:"_blank",rel:"noopener noreferrer"},
+          p.c==="Bulletin municipal"?"Ouvrir le bulletin (PDF) ↗":"Voir l'acte officiel (PDF) ↗")
+         :el("a",{class:"btn accent plein",href:p.u,target:"_blank",rel:"noopener noreferrer"},
+          "Accéder au site ↗")));
+}
+
+function infosMairie(){
+  const corps=el("div");
+  const zo=el("div",{class:"onglets",style:"flex-wrap:wrap"});
+  const zc=el("div",{class:"meta",style:"margin:12px 2px"});
+  const zl=el("div");
+
+  const dessiner=()=>{
+    const l=MAIRIE.pubs.filter(filtreMairie);
+    zc.textContent=`${l.length} publication${l.length>1?"s":""} · relevé du ${jolie(MAIRIE.releve)}`;
+    zl.innerHTML="";
+    if(!l.length){zl.append(el("div",{class:"vide"},el("b",{},"Rien dans cette rubrique"),
+      "Change d'onglet ou consulte directement le site de la mairie."));return;}
+    l.slice(0,60).forEach(p=>zl.append(carteMairie(p)));
+    if(l.length>60) zl.append(el("p",{class:"meta",style:"text-align:center;margin:12px"},
+      `+ ${l.length-60} autres sur le site de la mairie`));
+  };
+
+  MAIRIE_ONGLETS.forEach(o=>zo.append(el("button",{class:o.c===mairieOnglet?"on":"",
+    style:"flex:1 0 45%",onclick:e=>{
+      mairieOnglet=o.c;
+      [...zo.children].forEach(b=>b.classList.toggle("on",b===e.currentTarget));
+      dessiner();
+    }},o.lib)));
+
+  corps.append(
+    el("div",{class:"mr-live"},
+      el("div",{},
+        el("b",{},"Alertes en temps réel"),
+        el("p",{class:"txt",style:"margin-top:3px"},
+          "La commune diffuse ses alertes (route coupée, coupure d'eau, météo) sur Illiwap. "+
+          "Cette liste est un relevé daté : elle ne remplace pas le fil direct.")),
+      el("a",{class:"btn rouge plein",style:"margin-top:12px",href:ILLIWAP,
+        target:"_blank",rel:"noopener noreferrer"},"Ouvrir le fil Illiwap ↗")),
+    zo, zc, zl,
+    el("p",{class:"meta",style:"margin:16px 2px 0;line-height:1.6"},
+      "Titres, références et liens relevés sur vallouise-pelvoux.fr. Le contenu des arrêtés et "+
+      "des articles reste sur le site de la mairie : chaque bouton y renvoie."),
+    el("div",{class:"rangee",style:"margin-top:10px;flex-wrap:wrap"},
+      el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
+        href:"https://www.vallouise-pelvoux.fr/actualites"},"Actualités ↗"),
+      el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
+        href:"https://www.vallouise-pelvoux.fr/municipalite/actes-administratifs/arretes"},"Arrêtés ↗"),
+      el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
+        href:"https://www.vallouise-pelvoux.fr/bulletin-municipal"},"Bulletins ↗"),
+      el("a",{class:"mini",href:"tel:0492233019"},"Mairie 04 92 23 30 19")));
+
+  feuille("Infos mairie",corps,async()=>{
+    dessiner();
+    await chargerMairie();
+    dessiner();
+  });
+}
+
 const NIV_COULEUR={
   "Facile":               ["#EAF4EE","#2E6B48"],
   "Moyenne":              ["#E8F0F5","#2A6183"],
@@ -2080,33 +2369,14 @@ function rendreAccueil(){
   z.append(el("div",{class:"titre-bloc"},"Météo du village"));
   z.append(el("div",{class:"carte",id:"meteo"},el("div",{class:"meta"},"Chargement…")));
 
-  z.append(el("div",{class:"titre-bloc"},"Randonnée suggérée"));
-  const car=el("div",{class:"carrousel"});
-  SUGGESTIONS.forEach(sg=>{
-    car.append(el("div",{class:"sugg"},
-      el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
-        el("h4",{},sg.n),
-        el("span",{class:"badge"},sg.niv)),
-      el("div",{class:"lieu-c"},"Vallouise-Pelvoux (05)"),
-      el("div",{class:"chiffres"},
-        el("span",{},"↔ "+sg.km+" km"),
-        el("span",{},"▲ "+nb(sg.dp)+" m"),
-        el("span",{},"⏱ "+sg.h+" h")),
-      el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px;margin-top:auto"},
-        el("a",{class:"mini",target:"_blank",rel:"noopener",
-          href:"https://www.google.com/search?q="+encodeURIComponent("site:visorando.com "+sg.n+" Vallouise")},
-          "Fiche Visorando ↗"),
-        el("button",{class:"mini",onclick:()=>{
-          ecrire(addDoc(collection(db,"randos"),{nom:sg.n,depart:sg.d,denivele:String(sg.dp),
-            duree:String(sg.h),niveau:sg.niv,texte:"",liens:[],trace:null,gps:null,faite:[],
-            uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
-        }},"+ Mon carnet"))));
-  });
-  z.append(car);
-  z.append(el("button",{class:"btn fant plein",style:"margin-top:4px",onclick:listeSecteur},
-    `Voir les ${RANDOS_SECTEUR.length} randonnées du secteur`));
-
   /* ── Webcam en direct ─────────────────────────────────────── */
+  z.append(el("div",{class:"titre-bloc"},"Infos mairie"));
+  z.append(el("div",{class:"carte"},
+    el("p",{class:"txt",style:"margin:0 0 12px"},
+      "Arrêtés de circulation, actualités de la commune et bulletins municipaux, "+
+      "avec le fil d'alertes Illiwap."),
+    el("button",{class:"btn plein",onclick:infosMairie},"Ouvrir les infos mairie")));
+
   z.append(el("div",{class:"titre-bloc"},"La vallée en direct"));
   const bloc=el("div",{class:"cam-bloc"});
   const ongl=el("div",{class:"cam-onglets"});
@@ -2285,7 +2555,10 @@ $("#bloc-cal").addEventListener("touchend",e=>{
    ═══════════════════════════════════════════════════════════ */
 function ecouter(nom,champ,tri,rendu){
   onSnapshot(query(collection(db,nom),...(tri?[orderBy(...tri)]:[])),
-    snap=>{S[champ]=snap.docs.map(d=>({id:d.id,...d.data()}));rendu();},
+    snap=>{
+      S[champ]=snap.docs.map(d=>({id:d.id,...d.data()}))
+        .filter(x=>!(champ==="randos"&&randosMasquees.has(x.id)));
+      rendu();},
     err=>{console.error(nom,err);
       toast(`Lecture de « ${nom} » refusée — les règles Firestore doivent être mises à jour.`,true);});
 }

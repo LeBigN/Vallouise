@@ -106,7 +106,28 @@ Les photos sont **réduites dans le navigateur** (1400 px max, JPEG qualité 0,6
 
 ---
 
-## 6. Randonnées du secteur (données Visorando)
+## 6. Infos mairie (Vallouise-Pelvoux)
+
+Arrêtés municipaux, actualités de la commune et bulletins, avec renvoi vers le fil Illiwap.
+Bouton sur l'accueil, quatre onglets : Toutes les infos / Alertes & travaux / Arrêtés & actes / Bulletins.
+
+**Pourquoi ce module ne peut pas être « temps réel ».** Ni vallouise-pelvoux.fr ni Illiwap
+n'autorisent les requêtes croisées : le navigateur ne peut pas les interroger, quoi qu'on écrive
+côté client. L'app lit donc `mairie.json`, servi depuis la même origine qu'elle.
+
+**Pour l'actualiser automatiquement** : `scrape-mairie.py` récupère les trois pages et régénère
+`mairie.json`. Le fichier contient en commentaire le workflow GitHub Actions prêt à coller
+(`.github/workflows/mairie.yml`) : exécution quotidienne, commit du JSON, redéploiement de Pages.
+Sans cette mise en place, l'app affiche l'instantané embarqué du 17/08/2026, avec sa date visible.
+
+**Trois limites assumées :**
+- un arrêté de circulation peut avoir expiré — la date affichée est celle de mise en ligne, pas d'effet ;
+- le niveau d'urgence est déduit des mots du titre, ce n'est pas une qualification officielle ;
+- les alertes réelles passent par Illiwap : le module y renvoie, il ne les duplique pas.
+
+---
+
+## 7. Randonnées du secteur (données Visorando)
 
 38 itinéraires relevés sur `visorando.com/randonnee-vallouise.html` (départs Vallouise, Pelvoux,
 Puy-Saint-Vincent, Les Vigneaux) sont **embarqués dans l'app** : aucun appel réseau, tout fonctionne
@@ -129,7 +150,7 @@ la page et relancer le script.
 
 ---
 
-## 7. Apparence
+## 8. Apparence
 
 Onglet **L'appart › Apparence** : Automatique (suit le réglage du téléphone), Clair ou Sombre.
 Le choix est retenu dans `localStorage` (`vl-theme`) et appliqué avant le premier affichage par un
@@ -139,7 +160,7 @@ en direct, sans relancer l'app.
 
 ---
 
-## 8. Dépannage
+## 9. Dépannage
 
 **Un bouton ne fait rien / rien ne s'enregistre.** L'app affiche désormais un bandeau rouge ou un message
 d'erreur explicite dans les trois cas possibles :
@@ -161,12 +182,20 @@ depuis le PC) et me transmettre le message d'erreur.
 | « n'a jamais atteint le serveur » | la photo n'existe que dans le cache local (créée hors ligne et refusée à l'envoi) | Appart › Réinitialiser l'application |
 | rien, la photo revient au rechargement | écriture encore en attente | attendre la synchro, sablier ⌛ sur la vignette |
 
+Une randonnée supprimée suit exactement la même logique (clé `vl-randos-masquees`) : elle disparaît
+à l'instant du clic, ne revient pas au rechargement, et ses photos rattachées partent avec elle.
+
+Depuis la v19, une photo supprimée **reste masquée sur l'appareil quoi qu'il arrive** (liste retenue
+dans `localStorage`, clé `vl-photos-masquees`), sans message d'erreur d'autorisation. Attention à ce
+que cela implique : tant que la règle `allow delete` n'est pas publiée, la photo existe toujours
+côté serveur et reste visible pour les autres membres. Un message discret le rappelle une fois.
+
 **Après une mise à jour, le téléphone garde l'ancienne version.** Incrémenter `CACHE` dans
 `service-worker.js`, ou désinstaller/réinstaller la PWA.
 
 ---
 
-## 9. Cartes de randos, webcams, actualités
+## 10. Cartes de randos, webcams, actualités
 
 **Cartes de randos suggérées** : format compact, sans image — nom, commune, distance, dénivelé,
 durée, badge de difficulté et lien vers la fiche Visorando. Les photos restent réservées aux randos
@@ -184,7 +213,7 @@ sources permanentes (office de tourisme, station, parc national, vigilance).
 
 ---
 
-## 10. Traces GPX et app Exercice d'Apple
+## 11. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -203,7 +232,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 11. Idées pour la suite
+## 12. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
