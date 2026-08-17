@@ -62,6 +62,7 @@ html[data-theme="dark"] .mini:active{background:#33413E}
 html[data-theme="dark"] .onglets{background:#212E2B}
 html[data-theme="dark"] .onglets button.on{background:#33413E;color:#EDF1EF;box-shadow:none}
 html[data-theme="dark"] .fermer-x{background:#2B3937;color:#C2CFCB}
+html[data-theme="dark"] .feuille-tete{background:var(--neve)}
 html[data-theme="dark"] .fermer-x:active{background:#33413E}
 html[data-theme="dark"] .poignee{background:#33413E}
 html[data-theme="dark"] .vide{background:#1B2725;border-color:#2B3937}
@@ -107,6 +108,7 @@ html[data-theme="auto"] .mini:active{background:#33413E}
 html[data-theme="auto"] .onglets{background:#212E2B}
 html[data-theme="auto"] .onglets button.on{background:#33413E;color:#EDF1EF;box-shadow:none}
 html[data-theme="auto"] .fermer-x{background:#2B3937;color:#C2CFCB}
+html[data-theme="auto"] .feuille-tete{background:var(--neve)}
 html[data-theme="auto"] .fermer-x:active{background:#33413E}
 html[data-theme="auto"] .poignee{background:#33413E}
 html[data-theme="auto"] .vide{background:#1B2725;border-color:#2B3937}
@@ -161,7 +163,8 @@ button{cursor:pointer;border:none;background:none}
   white-space:nowrap;line-height:1.5}
 .alt b{display:block;font-size:15px;color:var(--neve);font-weight:500}
 
-main{padding:16px 14px 26px;max-width:760px;margin:0 auto}
+main{padding:16px 14px calc(26px + env(safe-area-inset-bottom, 0px));
+  max-width:600px;margin:0 auto;width:100%}
 .vue{display:none;animation:monte .22s ease both}
 .vue.on{display:block}
 @keyframes monte{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -253,27 +256,33 @@ textarea{min-height:78px;resize:vertical}
 .voile{position:fixed;inset:0;background:rgba(18,33,31,.55);z-index:60;
   display:none;align-items:flex-end;backdrop-filter:blur(2px)}
 .voile.on{display:flex}
-.feuille{background:var(--neve);width:100%;max-height:92vh;overflow-y:auto;
-  border-radius:20px 20px 0 0;padding:8px 16px calc(20px + var(--marge-bas));
+.feuille{background:var(--neve);width:100%;max-width:600px;margin:0 auto;
+  max-height:min(92dvh, 100dvh - 20px);overflow-y:auto;overscroll-behavior:contain;
+  border-radius:20px 20px 0 0;
+  padding:0 16px calc(28px + env(safe-area-inset-bottom, 20px));
   animation:monte-f .26s cubic-bezier(.2,.8,.3,1) both}
+.feuille-tete{position:sticky;top:0;z-index:9999;background:var(--neve);
+  padding:calc(6px + env(safe-area-inset-top, 0px)) 16px 10px;margin:0 -16px 2px}
+.tete-ligne{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 @keyframes monte-f{from{transform:translateY(100%)}to{transform:none}}
-.fermer-x{position:absolute;top:12px;right:14px;width:34px;height:34px;border-radius:50%;
+.fermer-x{position:relative;width:36px;height:36px;flex:none;border-radius:50%;
   background:#E9EDEB;color:var(--ardoise);font-size:16px;line-height:1;display:grid;place-items:center;
-  z-index:3;font-weight:600}
+  z-index:9999;font-weight:600;margin-top:-2px}
 .fermer-x:active{background:var(--brume)}
 .feuille{position:relative}
-.feuille h2{padding-right:44px}
-.poignee{width:44px;height:5px;border-radius:3px;background:#D3DAD6;margin:6px auto 12px;
+.feuille h2{padding-right:0;flex:1;min-width:0}
+.poignee{width:44px;height:5px;border-radius:3px;background:#D3DAD6;margin:0 auto 10px;
   cursor:grab;flex:none}
 .feuille{will-change:transform}
-.feuille h2{font-family:var(--display);font-size:var(--t-h2);margin:0 0 4px;font-weight:700;letter-spacing:-.02em}
+.feuille h2{font-family:var(--display);font-size:var(--t-h2);margin:0;font-weight:700;
+  letter-spacing:-.02em;line-height:1.25}
 @media(max-height:520px){
   .borne{padding-top:calc(8px + env(safe-area-inset-top));padding-bottom:10px}
   .borne h1{font-size:20px}
   .borne .lieu{margin-bottom:3px}
 }
 @media(min-width:640px){.voile{align-items:center;justify-content:center}
-  .feuille{max-width:520px;border-radius:20px;animation:none}}
+  .feuille{border-radius:20px;animation:none;max-height:min(86dvh, 100dvh - 60px)}}
 
 /* ── Navigation ─────────────────────────────────────────────── */
 nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.94);
@@ -394,27 +403,16 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 .carrousel::after{content:"";flex:none;width:4px}
 .sugg{flex:none;width:238px;scroll-snap-align:start;background:var(--blanc);border-radius:var(--r);
   border:1px solid var(--bord);box-shadow:var(--ombre);overflow:hidden}
-/* carte rando : photo pleine hauteur, texte en surimpression */
-.sugg{position:relative;height:250px;border:0}
-.sugg .vis{position:absolute;inset:0}
-.sugg .vis svg,.sugg .vis img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.sugg .voile-p{position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(10,20,18,.90) 0%,rgba(10,20,18,.55) 38%,rgba(10,20,18,.06) 72%)}
-.sugg .badge{position:absolute;top:11px;left:11px;font-family:var(--corps);font-size:10.5px;
-  letter-spacing:.09em;text-transform:uppercase;color:#12211F;background:rgba(255,255,255,.93);
-  padding:5px 10px;border-radius:20px;font-weight:700}
-.sugg .cam{position:absolute;top:9px;right:9px;width:31px;height:31px;border-radius:50%;
-  background:rgba(18,33,31,.55);color:#fff;display:grid;place-items:center;font-size:14px;
-  backdrop-filter:blur(3px)}
-.sugg .cnt{position:absolute;left:0;right:0;bottom:0;padding:13px 14px 14px;color:#fff}
-.sugg h4{font-family:var(--display);font-size:17.5px;margin:0 0 5px;font-weight:700;
-  line-height:1.15;letter-spacing:-.02em;text-shadow:0 1px 6px rgba(0,0,0,.45)}
-.sugg .lieu-c{font-size:12px;color:rgba(255,255,255,.85);margin-bottom:6px;
-  text-shadow:0 1px 4px rgba(0,0,0,.4)}
-.sugg .chiffres{display:flex;gap:12px;font-family:var(--corps);font-size:12px;font-weight:500;
-  color:rgba(255,255,255,.92);margin-bottom:9px;flex-wrap:wrap}
-.sugg .cnt .mini{background:rgba(255,255,255,.18);color:#fff;backdrop-filter:blur(3px)}
-.sugg .cnt .mini:active{background:rgba(255,255,255,.3)}
+/* carte rando compacte : uniquement l'essentiel */
+.sugg{display:flex;flex-direction:column;gap:5px;padding:14px 15px 15px;min-height:150px}
+.sugg h4{font-family:var(--display);font-size:16.5px;margin:0;font-weight:700;
+  line-height:1.2;letter-spacing:-.02em}
+.sugg .badge{flex:none;font-family:var(--corps);font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--meleze-sombre);background:rgba(224,122,31,.13);
+  padding:4px 9px;border-radius:20px;font-weight:700;margin-top:2px}
+.sugg .lieu-c{font-size:12.5px;color:var(--granit)}
+.sugg .chiffres{display:flex;gap:12px;font-family:var(--corps);font-size:12.5px;font-weight:500;
+  color:var(--ardoise);flex-wrap:wrap;margin:3px 0 10px}
 
 /* webcam */
 .cam-bloc{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);
@@ -618,15 +616,22 @@ function toast(msg,mauvais){const t=$("#toast");t.textContent=msg;
 
 let scrollY=0;
 function feuille(titre,corps,apres){
-  const f=$("#feuille");f.innerHTML='<div class="poignee"></div>';
+  const f=$("#feuille");f.innerHTML="";
+  // en-tête collant : la croix reste atteignable même après avoir fait
+  // défiler un long formulaire, et passe sous la barre d'état iOS
   f.append(
-    el("button",{class:"fermer-x","aria-label":"Fermer",onclick:fermer},"✕"),
-    el("h2",{},titre), corps);
+    el("div",{class:"feuille-tete"},
+      el("div",{class:"poignee"}),
+      el("div",{class:"tete-ligne"},
+        el("h2",{},titre),
+        el("button",{class:"fermer-x","aria-label":"Fermer",onclick:fermer},"✕"))),
+    corps);
   f.scrollTop=0;
   // verrou de défilement de l'arrière-plan
   scrollY=window.scrollY;
   document.body.style.position="fixed";
   document.body.style.top=`-${scrollY}px`;
+  document.body.style.left="0";document.body.style.right="0";document.body.style.bottom="0";
   document.body.style.width="100%";
   document.body.style.overflow="hidden";
   $("#voile").classList.add("on");apres?.();
@@ -635,6 +640,7 @@ const fermer=()=>{
   const f=$("#feuille");f.style.transition="";f.style.transform="";
   $("#voile").classList.remove("on");
   document.body.style.position="";document.body.style.top="";
+  document.body.style.left="";document.body.style.right="";document.body.style.bottom="";
   document.body.style.width="";document.body.style.overflow="";
   window.scrollTo(0,scrollY);
 };
@@ -645,6 +651,7 @@ $("#voile").addEventListener("click",e=>{if(e.target.id==="voile"&&!$("#voile").
   f.addEventListener("touchstart",e=>{
     if($("#voile").dataset.bloque)return;
     const t=e.target.tagName; if(t==="TEXTAREA"||t==="SELECT"||t==="INPUT")return;
+    if(e.target.closest(".fermer-x"))return;      // la croix reste cliquable
     if(f.scrollTop>0)return;                       // on laisse d'abord finir le défilement interne
     y0=e.touches[0].clientY;dy=0;actif=true;f.style.transition="none";
     e.stopPropagation();},{passive:true});
@@ -1303,7 +1310,7 @@ function formRando(r){
     el("input",{type:"date",id:"r-date",value:val(r?.date)||auj()}),
     el("label",{},"Départ"),
     el("input",{id:"r-dep",placeholder:"Parking de Chambran",value:val(r?.depart)}),
-    el("button",{class:"btn fant plein",id:"r-geo",style:"margin-top:8px"},"📍 Me géolocaliser"),
+    el("button",{class:"btn fant plein",id:"r-geo",style:"margin-top:8px"},"Me géolocaliser"),
     zGPS,
     el("div",{class:"duo"},
       el("div",{},el("label",{},"Dénivelé (m)"),el("input",{id:"r-den",type:"number",inputmode:"numeric",value:val(r?.denivele)})),
@@ -1431,7 +1438,7 @@ function formPrise(pr){
       el("div",{},el("label",{},"Heure"),el("input",{type:"time",id:"pk-h",value:hDef}))),
     el("label",{},"Lieu"),
     el("input",{id:"pk-l",placeholder:"La Gyronde, sous le pont",value:val(pr?.lieu)}),
-    el("button",{class:"btn fant plein",id:"pk-geo",style:"margin-top:8px"},"📍 Enregistrer le spot"),
+    el("button",{class:"btn fant plein",id:"pk-geo",style:"margin-top:8px"},"Enregistrer le spot"),
     zGPS,
     el("label",{},"Technique"),
     el("select",{id:"pk-tec",html:TECHNIQUES.map(t=>`<option ${pr?.technique===t?"selected":""}>${t}</option>`).join("")}),
@@ -1862,62 +1869,6 @@ async function chargerMeteo(){
     z.append(el("div",{class:"meta"},"Météo indisponible (pas de réseau ?). Elle s'affichera au retour de la connexion."));
   }
 }
-/* La photo de couverture vient du carnet de la famille :
-   soit choisie exprès (champ sugg), soit reprise d'une rando du même nom. */
-function couvertureDe(nom){
-  const v=photosVisibles();
-  const choisie=v.find(p=>p.sugg===nom);
-  if(choisie) return choisie;
-  const r=S.randos.find(x=>x.nom===nom);
-  if(r){ const p=v.find(x=>x.rando===r.id); if(p) return p; }
-  return null;
-}
-function choisirCouverture(nom){
-  const c=el("div");
-  const dispo=photosVisibles();
-  c.append(el("p",{class:"meta"},
-    `La photo de couverture de « ${nom} » vient de vos propres photos — rien n'est emprunté ailleurs.`));
-  if(dispo.length){
-    c.append(el("div",{class:"titre-bloc"},"Depuis le mur"));
-    const g=el("div",{class:"photos"});
-    dispo.forEach(p=>g.append(el("img",{src:p.data,alt:"",loading:"lazy",onclick:()=>{
-      ecrire(updateDoc(doc(db,"photos",p.id),{sugg:nom}),"Couverture mise à jour",fermer);}})));
-    c.append(g);
-  }
-  c.append(el("div",{class:"titre-bloc"},"Ou depuis le téléphone"),
-    el("input",{type:"file",id:"cv-f",accept:"image/*"}),
-    el("p",{class:"meta",style:"margin-top:8px"},"La photo rejoindra aussi le mur Photos."));
-  const actuelle=couvertureDe(nom);
-  if(actuelle&&actuelle.sugg===nom)
-    c.append(el("button",{class:"btn danger plein",style:"margin-top:14px",onclick:()=>{
-      ecrire(updateDoc(doc(db,"photos",actuelle.id),{sugg:null}),"Couverture retirée",fermer);
-    }},"Retirer la couverture actuelle"));
-  feuille("Photo de couverture",c,()=>{
-    $("#cv-f").onchange=async e=>{
-      const f=e.target.files[0]; if(!f) return;
-      toast("Préparation…");
-      try{
-        const data=await preparerPhoto(f);
-        if(!data) return toast("Photo trop lourde",true);
-        ecrire(addDoc(collection(db,"photos"),{data,legende:nom,date:auj(),
-          rando:null,prise:null,sugg:nom,uid:auth.currentUser.uid,cree:serverTimestamp()}),
-          "Couverture enregistrée",fermer);
-      }catch(err){toast("Photo illisible",true);}
-    };
-  });
-}
-function visuelSugg(s){
-  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
-  svg.setAttribute("viewBox","0 0 240 100");svg.setAttribute("preserveAspectRatio","none");
-  const id="g"+Math.random().toString(36).slice(2,7);
-  svg.innerHTML=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${s.t[0]}"/><stop offset="1" stop-color="${s.t[1]}"/></linearGradient></defs>
-    <rect width="240" height="100" fill="url(#${id})"/>
-    <path d="M-10 100 L60 42 L96 74 L130 36 L190 100 Z" fill="rgba(255,255,255,.22)"/>
-    <path d="M100 100 L160 50 L200 82 L250 100 Z" fill="rgba(255,255,255,.16)"/>
-    <path d="M60 42 L48 58 L60 53 L72 60 Z" fill="rgba(255,255,255,.55)"/>`;
-  return svg;
-}
 function formLien(l){
   let image=l?.image||null;
   const zi=el("div",{class:"bande-photos",style:"margin-top:8px"});
@@ -1993,31 +1944,24 @@ function rendreAccueil(){
   z.append(el("div",{class:"titre-bloc"},"Randonnée suggérée"));
   const car=el("div",{class:"carrousel"});
   SUGGESTIONS.forEach(sg=>{
-    const cv=couvertureDe(sg.n);
-    const vis=el("div",{class:"vis"});
-    vis.append(cv?el("img",{src:cv.data,alt:sg.n,loading:"lazy"}):visuelSugg(sg));
-    vis.append(el("div",{class:"voile-p"}));
     car.append(el("div",{class:"sugg"},
-      vis,
-      el("span",{class:"badge"},sg.niv),
-      el("button",{class:"cam",title:"Photo de couverture",
-        onclick:()=>choisirCouverture(sg.n)},cv?"⟳":"📷"),
-      el("div",{class:"cnt"},
+      el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
         el("h4",{},sg.n),
-        el("div",{class:"lieu-c"},"Vallouise-Pelvoux (05)"),
-        el("div",{class:"chiffres"},
-          el("span",{},"↔ "+sg.km+" km"),
-          el("span",{},"▲ "+nb(sg.dp)+" m"),
-          el("span",{},"⏱ "+sg.h+" h")),
-        el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px"},
-          el("a",{class:"mini",target:"_blank",rel:"noopener",
-            href:"https://www.google.com/search?q="+encodeURIComponent("site:visorando.com "+sg.n+" Vallouise")},
-            "Fiche Visorando ↗"),
-          el("button",{class:"mini",onclick:()=>{
-            ecrire(addDoc(collection(db,"randos"),{nom:sg.n,depart:sg.d,denivele:String(sg.dp),
-              duree:String(sg.h),niveau:sg.niv,texte:"",liens:[],trace:null,gps:null,faite:[],
-              uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
-          }},"+ Mon carnet")))));
+        el("span",{class:"badge"},sg.niv)),
+      el("div",{class:"lieu-c"},"Vallouise-Pelvoux (05)"),
+      el("div",{class:"chiffres"},
+        el("span",{},"↔ "+sg.km+" km"),
+        el("span",{},"▲ "+nb(sg.dp)+" m"),
+        el("span",{},"⏱ "+sg.h+" h")),
+      el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px;margin-top:auto"},
+        el("a",{class:"mini",target:"_blank",rel:"noopener",
+          href:"https://www.google.com/search?q="+encodeURIComponent("site:visorando.com "+sg.n+" Vallouise")},
+          "Fiche Visorando ↗"),
+        el("button",{class:"mini",onclick:()=>{
+          ecrire(addDoc(collection(db,"randos"),{nom:sg.n,depart:sg.d,denivele:String(sg.dp),
+            duree:String(sg.h),niveau:sg.niv,texte:"",liens:[],trace:null,gps:null,faite:[],
+            uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
+        }},"+ Mon carnet"))));
   });
   z.append(car);
 

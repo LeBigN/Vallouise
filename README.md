@@ -145,9 +145,9 @@ depuis le PC) et me transmettre le message d'erreur.
 
 ## 8. Photos de couverture, webcams, actualités
 
-**Couvertures de randos** : aucune image n'est empruntée à un site tiers — chaque carte de
-suggestion prend une photo de votre propre mur (icône appareil photo sur la carte). Techniquement
-la photo reçoit un champ `sugg` : aucune règle Firestore supplémentaire n'est nécessaire.
+**Cartes de randos suggérées** : format compact, sans image — nom, commune, distance, dénivelé,
+durée, badge de difficulté et lien vers la fiche Visorando. Les photos restent réservées aux randos
+du carnet et au mur Photos.
 
 **Webcams** : l'app intègre les lecteurs publiés par l'office de tourisme du Pays des Écrins
 (`vision-environnement.com/live/player/...`), sélectionnables entre Front de neige, Secteur 1800 m,
