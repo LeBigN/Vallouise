@@ -2800,23 +2800,6 @@ function rendreAccueil(){
   z.append(el("div",{class:"titre-bloc"},"Météo du village"));
   z.append(el("div",{class:"carte",id:"meteo"},el("div",{class:"meta"},"Chargement…")));
 
-  /* ── Randonnées suggérées : même module que dans l'onglet Sorties ── */
-  z.append(blocSuggestions());
-
-  /* ── Webcam en direct ─────────────────────────────────────── */
-  z.append(el("div",{class:"titre-bloc"},"Numéros utiles"));
-  z.append(el("div",{class:"carte"},
-    el("p",{class:"txt",style:"margin:0 0 12px"},
-      "Secours, mairie, commerces et taxis de la vallée : appel et itinéraire en un geste."),
-    el("button",{class:"btn plein",onclick:ouvrirAnnuaire},"Ouvrir l'annuaire")));
-
-  z.append(el("div",{class:"titre-bloc"},"Infos mairie"));
-  z.append(el("div",{class:"carte"},
-    el("p",{class:"txt",style:"margin:0 0 12px"},
-      "Arrêtés de circulation, actualités de la commune et bulletins municipaux, "+
-      "avec le fil d'alertes Illiwap."),
-    el("button",{class:"btn plein",onclick:infosMairie},"Ouvrir les infos mairie")));
-
   z.append(el("div",{class:"titre-bloc"},"La vallée en direct"));
   const bloc=el("div",{class:"cam-bloc"});
   const ongl=el("div",{class:"cam-onglets"});
@@ -2841,6 +2824,23 @@ function rendreAccueil(){
   bloc.append(ongl,cadre,pied);
   z.append(bloc);
   majCam();
+
+
+  /* ── Randonnées suggérées : même module que dans l'onglet Sorties ── */
+  z.append(blocSuggestions());
+
+  z.append(el("div",{class:"titre-bloc"},"Numéros utiles"));
+  z.append(el("div",{class:"carte"},
+    el("p",{class:"txt",style:"margin:0 0 12px"},
+      "Secours, mairie, commerces et taxis de la vallée : appel et itinéraire en un geste."),
+    el("button",{class:"btn plein",onclick:ouvrirAnnuaire},"Ouvrir l'annuaire")));
+
+  z.append(el("div",{class:"titre-bloc"},"Infos mairie"));
+  z.append(el("div",{class:"carte"},
+    el("p",{class:"txt",style:"margin:0 0 12px"},
+      "Arrêtés de circulation, actualités de la commune et bulletins municipaux, "+
+      "avec le fil d'alertes Illiwap."),
+    el("button",{class:"btn plein",onclick:infosMairie},"Ouvrir les infos mairie")));
 
   /* ── Actualités ───────────────────────────────────────────── */
   z.append(el("div",{class:"titre-bloc"},"Liens utiles"));
