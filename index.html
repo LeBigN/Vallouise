@@ -2369,6 +2369,9 @@ function rendreAccueil(){
   z.append(el("div",{class:"titre-bloc"},"Météo du village"));
   z.append(el("div",{class:"carte",id:"meteo"},el("div",{class:"meta"},"Chargement…")));
 
+  /* ── Randonnées suggérées : même module que dans l'onglet Sorties ── */
+  z.append(blocSuggestions());
+
   /* ── Webcam en direct ─────────────────────────────────────── */
   z.append(el("div",{class:"titre-bloc"},"Infos mairie"));
   z.append(el("div",{class:"carte"},
