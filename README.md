@@ -50,7 +50,8 @@ service cloud.firestore {
       allow update: if connecte() && (proprio()
                       // randos, fiches pratiques et liens sont collaboratifs
                       || col == 'randos' || col == 'infos' || col == 'liens');
-      allow delete: if connecte() && proprio();
+      // le mur photo est commun : chacun peut y faire le ménage
+      allow delete: if connecte() && (proprio() || col == 'photos');
     }
   }
 }
