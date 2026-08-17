@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#12211F">
+<script>
+/* Appliqué avant tout affichage : évite le clignotement clair au chargement */
+(function(){
+  var t=localStorage.getItem("vl-theme")||"auto";
+  document.documentElement.setAttribute("data-theme",t);
+  var sombre=t==="dark"||(t==="auto"&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+  var m=document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute("content",sombre?"#0D1615":"#12211F");
+})();
+</script>
 <title>Vallouise Hub</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -26,6 +36,8 @@
      mais pointe désormais sur la même famille, en plus petit et espacé */
   --cote:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
   --bord:#E8ECEA;
+  --sur-sombre:#12211F; --sur-texte:#F4F6F4;   /* bandeau, toast : toujours sombres */
+  --btn-bg:#12211F; --btn-fg:#F4F6F4;          /* bouton principal */
   --r:16px; --r-s:11px; --r-xs:9px;
   --ombre:0 1px 1px rgba(18,33,31,.03),0 4px 14px rgba(18,33,31,.05);
   --ombre-h:0 2px 4px rgba(18,33,31,.05),0 10px 28px rgba(18,33,31,.08);
@@ -35,6 +47,96 @@
   --marge-bas:min(env(safe-area-inset-bottom), 16px);
   --nav-h:calc(62px + var(--marge-bas));
 }
+html[data-theme="dark"]{
+  --nuit:#EDF1EF; --ardoise:#C2CFCB; --granit:#8A9995;
+  --brume:#26332F; --bord:#2B3937; --neve:#141E1C; --blanc:#1B2725;
+  --sur-sombre:#0D1615; --sur-texte:#EDF1EF;
+  --btn-bg:#EDF1EF; --btn-fg:#12211F;
+  --ombre:0 1px 1px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.3);
+  --ombre-h:0 2px 6px rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.45);
+}
+
+html[data-theme="dark"] .txt{color:#C7D3D0}
+html[data-theme="dark"] .mini{background:#26332F;color:#C2CFCB}
+html[data-theme="dark"] .mini:active{background:#33413E}
+html[data-theme="dark"] .onglets{background:#212E2B}
+html[data-theme="dark"] .onglets button.on{background:#33413E;color:#EDF1EF;box-shadow:none}
+html[data-theme="dark"] .fermer-x{background:#2B3937;color:#C2CFCB}
+html[data-theme="dark"] .fermer-x:active{background:#33413E}
+html[data-theme="dark"] .poignee{background:#33413E}
+html[data-theme="dark"] .vide{background:#1B2725;border-color:#2B3937}
+html[data-theme="dark"] nav{background:rgba(20,30,28,.93)}
+html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#141E1C;border-color:#2B3937;color:#EDF1EF}
+html[data-theme="dark"] input:focus,html[data-theme="dark"] select:focus,html[data-theme="dark"] textarea:focus{box-shadow:0 0 0 3px rgba(224,122,31,.18)}
+html[data-theme="dark"] .jour.passe{color:#3C4A47}
+html[data-theme="dark"] .ptr-rond{background:#1B2725;border-color:#2B3937}
+html[data-theme="dark"] .ptr-rond::after{border-color:#33413E;border-top-color:var(--meleze)}
+html[data-theme="dark"] .actu .res{color:#B4C1BD}
+html[data-theme="dark"] .badge-v .vtxt{color:#B4C1BD}
+html[data-theme="dark"] .badge-v .pastille-v{box-shadow:0 0 0 5px rgba(0,0,0,.30) inset}
+html[data-theme="dark"] .alerte-c p{color:#C7D3D0}
+html[data-theme="dark"] .a-orage{background:#221C2E;border-color:#332A45} html[data-theme="dark"] .a-orage .pic{background:#33294A;color:#C3A6E8}
+html[data-theme="dark"] .a-pluie{background:#182631;border-color:#25384A} html[data-theme="dark"] .a-pluie .pic{background:#22384A;color:#8FC2E4}
+html[data-theme="dark"] .a-neige{background:#1A272B;border-color:#27393F} html[data-theme="dark"] .a-neige .pic{background:#25383E;color:#9CC6D6}
+html[data-theme="dark"] .a-vent {background:#271F14;border-color:#3B2F1D} html[data-theme="dark"] .a-vent  .pic{background:#3B2C15;color:#E8BC7A}
+html[data-theme="dark"] .n-vert  {background:#152219;border-color:#264030}
+html[data-theme="dark"] .n-jaune {background:#241E10;border-color:#3E351B}
+html[data-theme="dark"] .n-orange{background:#261A0E;border-color:#432D14}
+html[data-theme="dark"] .n-rouge {background:#26150F;border-color:#43221A}
+html[data-theme="dark"] .cam-onglets button{background:#26332F;color:#C2CFCB}
+html[data-theme="dark"] .sugg .badge{background:rgba(240,244,242,.94);color:#12211F}
+html[data-theme="dark"] .non-sync{background:rgba(0,0,0,.7)}
+html[data-theme="dark"] .lb{background:rgba(6,12,11,.97)}
+html[data-theme="dark"] .reseau{background:#212E2B;color:#C2CFCB}
+html[data-theme="dark"] .reseau.off{background:#33413E;color:#EDF1EF}
+html[data-theme="dark"] .recap{background:#212E2B}
+
+@media (prefers-color-scheme: dark){
+html[data-theme="auto"]{
+  --nuit:#EDF1EF; --ardoise:#C2CFCB; --granit:#8A9995;
+  --brume:#26332F; --bord:#2B3937; --neve:#141E1C; --blanc:#1B2725;
+  --sur-sombre:#0D1615; --sur-texte:#EDF1EF;
+  --btn-bg:#EDF1EF; --btn-fg:#12211F;
+  --ombre:0 1px 1px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.3);
+  --ombre-h:0 2px 6px rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.45);
+}
+
+html[data-theme="auto"] .txt{color:#C7D3D0}
+html[data-theme="auto"] .mini{background:#26332F;color:#C2CFCB}
+html[data-theme="auto"] .mini:active{background:#33413E}
+html[data-theme="auto"] .onglets{background:#212E2B}
+html[data-theme="auto"] .onglets button.on{background:#33413E;color:#EDF1EF;box-shadow:none}
+html[data-theme="auto"] .fermer-x{background:#2B3937;color:#C2CFCB}
+html[data-theme="auto"] .fermer-x:active{background:#33413E}
+html[data-theme="auto"] .poignee{background:#33413E}
+html[data-theme="auto"] .vide{background:#1B2725;border-color:#2B3937}
+html[data-theme="auto"] nav{background:rgba(20,30,28,.93)}
+html[data-theme="auto"] input,html[data-theme="auto"] select,html[data-theme="auto"] textarea{background:#141E1C;border-color:#2B3937;color:#EDF1EF}
+html[data-theme="auto"] input:focus,html[data-theme="auto"] select:focus,html[data-theme="auto"] textarea:focus{box-shadow:0 0 0 3px rgba(224,122,31,.18)}
+html[data-theme="auto"] .jour.passe{color:#3C4A47}
+html[data-theme="auto"] .ptr-rond{background:#1B2725;border-color:#2B3937}
+html[data-theme="auto"] .ptr-rond::after{border-color:#33413E;border-top-color:var(--meleze)}
+html[data-theme="auto"] .actu .res{color:#B4C1BD}
+html[data-theme="auto"] .badge-v .vtxt{color:#B4C1BD}
+html[data-theme="auto"] .badge-v .pastille-v{box-shadow:0 0 0 5px rgba(0,0,0,.30) inset}
+html[data-theme="auto"] .alerte-c p{color:#C7D3D0}
+html[data-theme="auto"] .a-orage{background:#221C2E;border-color:#332A45} html[data-theme="auto"] .a-orage .pic{background:#33294A;color:#C3A6E8}
+html[data-theme="auto"] .a-pluie{background:#182631;border-color:#25384A} html[data-theme="auto"] .a-pluie .pic{background:#22384A;color:#8FC2E4}
+html[data-theme="auto"] .a-neige{background:#1A272B;border-color:#27393F} html[data-theme="auto"] .a-neige .pic{background:#25383E;color:#9CC6D6}
+html[data-theme="auto"] .a-vent {background:#271F14;border-color:#3B2F1D} html[data-theme="auto"] .a-vent  .pic{background:#3B2C15;color:#E8BC7A}
+html[data-theme="auto"] .n-vert  {background:#152219;border-color:#264030}
+html[data-theme="auto"] .n-jaune {background:#241E10;border-color:#3E351B}
+html[data-theme="auto"] .n-orange{background:#261A0E;border-color:#432D14}
+html[data-theme="auto"] .n-rouge {background:#26150F;border-color:#43221A}
+html[data-theme="auto"] .cam-onglets button{background:#26332F;color:#C2CFCB}
+html[data-theme="auto"] .sugg .badge{background:rgba(240,244,242,.94);color:#12211F}
+html[data-theme="auto"] .non-sync{background:rgba(0,0,0,.7)}
+html[data-theme="auto"] .lb{background:rgba(6,12,11,.97)}
+html[data-theme="auto"] .reseau{background:#212E2B;color:#C2CFCB}
+html[data-theme="auto"] .reseau.off{background:#33413E;color:#EDF1EF}
+html[data-theme="auto"] .recap{background:#212E2B}
+}
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--neve)}
 html,body{margin:0;padding:0}
@@ -46,8 +148,8 @@ button{cursor:pointer;border:none;background:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ── Bandeau d'altitude ─────────────────────────────────────── */
-.borne{position:relative;overflow:hidden;background:var(--nuit);color:var(--neve);
-  padding:calc(14px + env(safe-area-inset-top)) 18px 16px}
+.borne{position:relative;overflow:hidden;background:var(--sur-sombre);color:var(--sur-texte);
+  padding:calc(48px + env(safe-area-inset-top)) 18px 16px}
 .borne svg.fond{position:absolute;inset:0;width:100%;height:100%;opacity:.28}
 .borne-in{position:relative;display:flex;align-items:flex-end;justify-content:space-between;
   gap:12px;padding-right:64px}
@@ -55,7 +157,8 @@ button{cursor:pointer;border:none;background:none}
   margin:0;letter-spacing:-.03em}
 .borne .lieu{font-family:var(--corps);font-size:11px;font-weight:600;letter-spacing:.16em;white-space:nowrap;
   text-transform:uppercase;color:var(--meleze);margin-bottom:6px;display:block}
-.alt{font-family:var(--cote);font-size:11px;text-align:right;color:rgba(244,246,244,.55);white-space:nowrap;line-height:1.5}
+.alt{font-family:var(--corps);font-size:11.5px;text-align:right;color:rgba(244,246,244,.55);
+  white-space:nowrap;line-height:1.5}
 .alt b{display:block;font-size:15px;color:var(--neve);font-weight:500}
 
 main{padding:16px 14px 26px;max-width:760px;margin:0 auto}
@@ -82,12 +185,12 @@ main{padding:16px 14px 26px;max-width:760px;margin:0 auto}
   margin-bottom:5px;letter-spacing:-.015em}
 
 /* ── Boutons ────────────────────────────────────────────────── */
-.btn{background:var(--nuit);color:var(--neve);border-radius:11px;padding:11px 16px;
+.btn{background:var(--btn-bg);color:var(--btn-fg);border-radius:11px;padding:11px 16px;
   font-weight:600;font-size:14.5px;display:inline-flex;align-items:center;gap:7px;
   transition:transform .12s,filter .12s}
 .btn:active{transform:scale(.975);filter:brightness(.94)}
-.btn.accent{background:var(--meleze)}
-.btn.rouge{background:var(--alerte)}
+.btn.accent{background:var(--meleze);color:#fff}
+.btn.rouge{background:var(--alerte);color:#fff}
 a.btn,a.mini{text-decoration:none}
 .btn.plein{width:100%;justify-content:center}
 .btn.fant{background:var(--brume);color:var(--ardoise)}
@@ -106,7 +209,7 @@ a.btn,a.mini{text-decoration:none}
   box-shadow:var(--ombre);overflow:hidden}
 .consigne{display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:11px 13px;background:var(--brume);font-size:13.5px;color:var(--ardoise)}
-.consigne.actif{background:var(--nuit);color:var(--neve)}
+.consigne.actif{background:var(--sur-sombre);color:var(--sur-texte)}
 .consigne b{font-family:var(--display);font-weight:700}
 .consigne button{font-family:var(--corps);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
   padding:5px 9px;border-radius:8px;background:rgba(255,255,255,.16);color:inherit;flex:none}
@@ -201,13 +304,24 @@ nav button.on span.l{color:var(--meleze)}
   background:rgba(18,33,31,.62);color:#fff;font-size:15px;line-height:1;display:grid;place-items:center;
   backdrop-filter:blur(3px)}
 .vignette .sup:active{background:var(--alerte)}
+.non-sync{position:absolute;left:5px;bottom:5px;background:rgba(18,33,31,.62);color:#fff;
+  font-size:11px;border-radius:8px;padding:2px 6px}
 .lb{position:fixed;inset:0;background:rgba(18,33,31,.96);z-index:70;display:none;
   flex-direction:column;align-items:center;justify-content:center;padding:20px}
 .lb.on{display:flex}
 .lb img{max-width:100%;max-height:70vh;border-radius:10px}
 .lb p{color:var(--neve);text-align:center;margin:14px 0 0;max-width:520px}
+.ptr{position:fixed;top:0;left:0;right:0;z-index:55;display:flex;justify-content:center;
+  pointer-events:none;opacity:0;transform:translateY(0)}
+.ptr-rond{width:34px;height:34px;border-radius:50%;background:var(--blanc);
+  border:1px solid var(--bord);box-shadow:var(--ombre-h);position:relative;margin-top:-40px}
+.ptr-rond::after{content:"";position:absolute;inset:9px;border-radius:50%;
+  border:2px solid var(--brume);border-top-color:var(--meleze)}
+.ptr.pret .ptr-rond::after{border-top-color:var(--ok)}
+.ptr.tourne .ptr-rond::after{animation:tourne .8s linear infinite}
+@keyframes tourne{to{transform:rotate(360deg)}}
 .toast{position:fixed;left:12px;right:12px;bottom:calc(var(--nav-h) + 18px);
-  background:var(--nuit);color:var(--neve);padding:12px 16px;border-radius:11px;z-index:90;
+  background:var(--sur-sombre);color:var(--sur-texte);padding:12px 16px;border-radius:11px;z-index:90;
   font-size:14px;box-shadow:var(--ombre);opacity:0;pointer-events:none;transition:opacity .2s;
   max-width:520px;margin:0 auto;text-align:center}
 .toast.on{opacity:1}
@@ -308,8 +422,8 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 .cam-onglets{display:flex;gap:4px;padding:10px 10px 0;overflow-x:auto}
 .cam-onglets button{flex:none;font-family:var(--corps);font-size:12.5px;font-weight:500;letter-spacing:.01em;
   padding:7px 11px;border-radius:9px;background:#EDF1EF;color:var(--ardoise);white-space:nowrap}
-.cam-onglets button.on{background:var(--nuit);color:var(--neve)}
-.cam-cadre{position:relative;margin:10px;border-radius:12px;overflow:hidden;background:var(--nuit);
+.cam-onglets button.on{background:var(--sur-sombre);color:var(--sur-texte)}
+.cam-cadre{position:relative;margin:10px;border-radius:12px;overflow:hidden;background:var(--sur-sombre);
   aspect-ratio:16/10}
 .cam-cadre iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .cam-secours{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
@@ -331,6 +445,13 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 .sos-gps{font-family:var(--corps);font-size:29px;font-weight:700;line-height:1.4;
   font-variant-numeric:tabular-nums;letter-spacing:.01em;word-break:break-all}
 .sos-ligne{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.choix-theme{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.choix-theme button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:15px 8px;
+  border-radius:var(--r-s);background:var(--neve);border:1.5px solid var(--bord);
+  color:var(--granit);font-size:13px;font-weight:500;transition:border-color .15s,color .15s}
+.choix-theme button svg{width:24px;height:24px}
+.choix-theme button.on{border-color:var(--meleze);color:var(--nuit);
+  box-shadow:0 0 0 3px rgba(224,122,31,.12)}
 </style>
 </head>
 <body>
@@ -405,6 +526,10 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
         <div><b>Contact d'urgence</b><div class="meta" id="urg-txt">aucun</div></div>
         <button class="btn fant" id="urg-btn">Définir</button>
       </div>
+    </div>
+    <div class="titre-bloc">Apparence</div>
+    <div class="carte">
+      <div class="choix-theme" id="theme-choix"></div>
     </div>
     <div class="titre-bloc">Maintenance</div>
     <div class="carte">
@@ -653,6 +778,46 @@ function majUrgence(){
 $("#urg-btn").onclick=formUrgence;
 
 /* ═══════════════════════════════════════════════════════════
+   APPARENCE — automatique / clair / sombre
+   ═══════════════════════════════════════════════════════════ */
+const ICO_AUTO=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+  stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6"/>
+  <path d="M10.5 5.4h3M12 18.4h.01"/></svg>`;
+const ICO_CLAIR=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+  stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/>
+  <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>`;
+const ICO_SOMBRE=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+  stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z"/></svg>`;
+const THEMES=[{c:"auto",lib:"Automatique",i:ICO_AUTO},
+              {c:"light",lib:"Clair",i:ICO_CLAIR},
+              {c:"dark",lib:"Sombre",i:ICO_SOMBRE}];
+const themeActuel=()=>localStorage.getItem("vl-theme")||"auto";
+function sombreActif(){
+  const t=themeActuel();
+  return t==="dark"||(t==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches);
+}
+function appliquerTheme(t){
+  localStorage.setItem("vl-theme",t);
+  document.documentElement.setAttribute("data-theme",t);
+  const m=document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute("content",sombreActif()?"#0D1615":"#12211F");
+  rendreTheme();
+}
+function rendreTheme(){
+  const z=$("#theme-choix"); if(!z) return;
+  z.innerHTML="";
+  const t=themeActuel();
+  THEMES.forEach(x=>z.append(el("button",{class:x.c===t?"on":"",
+    onclick:()=>appliquerTheme(x.c)},
+    el("span",{html:x.i}), el("span",{},x.lib))));
+}
+/* le mode automatique suit les réglages du téléphone en direct */
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{
+  if(themeActuel()==="auto") appliquerTheme("auto");
+});
+rendreTheme();
+
+/* ═══════════════════════════════════════════════════════════
    4. DÉMARRAGE
    ═══════════════════════════════════════════════════════════ */
 const CLES=["apiKey","authDomain","projectId","storageBucket","messagingSenderId","appId"];
@@ -875,35 +1040,43 @@ function rendrePhotos(){
     parDate[k].forEach(p=>{
       const v=el("div",{class:"vignette"},
         el("img",{src:p.data,alt:val(p.legende),loading:"lazy",onclick:()=>ouvrirPhoto(p)}));
-      if(estMien(p)){
-        v.append(el("button",{class:"sup",style:"right:36px",
-          onclick:()=>formPhotoEdit(p)},"✎"));
-        v.append(el("button",{class:"sup",onclick:()=>{
-          if(confirm("Supprimer cette photo ?")) supprimerPhoto(p);}},"✕"));
-      }
+      v.append(el("button",{class:"sup",style:"right:36px",onclick:()=>formPhotoEdit(p)},"✎"));
+      v.append(el("button",{class:"sup",onclick:()=>{
+        if(confirm("Supprimer cette photo ?")) supprimerPhoto(p);}},"✕"));
+      if(p._local) v.append(el("span",{class:"non-sync",title:"Pas encore envoyée au serveur"},"⌛"));
       g.append(v);});
     z.append(g);});
 }
 /* Retrait optimiste : la photo disparaît tout de suite de l'écran ;
    si Firestore refuse, on la remet et on explique pourquoi. */
 const supprimees=new Set();
-/* Carnet familial : chacun peut faire le ménage sur le mur commun.
-   Nécessite la règle Firestore « allow delete » ouverte sur photos (voir README). */
-function estMien(p){ return !!auth.currentUser; }
+/* Mur commun : le bouton de suppression est proposé sur TOUTES les photos,
+   sans condition d'auteur. Le seul arbitre restant est la règle Firestore. */
+function estMien(){ return true; }
 const estAuteur=p=>p.uid===auth.currentUser?.uid;
 function supprimerPhoto(p,apres){
+  const id=p.id;
+  // 1. disparition immédiate, avant toute réponse du serveur
+  supprimees.add(id);
+  S.photos=S.photos.filter(x=>x.id!==id);
+  $("#lb").classList.remove("on");
+  rendrePhotos(); rafraichirPhotos(); apres?.();
 
-  supprimees.add(p.id);
-  rafraichirPhotos(); apres?.();
-  deleteDoc(doc(db,"photos",p.id))
+  // 2. suppression réelle, sans aucune condition préalable
+  deleteDoc(doc(db,"photos",id))
     .then(()=>toast("Photo supprimée"))
     .catch(err=>{
-      supprimees.delete(p.id); rafraichirPhotos();
-      console.error(err);
+      console.error("suppression photo",err);
       const c=err?.code||"";
-      toast(c.includes("permission")
-        ? "Suppression refusée par Firestore. Republie les règles du README (bloc allow delete)."
-        : "Suppression impossible — "+(err?.message||c), true);
+      if(c.includes("permission")){
+        supprimees.delete(id); rafraichirPhotos();
+        toast("Refusé par Firestore : republie les règles (bloc allow delete du README).",true);
+      } else if(p._local){
+        toast("Cette photo n'a jamais atteint le serveur. Onglet Appart › Réinitialiser l'application.",true);
+      } else {
+        supprimees.delete(id); rafraichirPhotos();
+        toast("Suppression impossible — "+(err?.message||c),true);
+      }
     });
 }
 function photosVisibles(){ return S.photos.filter(p=>!supprimees.has(p.id)); }
@@ -926,11 +1099,10 @@ function ouvrirPhoto(p){
     p.date?jolie(p.date):null,membre(p.uid).nom].filter(Boolean).join(" — "));
   t.append(el("div",{class:"rangee",style:"margin-top:16px;justify-content:center;flex-wrap:wrap"},
     el("button",{class:"btn fant",onclick:()=>telechargerPhoto(p)},"Télécharger")));
-  if(estMien(p))
-    t.append(el("div",{class:"rangee",style:"margin-top:10px;justify-content:center"},
+  t.append(el("div",{class:"rangee",style:"margin-top:10px;justify-content:center"},
       el("button",{class:"btn fant",onclick:()=>{lb.classList.remove("on");formPhotoEdit(p);}},"Modifier"),
       el("button",{class:"btn rouge",onclick:()=>{
-        if(confirm("Supprimer cette photo ?")) supprimerPhoto(p,()=>lb.classList.remove("on"));
+        if(confirm("Supprimer cette photo ?")) supprimerPhoto(p);
       }},"Supprimer")));
   lb.classList.add("on");
 }
@@ -1976,6 +2148,45 @@ $("#cfg-lien").onclick=()=>{
   if(confirm("Effacer la configuration Firebase enregistrée sur cet appareil ?")){
     localStorage.removeItem("vl-config");location.reload();}};
 
+/* Tirer la page vers le bas depuis le haut pour tout réactualiser */
+async function rafraichirTout(){
+  const debut=Date.now();
+  try{ await chargerMeteo(); }catch(e){}
+  rendreSejours();rendreRandos();rendrePlans();rendrePhotos();rendrePeche();rendreInfos();rendreAccueil();
+  const reste=650-(Date.now()-debut);
+  if(reste>0) await new Promise(r=>setTimeout(r,reste));
+}
+(()=>{
+  const ind=el("div",{class:"ptr"},el("div",{class:"ptr-rond"}));
+  document.body.append(ind);
+  let y0=0,dy=0,actif=false,occupe=false;
+  const bloque=()=>occupe || $("#voile").classList.contains("on") || $("#lb").classList.contains("on");
+  addEventListener("touchstart",e=>{
+    if(window.scrollY>0||bloque())return;
+    y0=e.touches[0].clientY;dy=0;actif=true;ind.style.transition="none";},{passive:true});
+  addEventListener("touchmove",e=>{
+    if(!actif)return;
+    dy=e.touches[0].clientY-y0;
+    if(dy<=0){actif=false;ind.style.transform="";return;}
+    if(e.cancelable&&dy>6)e.preventDefault();          // c'est l'indicateur qui suit le doigt
+    const d=Math.min(dy*0.55,96);
+    ind.style.transform=`translateY(${d}px)`;
+    ind.style.opacity=Math.min(1,dy/70);
+    ind.classList.toggle("pret",dy>=90);},{passive:false});
+  const fin=async()=>{
+    if(!actif)return;actif=false;
+    ind.style.transition="transform .25s ease,opacity .25s ease";
+    if(dy>=90){
+      occupe=true;
+      ind.classList.add("tourne");ind.style.transform="translateY(58px)";ind.style.opacity="1";
+      try{ await rafraichirTout(); toast("Données actualisées"); }
+      finally{ occupe=false;ind.classList.remove("tourne","pret");
+        ind.style.transform="";ind.style.opacity="0"; }
+    } else { ind.style.transform="";ind.style.opacity="0";ind.classList.remove("pret"); }
+  };
+  addEventListener("touchend",fin);addEventListener("touchcancel",fin);
+})();
+
 let x0=null;
 $("#bloc-cal").addEventListener("touchstart",e=>{x0=e.touches[0].clientX;},{passive:true});
 $("#bloc-cal").addEventListener("touchend",e=>{
@@ -2001,7 +2212,7 @@ onAuthStateChanged(auth,user=>{
       p.textContent="Connexion refusée ("+(e.code||e.message)+"). Vérifie la connexion anonyme dans Firebase → Authentication, et que ton domaine figure dans Authentication → Settings → Domaines autorisés.";});
     return;}
   $("#boot")?.remove();
-  majUrgence(); majReseau(); aller("accueil");
+  majUrgence(); majReseau(); rendreTheme(); aller("accueil");
 
   onSnapshot(collection(db,"membres"),snap=>{
     S.membres={};snap.forEach(d=>S.membres[d.id]=d.data());
@@ -2019,7 +2230,16 @@ onAuthStateChanged(auth,user=>{
   ecouter("sejours","sejours",["debut","asc"],()=>{rendreSejours();rendreAccueil();chargerMeteo();});
   ecouter("randos","randos",null,rendreRandos);
   ecouter("plans","plans",["nom","asc"],rendrePlans);
-  ecouter("photos","photos",["cree","desc"],()=>{rendrePhotos();rendreRandos();rendrePeche();rendrePlans();rendreAccueil();});
+  /* on garde la trace des documents encore en attente d'envoi :
+     ce sont eux qui résistent à la suppression tant que le cache local n'est pas vidé */
+  onSnapshot(query(collection(db,"photos"),orderBy("cree","desc")),
+    snap=>{
+      S.photos=snap.docs.filter(d=>!supprimees.has(d.id))
+        .map(d=>({id:d.id,_local:d.metadata.hasPendingWrites,...d.data()}));
+      rendrePhotos();rendreRandos();rendrePeche();rendrePlans();rendreAccueil();
+    },
+    err=>{console.error("photos",err);
+      toast("Lecture des photos refusée — règles Firestore à mettre à jour.",true);});
   ecouter("infos","infos",["titre","asc"],rendreInfos);
   ecouter("prises","prises",null,rendrePeche);
   ecouter("liens","liens",["titre","asc"],()=>{rendreAccueil();chargerMeteo();});

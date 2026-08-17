@@ -106,7 +106,17 @@ Les photos sont **réduites dans le navigateur** (1400 px max, JPEG qualité 0,6
 
 ---
 
-## 6. Dépannage
+## 6. Apparence
+
+Onglet **L'appart › Apparence** : Automatique (suit le réglage du téléphone), Clair ou Sombre.
+Le choix est retenu dans `localStorage` (`vl-theme`) et appliqué avant le premier affichage par un
+petit script en tête de page — pas de clignotement clair au chargement. La barre d'état du téléphone
+(`theme-color`) suit le thème actif. En mode Automatique, un changement de réglage iOS est répercuté
+en direct, sans relancer l'app.
+
+---
+
+## 7. Dépannage
 
 **Un bouton ne fait rien / rien ne s'enregistre.** L'app affiche désormais un bandeau rouge ou un message
 d'erreur explicite dans les trois cas possibles :
@@ -120,12 +130,20 @@ d'erreur explicite dans les trois cas possibles :
 Si rien ne s'affiche du tout : ouvrir la console du navigateur (sur Android, Chrome → `chrome://inspect`
 depuis le PC) et me transmettre le message d'erreur.
 
+**Une photo refuse de disparaître.** Trois causes possibles, l'app vous dit laquelle :
+
+| Message affiché | Cause | Correctif |
+|---|---|---|
+| « Refusé par Firestore » | la règle `allow delete` n'est pas publiée | republier les règles (étape 2) |
+| « n'a jamais atteint le serveur » | la photo n'existe que dans le cache local (créée hors ligne et refusée à l'envoi) | Appart › Réinitialiser l'application |
+| rien, la photo revient au rechargement | écriture encore en attente | attendre la synchro, sablier ⌛ sur la vignette |
+
 **Après une mise à jour, le téléphone garde l'ancienne version.** Incrémenter `CACHE` dans
 `service-worker.js`, ou désinstaller/réinstaller la PWA.
 
 ---
 
-## 7. Photos de couverture, webcams, actualités
+## 8. Photos de couverture, webcams, actualités
 
 **Couvertures de randos** : aucune image n'est empruntée à un site tiers — chaque carte de
 suggestion prend une photo de votre propre mur (icône appareil photo sur la carte). Techniquement
@@ -143,7 +161,7 @@ sources permanentes (office de tourisme, station, parc national, vigilance).
 
 ---
 
-## 8. Traces GPX et app Exercice d'Apple
+## 9. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -162,7 +180,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 9. Idées pour la suite
+## 10. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
