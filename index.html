@@ -340,6 +340,18 @@ nav button.on span.l{color:var(--meleze)}
 .onglets{display:flex;gap:4px;background:#E9EDEB;padding:4px;border-radius:13px;margin-bottom:16px}
 .onglets button{flex:1;padding:9px;border-radius:9px;font-weight:600;font-size:14.5px;color:var(--granit)}
 .onglets button.on{background:var(--blanc);color:var(--nuit);box-shadow:0 1px 3px rgba(18,33,31,.10)}
+.rd-filtres{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);padding:13px}
+.rd-carte{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);
+  padding:15px 16px;margin-bottom:10px;box-shadow:var(--ombre)}
+.rd-carte h4{font-family:var(--display);font-size:16.5px;margin:0;font-weight:700;
+  line-height:1.2;letter-spacing:-.02em}
+.rd-badge{flex:none;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
+.rd-lieu{font-size:12.5px;color:var(--granit);margin-top:3px}
+.rd-chiffres{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;font-weight:500;
+  color:var(--ardoise);margin:9px 0 10px}
+.rd-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.rd-actions .btn{font-size:14px}
 .meteo-auj{display:flex;align-items:center;gap:13px}
 .meteo-auj .ico{width:46px;height:46px;flex:none;color:var(--ardoise)}
 .meteo-auj .ico svg{width:100%;height:100%}
@@ -1753,6 +1765,133 @@ const _neige=`${_nua}<path d="M12 26h.01M16 27h.01M20 26h.01M14 29h.01M18 29h.01
 const _orage=`${_nua}<path d="M17 24l-3.2 4.6h4L15.4 32"/>`;
 const _brume=`<path d="M6 12h20M4 17h24M8 22h16M6 27h20"/>`;
 /* [libellé, dessin SVG] */
+const RANDOS_SECTEUR=[
+  {n:"Boucle le long de l'Onde à Vallouise",a:"Pédestre",d:"Facile",h:"2h45",m:165,km:7.61,dp:212,dm:205,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-boucle-le-long-de-l-onde-a-vallouise/"},
+  {n:"Les Parchers depuis Vallouise",a:"Pédestre",d:"Facile",h:"2h20",m:140,km:6.87,dp:118,dm:112,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-les-parchers-depuis-vallouise/"},
+  {n:"Vallouise - Refuge du Pré de la Chaumette",a:"Pédestre",d:"Très difficile",h:"10h00",m:600,km:21.79,dp:1640,dm:992,ty:"Aller simple",c:"Vallouise",u:"https://www.visorando.com/randonnee-vallouise-refuge-du-pre-de-la-chaumette/"},
+  {n:"Coul d'Amont et Cabane de Chouvet en boucle depuis Le Poët",a:"Pédestre",d:"Moyenne",h:"4h40",m:280,km:8.59,dp:766,dm:767,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-coul-d-amont-et-cabane-de-chouvet-en-bou/"},
+  {n:"Boucle de Puy Aillaud par le Ravin du Goitreux",a:"Pédestre",d:"Moyenne",h:"2h15",m:135,km:5.01,dp:293,dm:302,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-boucle-de-puy-aillaud-par-le-ravin-du-go/"},
+  {n:"La Blanche par le Lac de Puy Aillaud et le belvédère des trois refuges",a:"Pédestre",d:"Difficile",h:"8h00",m:480,km:13.67,dp:1448,dm:1442,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-la-blanche-par-le-lac-de-puy-aillaud-et-/"},
+  {n:"Boucle de Puy Aillaud en passant sous le Télésiège de Préron",a:"Pédestre",d:"Facile",h:"2h00",m:120,km:4.04,dp:296,dm:296,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-boucle-de-puy-aillaud-en-passant-sous-le/"},
+  {n:"Vallouise - Argentière",a:"Pédestre",d:"Difficile",h:"6h30",m:390,km:14.24,dp:865,dm:1077,ty:"Aller simple",c:"Vallouise",u:"https://www.visorando.com/randonnee-vallouise-argentiere/"},
+  {n:"Cascade de la Pissette",a:"Pédestre",d:"Moyenne",h:"2h35",m:155,km:4.05,dp:512,dm:512,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-cascade-de-la-pissette/"},
+  {n:"L'architecture du Puy",a:"Pédestre",d:"Facile",h:"0h05",m:5,km:0.3,dp:10,dm:10,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-l-architecture-du-puy/"},
+  {n:"La Tête d'Amont",a:"Pédestre",d:"Très difficile",h:"8h00",m:480,km:11.43,dp:1680,dm:1680,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-la-tete-d-amont/"},
+  {n:"Forêt domaniale de Montbrison",a:"Pédestre",d:"Difficile",h:"7h10",m:430,km:13.82,dp:1123,dm:1122,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-foret-domaniale-de-montbrison/"},
+  {n:"Le tour du Rouchas",a:"Pédestre",d:"Facile",h:"2h40",m:160,km:6.04,dp:325,dm:329,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-le-tour-du-rouchas/"},
+  {n:"Le Grand Parcher et le Bois de Parapin",a:"Pédestre",d:"Moyenne",h:"2h30",m:150,km:5.0,dp:364,dm:364,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-le-grand-parcher-et-le-bois-de-parapin/"},
+  {n:"La Font Saint-Marcellin",a:"Pédestre",d:"Moyenne",h:"4h30",m:270,km:8.69,dp:703,dm:702,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-la-fontaine-saint-marcellin/"},
+  {n:"Cime de la Condamine depuis Pelvoux",a:"Pédestre",d:"Très difficile",h:"8h00",m:480,km:18.52,dp:1535,dm:1535,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-cime-de-la-condamine-depuis-pelvoux/"},
+  {n:"Le circuit des chapelles de Puy-Saint-Vincent",a:"Pédestre",d:"Facile",h:"2h30",m:150,km:6.75,dp:200,dm:200,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-le-circuit-des-chapelles-de-puy-saint-vi/"},
+  {n:"Le Béal des Prés à Puy-Saint-Vincent",a:"Raquettes à neige",d:"Facile",h:"3h00",m:180,km:5.52,dp:248,dm:246,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-puy-saint-vincent-le-beal-des-pres/"},
+  {n:"Col du Bal",a:"Pédestre",d:"Moyenne",h:"5h00",m:300,km:9.1,dp:836,dm:836,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-alpes-massif-des-ecrins-col-de-bal/"},
+  {n:"Les crêtes de Puy-Saint-Vincent",a:"Pédestre",d:"Moyenne",h:"3h30",m:210,km:7.02,dp:517,dm:514,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-les-cretes-de-puy-saint-vincent/"},
+  {n:"Col des Lauzes",a:"Pédestre",d:"Moyenne",h:"3h25",m:205,km:8.03,dp:386,dm:390,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-col-des-lauzes/"},
+  {n:"Sommet de la Condamine",a:"Pédestre",d:"Très difficile",h:"7h00",m:420,km:17.39,dp:1429,dm:1435,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-sommet-de-la-condamine/"},
+  {n:"Le Col de la Pousterle",a:"Pédestre",d:"Moyenne",h:"5h55",m:355,km:13.46,dp:736,dm:732,ty:"Retour au départ",c:"Les Vigneaux",u:"https://www.visorando.com/randonnee-le-col-de-la-pousterle/"},
+  {n:"La Cabane de Chouvet",a:"Pédestre",d:"Moyenne",h:"2h55",m:175,km:6.19,dp:404,dm:399,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-la-cabane-de-chouvet/"},
+  {n:"Crête de la Pendine par le Col du Bal",a:"Pédestre",d:"Difficile",h:"5h25",m:325,km:9.76,dp:922,dm:920,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-crete-de-la-pendine-par-le-col-du-bal/"},
+  {n:"Plateau de la Pousterle et Lac des Charbonières",a:"Pédestre",d:"Facile",h:"1h55",m:115,km:4.78,dp:195,dm:195,ty:"Retour au départ",c:"Les Vigneaux",u:"https://www.visorando.com/randonnee-plateau-de-la-pousterle-et-lac-des-charb/"},
+  {n:"Cabane des Grands Plans, Vallon de Narreyroux",a:"Pédestre",d:"Moyenne",h:"1h55",m:115,km:3.6,dp:303,dm:303,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-cabane-des-grands-plans-vallon-de-narrey/"},
+  {n:"L'Aiglière en boucle par le Lac des Neyzets et le Vallon des Lauses",a:"Pédestre",d:"Très difficile",h:"7h00",m:420,km:11.13,dp:1442,dm:1444,ty:"Retour au départ",c:"Puy-Saint-Vincent",u:"https://www.visorando.com/randonnee-l-aigliere-en-boucle-par-le-lac-des-neyz/"},
+  {n:"Circuit VTT en Vallouise",a:"VTT",d:"Moyenne",h:"3h00",m:180,km:25.88,dp:621,dm:612,ty:"Retour au départ",c:"Les Vigneaux",u:"https://www.visorando.com/randonnee-circuit-vtt-en-vallouise/"},
+  {n:"Les Têtes par le Lac des Charbonnières",a:"Pédestre",d:"Facile",h:"2h40",m:160,km:6.18,dp:303,dm:303,ty:"Retour au départ",c:"Les Vigneaux",u:"https://www.visorando.com/randonnee-les-tetes-par-le-lac-des-charbonnieres/"},
+  {n:"La Bosse de Clapouse",a:"Pédestre",d:"Moyenne",h:"4h05",m:245,km:7.67,dp:661,dm:659,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-la-bosse-de-clapouse/"},
+  {n:"Le Pas la Rosse et retour par le Sentier du Pelvoux",a:"Pédestre",d:"Extrêmement difficile",h:"4h00",m:240,km:7.69,dp:815,dm:821,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-le-pas-la-rosse-et-retour-par-le-sentier/"},
+  {n:"Vallon du Sélé",a:"Pédestre",d:"Difficile",h:"6h20",m:380,km:12.39,dp:977,dm:977,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-vallon-du-sele/"},
+  {n:"Traversée d'Ailefroide à Chambran par la Cime du Paillon",a:"Pédestre",d:"Très difficile",h:"6h00",m:360,km:7.06,dp:1278,dm:1066,ty:"Aller simple",c:"Pelvoux",u:"https://www.visorando.com/randonnee-traversee-d-ailefroide-a-chambran-par-la/"},
+  {n:"Tête de la Draye",a:"Pédestre",d:"Difficile",h:"3h20",m:200,km:5.43,dp:631,dm:634,ty:"Retour au départ",c:"Pelvoux",u:"https://www.visorando.com/randonnee-tete-de-la-draye/"},
+  {n:"La Cabane de Jas Lacroix",a:"Pédestre",d:"Moyenne",h:"3h25",m:205,km:8.52,dp:344,dm:338,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-la-cabane-de-jas-lacroix/"},
+  {n:"Vallouise - Refuge du Pré de la Chaumette (étape GR®54)",a:"Pédestre",d:"Très difficile",h:"8h00",m:480,km:15.83,dp:1174,dm:984,ty:"Aller simple",c:"Vallouise",u:"https://www.visorando.com/randonnee-vallouise-refuge-du-pre-de-la-chaumette-2/"},
+  {n:"Refuge des Bans",a:"Pédestre",d:"Moyenne",h:"3h40",m:220,km:7.85,dp:512,dm:511,ty:"Retour au départ",c:"Vallouise",u:"https://www.visorando.com/randonnee-refuge-des-bans/"}
+];
+
+/* ═══════════════════════════════════════════════════════════
+   RANDONNÉES DU SECTEUR — données Visorando (faits bruts)
+   ═══════════════════════════════════════════════════════════ */
+const NIV_COULEUR={
+  "Facile":               ["#EAF4EE","#2E6B48"],
+  "Moyenne":              ["#E8F0F5","#2A6183"],
+  "Difficile":            ["#FBF0E4","#9C6412"],
+  "Très difficile":       ["#FBEAE5","#B44228"],
+  "Extrêmement difficile":["#2C1A16","#F3D7CF"]
+};
+const S_FILTRE={diff:"",commune:"",duree:0,q:""};
+
+function carteRando(r){
+  const [fond,encre]=NIV_COULEUR[r.d]||["#EDF1EF","#41514E"];
+  return el("div",{class:"rd-carte"},
+    el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
+      el("h4",{},r.n),
+      el("span",{class:"rd-badge",style:`background:${fond};color:${encre}`},r.d)),
+    el("div",{class:"rd-lieu"},`${r.c} · Hautes-Alpes (05)`),
+    el("div",{class:"rd-chiffres"},
+      el("span",{},"↔ "+r.km.toFixed(2).replace(".",",")+" km"),
+      el("span",{},"↗ +"+nb(r.dp)+" m"),
+      el("span",{},"↘ −"+nb(r.dm)+" m"),
+      el("span",{},"◔ "+r.h)),
+    el("div",{class:"rd-tags"},
+      el("span",{class:"puce"},r.a),
+      el("span",{class:"puce"},r.ty)),
+    el("div",{class:"rd-actions"},
+      el("a",{class:"btn accent plein",href:r.u,target:"_blank",rel:"noopener noreferrer"},
+        "Voir la fiche Visorando ↗"),
+      el("button",{class:"btn fant plein",style:"margin-top:7px",onclick:()=>{
+        ecrire(addDoc(collection(db,"randos"),{nom:r.n,date:auj(),depart:r.c,
+          denivele:String(r.dp),duree:String(Math.round(r.m/6)/10),
+          niveau:(r.d==="Facile"?"Facile":r.d==="Moyenne"?"Moyen":r.d==="Difficile"?"Sportif":"Alpin"),
+          texte:"",liens:[r.u],trace:null,gps:null,faite:[],
+          uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
+      }},"+ Ajouter à mon carnet")));
+}
+
+function listeSecteur(){
+  const corps=el("div");
+  const zf=el("div",{class:"rd-filtres"});
+  const zl=el("div",{id:"rd-liste"});
+  const compteur=el("div",{class:"meta",style:"margin:12px 2px"});
+  const communes=[...new Set(RANDOS_SECTEUR.map(r=>r.c))].sort();
+  const niveaux=["Facile","Moyenne","Difficile","Très difficile","Extrêmement difficile"];
+
+  const dessiner=()=>{
+    const l=RANDOS_SECTEUR.filter(r=>
+      (!S_FILTRE.diff||r.d===S_FILTRE.diff) &&
+      (!S_FILTRE.commune||r.c===S_FILTRE.commune) &&
+      (!S_FILTRE.duree||r.m<=S_FILTRE.duree) &&
+      (!S_FILTRE.q||r.n.toLowerCase().includes(S_FILTRE.q.toLowerCase())))
+      .sort((a,b)=>a.m-b.m);
+    compteur.textContent=`${l.length} randonnée${l.length>1?"s":""} sur ${RANDOS_SECTEUR.length}`;
+    zl.innerHTML="";
+    if(!l.length){zl.append(el("div",{class:"vide"},el("b",{},"Aucun résultat"),
+      "Élargis les filtres pour voir davantage d'itinéraires."));return;}
+    l.forEach(r=>zl.append(carteRando(r)));
+  };
+
+  zf.append(
+    el("input",{id:"rd-q",placeholder:"Chercher un nom…",
+      oninput:e=>{S_FILTRE.q=e.target.value;dessiner();}}),
+    el("div",{class:"duo",style:"margin-top:9px"},
+      el("select",{onchange:e=>{S_FILTRE.diff=e.target.value;dessiner();},
+        html:'<option value="">Toutes difficultés</option>'+niveaux.map(n=>
+          `<option ${S_FILTRE.diff===n?"selected":""}>${n}</option>`).join("")}),
+      el("select",{onchange:e=>{S_FILTRE.commune=e.target.value;dessiner();},
+        html:'<option value="">Tous les départs</option>'+communes.map(c=>
+          `<option ${S_FILTRE.commune===c?"selected":""}>${c}</option>`).join("")})),
+    el("select",{style:"margin-top:9px",onchange:e=>{S_FILTRE.duree=+e.target.value;dessiner();},
+      html:'<option value="0">Toutes durées</option>'+
+        [[120,"Moins de 2 h"],[180,"Moins de 3 h"],[300,"Moins de 5 h"],[480,"Moins de 8 h"]]
+        .map(([v,t])=>`<option value="${v}" ${S_FILTRE.duree===v?"selected":""}>${t}</option>`).join("")}));
+
+  corps.append(zf,compteur,zl,
+    el("p",{class:"meta",style:"margin:16px 2px 0;line-height:1.6"},
+      "Distances, dénivelés, durées et difficultés relevés sur Visorando. Les descriptifs détaillés "+
+      "et les photos restent sur le site d'origine : chaque fiche s'y ouvre en un geste."),
+    el("a",{class:"mini",style:"margin-top:10px;display:inline-block",target:"_blank",
+      rel:"noopener noreferrer",href:"https://www.visorando.com/randonnee-vallouise.html"},
+      "Source : Visorando ↗"));
+  feuille("Randonnées du secteur",corps,dessiner);
+}
+
 const METEO={0:["Ciel clair",_sol],1:["Peu nuageux",_solnua],2:["Nuages épars",_solnua],3:["Couvert",_nua],
   45:["Brouillard",_brume],48:["Brouillard givrant",_brume],51:["Bruine",_pluie],53:["Bruine",_pluie],55:["Bruine",_pluie],
   61:["Pluie faible",_pluie],63:["Pluie",_pluie],65:["Forte pluie",_pluie],66:["Pluie verglaçante",_pluie],67:["Pluie verglaçante",_pluie],
@@ -1964,6 +2103,8 @@ function rendreAccueil(){
         }},"+ Mon carnet"))));
   });
   z.append(car);
+  z.append(el("button",{class:"btn fant plein",style:"margin-top:4px",onclick:listeSecteur},
+    `Voir les ${RANDOS_SECTEUR.length} randonnées du secteur`));
 
   /* ── Webcam en direct ─────────────────────────────────────── */
   z.append(el("div",{class:"titre-bloc"},"La vallée en direct"));

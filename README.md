@@ -106,7 +106,30 @@ Les photos sont **réduites dans le navigateur** (1400 px max, JPEG qualité 0,6
 
 ---
 
-## 6. Apparence
+## 6. Randonnées du secteur (données Visorando)
+
+38 itinéraires relevés sur `visorando.com/randonnee-vallouise.html` (départs Vallouise, Pelvoux,
+Puy-Saint-Vincent, Les Vigneaux) sont **embarqués dans l'app** : aucun appel réseau, tout fonctionne
+hors ligne. Accès par le bouton sous le carrousel de l'accueil, avec filtres difficulté / commune /
+durée et recherche par nom.
+
+Ce qui est repris et ce qui ne l'est pas :
+
+| Repris | Non repris | Pourquoi |
+|---|---|---|
+| distance, D+, D−, durée, difficulté, activité, commune de départ | descriptifs rédigés | textes des contributeurs Visorando, protégés |
+| lien vers la fiche d'origine | photographies | idem, et pointer vers leurs serveurs casserait au premier changement |
+
+Le type de tracé (« Retour au départ » / « Aller simple ») n'est pas publié dans la liste : il est
+déduit de l'écart entre D+ et D−.
+
+Le fichier `randos-vallouise.json` et le script `build-randos-vallouise.py` permettent de régénérer
+ou d'alimenter une base de données. Pour actualiser après ajout de circuits sur Visorando, relever
+la page et relancer le script.
+
+---
+
+## 7. Apparence
 
 Onglet **L'appart › Apparence** : Automatique (suit le réglage du téléphone), Clair ou Sombre.
 Le choix est retenu dans `localStorage` (`vl-theme`) et appliqué avant le premier affichage par un
@@ -116,7 +139,7 @@ en direct, sans relancer l'app.
 
 ---
 
-## 7. Dépannage
+## 8. Dépannage
 
 **Un bouton ne fait rien / rien ne s'enregistre.** L'app affiche désormais un bandeau rouge ou un message
 d'erreur explicite dans les trois cas possibles :
@@ -143,7 +166,7 @@ depuis le PC) et me transmettre le message d'erreur.
 
 ---
 
-## 8. Photos de couverture, webcams, actualités
+## 9. Cartes de randos, webcams, actualités
 
 **Cartes de randos suggérées** : format compact, sans image — nom, commune, distance, dénivelé,
 durée, badge de difficulté et lien vers la fiche Visorando. Les photos restent réservées aux randos
@@ -161,7 +184,7 @@ sources permanentes (office de tourisme, station, parc national, vigilance).
 
 ---
 
-## 9. Traces GPX et app Exercice d'Apple
+## 10. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -180,7 +203,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 10. Idées pour la suite
+## 11. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
