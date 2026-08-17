@@ -150,7 +150,17 @@ la page et relancer le script.
 
 ---
 
-## 8. Apparence
+## 8. Géolocalisation des bons plans
+
+Le bouton « Me géolocaliser » du formulaire Bons plans convertit les coordonnées en adresse via
+**Nominatim (OpenStreetMap)**, un service gratuit mais soumis à conditions : une requête par seconde
+maximum, et aucune garantie de disponibilité. L'appel est donc borné à 8 secondes, et en cas d'échec
+ou d'absence de réseau la position est conservée telle quelle — seul le remplissage automatique de
+l'adresse est perdu. Le champ reste modifiable à la main dans tous les cas.
+
+---
+
+## 9. Apparence
 
 Onglet **L'appart › Apparence** : Automatique (suit le réglage du téléphone), Clair ou Sombre.
 Le choix est retenu dans `localStorage` (`vl-theme`) et appliqué avant le premier affichage par un
@@ -160,7 +170,7 @@ en direct, sans relancer l'app.
 
 ---
 
-## 9. Dépannage
+## 10. Dépannage
 
 **Un bouton ne fait rien / rien ne s'enregistre.** L'app affiche désormais un bandeau rouge ou un message
 d'erreur explicite dans les trois cas possibles :
@@ -195,7 +205,7 @@ côté serveur et reste visible pour les autres membres. Un message discret le r
 
 ---
 
-## 10. Cartes de randos, webcams, actualités
+## 11. Cartes de randos, webcams, actualités
 
 **Cartes de randos suggérées** : format compact, sans image — nom, commune, distance, dénivelé,
 durée, badge de difficulté et lien vers la fiche Visorando. Les photos restent réservées aux randos
@@ -213,7 +223,7 @@ sources permanentes (office de tourisme, station, parc national, vigilance).
 
 ---
 
-## 11. Traces GPX et app Exercice d'Apple
+## 12. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -232,7 +242,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 12. Idées pour la suite
+## 13. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API

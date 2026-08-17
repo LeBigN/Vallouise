@@ -2117,8 +2117,30 @@ async function pdfPeche(){
    12. BONS PLANS
    ═══════════════════════════════════════════════════════════ */
 const CATS=["Restaurant","Commerce","Activité","Baignade","Pratique"];
+
+/* Adresse lisible à partir de coordonnées, via Nominatim (OpenStreetMap).
+   Le service impose une requête par seconde et peut être indisponible :
+   en cas d'échec on retombe proprement sur les coordonnées brutes. */
+async function adresseDepuisGPS(lat,lon){
+  const u="https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1"
+    +`&lat=${lat}&lon=${lon}&accept-language=fr`;
+  const ctrl=new AbortController();
+  const minuteur=setTimeout(()=>ctrl.abort(),8000);
+  try{
+    const r=await fetch(u,{signal:ctrl.signal,headers:{"Accept":"application/json"}});
+    if(!r.ok) throw new Error("service indisponible");
+    const j=await r.json(), a=j.address||{};
+    const voie=[a.house_number,a.road||a.pedestrian||a.footway].filter(Boolean).join(" ");
+    const lieu=a.hamlet||a.village||a.town||a.city||a.municipality||"";
+    const nom=(j.name&&j.name!==voie)?j.name:"";
+    const texte=[nom,voie,lieu].filter(Boolean).join(", ");
+    return texte||j.display_name?.split(",").slice(0,3).join(",")||"";
+  }catch(e){ return ""; }
+  finally{ clearTimeout(minuteur); }
+}
 function formPlan(p){
   const nouvelles=[];
+  let gps=p?.gps||null;
   const zPh=el("div",{class:"bande-photos",style:"margin-top:8px"});
   const majPh=()=>vignettesForm(zPh, p?photosVisibles().filter(x=>x.plan===p.id):[], nouvelles, majPh);
   const c=el("div");
@@ -2129,6 +2151,10 @@ function formPlan(p){
     el("select",{id:"p-cat",html:CATS.map(x=>`<option ${p?.cat===x?"selected":""}>${x}</option>`).join("")}),
     el("label",{},"Note"),
     el("select",{id:"p-note",html:[5,4,3,2,1].map(n=>`<option value="${n}" ${p?.note==n?"selected":""}>${"★".repeat(n)}</option>`).join("")}),
+    el("label",{},"Lieu / adresse"),
+    el("input",{id:"p-adr",placeholder:"Place de l'Église, Vallouise",value:val(p?.adresse)}),
+    el("button",{class:"btn fant plein",id:"p-geo",style:"margin-top:8px"},"Me géolocaliser"),
+    el("div",{id:"p-gps",style:"margin-top:6px"}),
     el("label",{},"Pourquoi c'est bien"),
     el("textarea",{id:"p-txt",placeholder:"Le pain au levain du samedi part avant 10 h."}),
     el("label",{},"Photos"),
@@ -2137,6 +2163,7 @@ function formPlan(p){
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const nom=$("#p-nom").value.trim();if(!nom)return toast("Il manque le nom");
       const d={nom,cat:$("#p-cat").value,note:+$("#p-note").value,
+        adresse:$("#p-adr").value.trim(),gps,
         texte:$("#p-txt").value.trim(),uid:auth.currentUser.uid};
       const ref=p?doc(db,"plans",p.id):doc(collection(db,"plans"));
       ecrire(p?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
@@ -2147,7 +2174,38 @@ function formPlan(p){
     }},p?"Enregistrer":"Partager le bon plan"));
   feuille(p?"Modifier le bon plan":"Nouveau bon plan",c,()=>{
     $("#p-txt").value=val(p?.texte); majPh();
-    selecteurPhotos($("#p-ph"),zPh,nouvelles,majPh);});
+    selecteurPhotos($("#p-ph"),zPh,nouvelles,majPh);
+
+    const majGPS=()=>{
+      const z=$("#p-gps"); z.innerHTML="";
+      z.append(gps?blocCarte(gps,()=>{gps=null;majGPS();})
+        :el("span",{class:"meta"},"Aucune position enregistrée. Elle permettra l'itinéraire direct."));
+    };
+    majGPS();
+    $("#p-geo").onclick=e=>{
+      const b=e.currentTarget;
+      if(!navigator.geolocation) return toast("Géolocalisation indisponible sur cet appareil",true);
+      b.textContent="Localisation en cours…"; b.disabled=true;
+      navigator.geolocation.getCurrentPosition(async pos=>{
+        gps={lat:pos.coords.latitude,lon:pos.coords.longitude,
+             alt:pos.coords.altitude,precision:pos.coords.accuracy};
+        majGPS();
+        b.textContent="Recherche de l'adresse…";
+        const adr=await adresseDepuisGPS(gps.lat,gps.lon);
+        b.textContent="Mettre à jour ma position"; b.disabled=false;
+        const champ=$("#p-adr");
+        if(adr && !champ.value.trim()){ champ.value=adr; toast("Adresse trouvée : "+adr); }
+        else if(adr){ toast("Position enregistrée · "+adr); }
+        else { toast("Position enregistrée (adresse introuvable, hors ligne ?)"); }
+      },err=>{
+        b.textContent="Me géolocaliser"; b.disabled=false;
+        toast(err.code===1
+          ? "Position refusée — autorise la localisation dans les réglages"
+          : err.code===3 ? "Position trop longue à obtenir, réessaie dehors"
+          : "Position introuvable", true);
+      },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+    };
+  });
 }
 function rendrePlans(){
   const z=$("#liste-plans");if(!z)return;z.innerHTML="";
@@ -2161,16 +2219,29 @@ function rendrePlans(){
       const photos=photosVisibles().filter(x=>x.plan===p.id);
       const carte=el("div",{class:"carte"},
         el("div",{class:"entre"},el("h3",{},p.nom),el("span",{class:"etoiles"},"★".repeat(p.note||0))),
+        p.adresse?el("div",{class:"meta",style:"margin-top:3px"},val(p.adresse)):null,
         p.texte?el("p",{class:"txt"},val(p.texte)):null);
       if(photos.length){
         const bande=el("div",{class:"bande-photos"});
         photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",
           onclick:()=>ouvrirPhoto(x)})));
         carte.append(bande);}
+      if(p.gps||p.adresse){
+        const cible=p.gps?`${p.gps.lat},${p.gps.lon}`
+          :encodeURIComponent([p.nom,val(p.adresse)].filter(Boolean).join(", "));
+        carte.append(el("div",{class:"rangee",style:"margin-top:12px;gap:7px"},
+          el("a",{class:"btn accent",style:"flex:1;justify-content:center",target:"_blank",
+            rel:"noopener noreferrer",href:"https://maps.apple.com/?"+(p.gps?"ll="+cible:"q="+cible)},"Plans"),
+          el("a",{class:"btn fant",style:"flex:1;justify-content:center",target:"_blank",
+            rel:"noopener noreferrer",
+            href:"https://www.google.com/maps/search/?api=1&query="+cible},"Google Maps")));
+      }
       carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
         el("button",{class:"mini",onclick:()=>formPhoto({type:"plan",id:p.id,nom:p.nom})},"📷 Photo"),
           el("span",{class:"meta"},"par "+membre(p.uid).nom),
-          el("button",{class:"mini",onclick:()=>partager(`📍 ${p.nom}\n${val(p.texte)}`)},"Partager"),
+          el("button",{class:"mini",onclick:()=>partager([`📍 ${p.nom}`,val(p.adresse),val(p.texte),
+          p.gps?`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`:null]
+          .filter(Boolean).join("\n"))},"Partager"),
           mien?el("button",{class:"mini",onclick:()=>formPlan(p)},"Modifier"):null,
         mien?el("button",{class:"mini",onclick:()=>{
           if(confirm("Supprimer ?"))ecrire(deleteDoc(doc(db,"plans",p.id)),"Supprimé");}},"🗑"):null));
