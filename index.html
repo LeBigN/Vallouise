@@ -372,6 +372,23 @@ nav button.on span.l{color:var(--meleze)}
   color:var(--ardoise);margin:9px 0 10px}
 .rd-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .rd-actions .btn{font-size:14px}
+.so-onglets button{flex-direction:column;gap:4px;padding:9px 4px;font-size:13px}
+.so-i{width:20px;height:20px}
+.vt-niv{flex:none;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+  padding:5px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
+.vt-mesures{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-weight:500;
+  color:var(--ardoise);margin-top:9px}
+.wifi-bulle{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);
+  padding:15px 16px;margin-bottom:12px;box-shadow:var(--ombre);
+  border-left:3px solid var(--glacier)}
+.wifi-bulle b{font-family:var(--display);font-size:16px}
+.wifi-ic{width:22px;height:22px;color:var(--glacier);display:block}
+.wifi-ic svg{width:100%;height:100%}
+.wifi-ligne{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:8px 0;border-bottom:1px solid var(--bord)}
+.wifi-ligne:last-of-type{border-bottom:0}
+.wifi-mdp{font-variant-numeric:tabular-nums;letter-spacing:.03em;word-break:break-all;text-align:right}
+.pdf-cadre{width:100%;height:62vh;border:1px solid var(--bord);border-radius:12px;background:var(--blanc)}
 .meteo-auj{display:flex;align-items:center;gap:13px}
 .meteo-auj .ico{width:46px;height:46px;flex:none;color:var(--ardoise)}
 .meteo-auj .ico svg{width:100%;height:100%}
@@ -529,11 +546,13 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
   </section>
 
   <section class="vue" id="v-sorties">
-    <div class="onglets">
-      <button class="on" data-sortie="randos">Randos</button>
-      <button data-sortie="peche">Pêche</button>
+    <div class="onglets so-onglets">
+      <button class="on" data-sortie="randos"><svg class="so-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 6 21M13 3l3 6M16 9l5 12M16 9l-4 2M9 13l4 2M11.5 17l4 2"/></svg><span>Randos</span></button>
+      <button data-sortie="vtt"><svg class="so-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17" r="3.6"/><circle cx="18.5" cy="17" r="3.6"/><path d="M5.5 17l4-8h5l-3 8h7"/><path d="M14.5 9l-2-3h-2"/><circle cx="16.5" cy="5.5" r="1.1"/></svg><span>VTT</span></button>
+      <button data-sortie="peche"><svg class="so-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3-4 7-6 11-6 4 0 6 3 7 6-1 3-3 6-7 6-4 0-8-2-11-6Z"/><path d="M17 10.5h.01"/><path d="M3 12c-.6-1.6-.6-3.4 0-5M3 12c-.6 1.6-.6 3.4 0 5"/></svg><span>Pêche</span></button>
     </div>
     <div id="liste-randos"></div>
+    <div id="liste-vtt" hidden></div>
     <div id="liste-peche" hidden></div>
   </section>
   <section class="vue" id="v-plans"><div id="liste-plans"></div></section>
@@ -892,6 +911,7 @@ const auth=getAuth(app);
 const db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
 
 const S={moi:null,membres:{},sejours:[],randos:[],plans:[],photos:[],infos:[],prises:[],liens:[],
+  vtt:[],annuaire:[],
   curseur:new Date(),vue:"accueil",sortie:"randos",selMode:false,selDeb:null};
 
 /* ═══════════════════════════════════════════════════════════
@@ -1044,7 +1064,7 @@ function formPhoto(ctx){
       const date=$("#ph-d").value||auj(), legende=$("#ph-l").value.trim(), n=nouvelles.length;
       nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),{data,legende,date,
         rando:ctx?.type==="rando"?ctx.id:null, prise:ctx?.type==="prise"?ctx.id:null,
-        plan:ctx?.type==="plan"?ctx.id:null,
+        plan:ctx?.type==="plan"?ctx.id:null, vtt:ctx?.type==="vtt"?ctx.id:null,
         uid:auth.currentUser.uid,cree:serverTimestamp()})));
       fermer(); toast(`${n} photo${n>1?"s":""} ajoutée${n>1?"s":""}`);
     }},"Envoyer"));
@@ -1122,7 +1142,7 @@ function supprimerPhoto(p,apres){
     });
 }
 function photosVisibles(){ return S.photos.filter(p=>!supprimees.has(p.id)); }
-function rafraichirPhotos(){ rendrePhotos(); rendreRandos(); rendrePeche(); rendrePlans(); rendreAccueil(); }
+function rafraichirPhotos(){ rendrePhotos(); rendreRandos(); rendrePeche(); rendrePlans(); rendreVTT(); rendreAccueil(); }
 
 function telechargerPhoto(p){
   const nom=(val(p.legende)||"vallouise-"+(val(p.date)||auj())).replace(/[^\w\-]+/g,"-").toLowerCase();
@@ -1508,6 +1528,383 @@ const texteRando=r=>[`🥾 ${r.nom}`,
   ...liensDe(r)].filter(Boolean).join("\n");
 
 /* ═══════════════════════════════════════════════════════════
+
+/* ═══════════════════════════════════════════════════════════
+   VTT
+   ═══════════════════════════════════════════════════════════ */
+const PRATIQUES=["VTT musculaire","VTTAE / Électrique","Enduro","Cross-country","Gravel","DH / Descente"];
+const NIV_VTT=[
+  {c:"Vert - Facile",   f:"#EAF4EE", e:"#2E6B48", p:"#3F7D5A"},
+  {c:"Bleu - Moyen",    f:"#E8F0F5", e:"#2A6183", p:"#3E7C9B"},
+  {c:"Rouge - Difficile",f:"#FBEAE5", e:"#B44228", p:"#C4472C"},
+  {c:"Noir - Expert",   f:"#E4E7E6", e:"#1E2A28", p:"#12211F"}
+];
+const nivVTT=c=>NIV_VTT.find(x=>x.c===c)||NIV_VTT[1];
+
+const vttMasquees=new Set(JSON.parse(localStorage.getItem("vl-vtt-masquees")||"[]"));
+function supprimerVTT(v){
+  const id=v.id;
+  vttMasquees.add(id);
+  localStorage.setItem("vl-vtt-masquees",JSON.stringify([...vttMasquees]));
+  S.vtt=S.vtt.filter(x=>x.id!==id);
+  rendreVTT();
+  photosVisibles().filter(p=>p.vtt===id).forEach(p=>{
+    memoriserMasquee(p.id);
+    deleteDoc(doc(db,"photos",p.id)).catch(e=>console.error("photo liée",e));
+  });
+  deleteDoc(doc(db,"vtt",id)).then(()=>toast("Sortie supprimée")).catch(err=>{
+    console.error("suppression vtt",err);
+    if(!window.__avisRegles){window.__avisRegles=true;
+      toast("Sortie masquée sur cet appareil. Publie les règles Firestore pour l'effacer partout.");}
+  });
+}
+
+function formVTT(v){
+  let trace=v?.trace||null, gps=v?.gps||null;
+  const nouvelles=[];
+  const zGPX=el("div",{class:"recap",style:"margin-top:6px"});
+  const zGPS=el("div",{style:"margin-top:6px"});
+  const zPh =el("div",{class:"bande-photos",style:"margin-top:8px"});
+  const majGPX=()=>{zGPX.innerHTML="";
+    zGPX.append(trace
+      ? el("div",{},el("b",{},`Trace : ${trace.km} km · ▲ ${nb(trace.dplus)} m`),
+          el("span",{class:"meta"},`${trace.pts.length} points`),
+          el("button",{class:"btn danger",onclick:()=>{trace=null;majGPX();}},"Retirer la trace"))
+      : el("span",{class:"meta"},"Aucune trace. Importe un .gpx (Strava, Komoot, Garmin…)"));};
+  const majGPS=()=>{zGPS.innerHTML="";
+    zGPS.append(gps?blocCarte(gps,()=>{gps=null;majGPS();})
+      :el("span",{class:"meta"},"Aucun spot de départ enregistré."));};
+  const majPh=()=>vignettesForm(zPh, v?photosVisibles().filter(p=>p.vtt===v.id):[], nouvelles, majPh);
+  majGPX();majGPS();
+
+  const c=el("div");
+  c.append(
+    el("label",{},"Nom du parcours"),
+    el("input",{id:"v-nom",placeholder:"Boucle de la Pousterle",value:val(v?.nom)}),
+    el("label",{},"Date de la sortie"),
+    el("input",{type:"date",id:"v-date",value:val(v?.date)||auj()}),
+    el("label",{},"Point de départ / spot"),
+    el("input",{id:"v-dep",placeholder:"Les Vigneaux, parking du village",value:val(v?.depart)}),
+    el("button",{class:"btn fant plein",id:"v-geo",style:"margin-top:8px"},"Me géolocaliser"),
+    zGPS,
+    el("div",{class:"trio"},
+      el("div",{},el("label",{},"Distance (km)"),
+        el("input",{id:"v-km",type:"number",step:"0.1",inputmode:"decimal",value:val(v?.km)})),
+      el("div",{},el("label",{},"D+ (m)"),
+        el("input",{id:"v-dp",type:"number",inputmode:"numeric",value:val(v?.dplus)})),
+      el("div",{},el("label",{},"Durée (h)"),
+        el("input",{id:"v-h",type:"number",step:"0.25",inputmode:"decimal",value:val(v?.duree)}))),
+    el("label",{},"Type de VTT / pratique"),
+    el("select",{id:"v-prat",html:PRATIQUES.map(x=>`<option ${v?.pratique===x?"selected":""}>${x}</option>`).join("")}),
+    el("label",{},"Niveau / difficulté"),
+    el("select",{id:"v-niv",html:NIV_VTT.map(x=>`<option ${v?.niveau===x.c?"selected":""}>${x.c}</option>`).join("")}),
+    el("label",{},"État du terrain / notes"),
+    el("textarea",{id:"v-txt",placeholder:"Sentiers secs, cailloux roulants dans la descente, singletracks propres…"}),
+    el("label",{},"Photos"),
+    el("input",{type:"file",id:"v-ph",accept:"image/*",multiple:""}),
+    zPh,
+    el("label",{},"Trace GPX"),
+    el("input",{type:"file",id:"v-gpx",accept:".gpx,application/gpx+xml,text/xml"}),
+    zGPX,
+    el("button",{class:"btn accent plein",style:"margin-top:18px",onclick:()=>{
+      const nom=$("#v-nom").value.trim();
+      if(!nom)return toast("Il manque le nom du parcours");
+      const d={nom,date:$("#v-date").value||auj(),depart:$("#v-dep").value.trim(),
+        km:$("#v-km").value?+$("#v-km").value:(trace?trace.km:null),
+        dplus:$("#v-dp").value?+$("#v-dp").value:(trace?trace.dplus:null),
+        duree:$("#v-h").value?+$("#v-h").value:null,
+        pratique:$("#v-prat").value,niveau:$("#v-niv").value,
+        texte:$("#v-txt").value.trim(),trace,gps,uid:auth.currentUser.uid};
+      const ref=v?doc(db,"vtt",v.id):doc(collection(db,"vtt"));
+      ecrire(v?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
+        v?"Sortie mise à jour":"Sortie VTT enregistrée",fermer);
+      nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),
+        {data,legende:nom,date:d.date,rando:null,prise:null,plan:null,vtt:ref.id,
+         uid:auth.currentUser.uid,cree:serverTimestamp()})));
+    }},v?"Enregistrer":"Ajouter la sortie"));
+
+  feuille(v?"Modifier la sortie VTT":"Nouvelle sortie VTT",c,()=>{
+    $("#v-txt").value=val(v?.texte); majPh();
+    selecteurPhotos($("#v-ph"),zPh,nouvelles,majPh);
+    $("#v-geo").onclick=e=>geolocaliser(e.currentTarget,p=>{gps=p;majGPS();});
+    $("#v-gpx").onchange=async e=>{
+      const f=e.target.files[0];if(!f)return;
+      try{trace=lireGPX(await f.text());
+        if(!$("#v-km").value)$("#v-km").value=trace.km;
+        if(!$("#v-dp").value)$("#v-dp").value=trace.dplus;
+        majGPX();toast(`Trace lue : ${trace.km} km`);}catch(err){toast(err.message,true);}};
+  });
+}
+
+function rendreVTT(){
+  const z=$("#liste-vtt");if(!z)return;z.innerHTML="";
+  z.append(el("button",{class:"btn accent plein",onclick:()=>formVTT()},"+ Nouvelle sortie VTT"));
+  const mes=S.vtt.filter(v=>!vttMasquees.has(v.id));
+  z.append(el("div",{class:"titre-bloc"},"Mes sorties VTT"));
+  if(!mes.length){z.append(el("div",{class:"vide"},el("b",{},"Aucune sortie enregistrée"),
+    "Distance, D+, type de vélo et état du terrain : de quoi refaire le bon parcours au bon moment."));return;}
+  z.append(el("div",{class:"meta",style:"margin:-4px 2px 10px"},
+    `${mes.length} sortie${mes.length>1?"s":""} · ${nb(mes.reduce((s,v)=>s+(v.km||0),0).toFixed(0))} km cumulés`));
+
+  [...mes].sort((a,b)=>(val(b.date)||"")<(val(a.date)||"")?-1:1).forEach(v=>{
+    const n=nivVTT(v.niveau), mien=v.uid===auth.currentUser.uid;
+    const photos=photosVisibles().filter(p=>p.vtt===v.id);
+    const carte=el("div",{class:"carte"},
+      el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
+        el("h3",{},v.nom),
+        el("span",{class:"vt-niv",style:`background:${n.f};color:${n.e}`},v.niveau||"—")),
+      el("div",{class:"meta",style:"margin-top:3px"},
+        [v.date?jolie(v.date):null,val(v.depart)].filter(Boolean).join("  ·  ")),
+      el("div",{class:"vt-mesures"},
+        v.km?el("span",{},"↔ "+v.km+" km"):null,
+        v.dplus?el("span",{},"▲ "+nb(v.dplus)+" m"):null,
+        v.duree?el("span",{},"⏱ "+v.duree+" h"):null),
+      el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px;margin-top:9px"},
+        el("span",{class:"puce o"},val(v.pratique)||"VTT")),
+      dessinerTrace(v.trace),
+      v.texte?el("p",{class:"txt"},val(v.texte)):null);
+    if(photos.length){const bande=el("div",{class:"bande-photos"});
+      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",onclick:()=>ouvrirPhoto(p)})));
+      carte.append(bande);}
+    carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
+      el("button",{class:"mini",onclick:()=>formPhoto({type:"vtt",id:v.id,nom:v.nom})},"Photo"),
+      v.gps?el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
+        href:`https://www.google.com/maps/search/?api=1&query=${v.gps.lat},${v.gps.lon}`},"Départ ↗"):null,
+      v.trace?el("button",{class:"mini",onclick:()=>exporterGPX(v)},"Export GPX"):null,
+      el("button",{class:"mini",onclick:()=>partager(texteVTT(v))},"Partager"),
+      mien?el("button",{class:"mini",onclick:()=>formVTT(v)},"Modifier"):null,
+      mien?el("button",{class:"mini",onclick:()=>{
+        if(confirm("Supprimer cette sortie ?")) supprimerVTT(v);}},"🗑"):null));
+    z.append(carte);
+  });
+}
+const texteVTT=v=>[`🚵 ${v.nom}`,
+  [v.date?jolie(v.date):null,val(v.depart),v.km?v.km+" km":null,
+   v.dplus?"D+ "+v.dplus+" m":null,val(v.pratique),val(v.niveau)].filter(Boolean).join(" · "),
+  val(v.texte)].filter(Boolean).join("\n");
+
+/* Réexport de la trace importée, au format GPX */
+function exporterGPX(v){
+  if(!v.trace?.pts?.length) return toast("Aucune trace sur cette sortie");
+  const pts=v.trace.pts.map(p=>`<trkpt lat="${p[0]}" lon="${p[1]}"><ele>${p[2]}</ele></trkpt>`).join("\n");
+  const gpx=`<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Vallouise Hub" xmlns="http://www.topografix.com/GPX/1/1">
+<trk><name>${val(v.nom).replace(/[<>&]/g,"")}</name><trkseg>
+${pts}
+</trkseg></trk></gpx>`;
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([gpx],{type:"application/gpx+xml"}));
+  a.download=val(v.nom).replace(/[^\w\-]+/g,"-").toLowerCase()+".gpx";
+  document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  toast("Trace exportée");
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WI-FI — bulle partagée en tête de l'onglet L'Appart
+   Stocké dans la collection infos (doc marqué wifi:true),
+   pour éviter une collection de plus à autoriser.
+   ═══════════════════════════════════════════════════════════ */
+const docWifi=()=>S.infos.find(i=>i.wifi===true);
+
+function formWifi(){
+  const w=docWifi();
+  const c=el("div");
+  c.append(
+    el("p",{class:"meta"},"Visible par toute la famille, mise à jour instantanée sur tous les téléphones."),
+    el("label",{},"Nom du réseau (SSID)"),
+    el("input",{id:"w-ssid",placeholder:"Vallouise_Appart",value:val(w?.ssid)}),
+    el("label",{},"Mot de passe"),
+    el("input",{id:"w-mdp",placeholder:"…",value:val(w?.mdp)}),
+    el("label",{},"Note (facultatif)"),
+    el("input",{id:"w-note",placeholder:"Box dans le placard de l'entrée",value:val(w?.note)}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
+      const d={wifi:true,titre:"Wi-Fi",ssid:$("#w-ssid").value.trim(),
+        mdp:$("#w-mdp").value.trim(),note:$("#w-note").value.trim(),
+        texte:"",uid:auth.currentUser.uid};
+      ecrire(w?updateDoc(doc(db,"infos",w.id),d):addDoc(collection(db,"infos"),{...d,cree:serverTimestamp()}),
+        "Wi-Fi enregistré",fermer);
+    }},"Enregistrer"));
+  feuille("Réseau Wi-Fi",c);
+}
+
+function blocWifi(){
+  const w=docWifi();
+  const z=el("div",{class:"wifi-bulle"});
+  z.append(el("div",{class:"entre"},
+    el("div",{class:"rangee"},
+      el("span",{class:"wifi-ic",html:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.7" stroke-linecap="round"><path d="M2.5 8.5a15 15 0 0 1 19 0"/>
+        <path d="M5.5 12a10.5 10.5 0 0 1 13 0"/><path d="M8.6 15.4a6 6 0 0 1 6.8 0"/>
+        <circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg>`}),
+      el("b",{},"Wi-Fi")),
+    el("button",{class:"mini",onclick:formWifi},w?"Modifier":"Configurer")));
+  if(!w||!w.ssid){
+    z.append(el("p",{class:"txt",style:"margin-top:8px"},
+      "Aucun réseau enregistré. Renseigne-le une fois, tout le monde l'aura."));
+    return z;
+  }
+  z.append(
+    el("div",{class:"wifi-ligne"},el("span",{class:"meta"},"Réseau"),el("b",{},w.ssid)),
+    el("div",{class:"wifi-ligne"},el("span",{class:"meta"},"Mot de passe"),
+      el("b",{class:"wifi-mdp"},w.mdp||"—")),
+    w.note?el("p",{class:"meta",style:"margin-top:8px"},val(w.note)):null,
+    el("button",{class:"btn plein",style:"margin-top:12px",onclick:()=>{
+      navigator.clipboard?.writeText(w.mdp||"").then(
+        ()=>toast("Mot de passe copié"),()=>toast("Copie impossible",true));
+    }},"Copier le mot de passe"));
+  return z;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FICHES PRATIQUES — édition et document PDF
+   ═══════════════════════════════════════════════════════════ */
+const LIMITE_PDF=700000;   // marge sous la limite d'un document Firestore
+
+function lirePDF(file){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onload=()=>res(fr.result);
+    fr.onerror=()=>rej(new Error("lecture impossible"));
+    fr.readAsDataURL(file);
+  });
+}
+function ouvrirPDF(nom,data){
+  const blob=(()=>{
+    const b64=data.split(",")[1];
+    const bin=atob(b64), buf=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) buf[i]=bin.charCodeAt(i);
+    return new Blob([buf],{type:"application/pdf"});
+  })();
+  const url=URL.createObjectURL(blob);
+  const c=el("div");
+  c.append(
+    el("iframe",{class:"pdf-cadre",src:url,title:nom}),
+    el("a",{class:"btn accent plein",style:"margin-top:12px",href:url,
+      target:"_blank",rel:"noopener noreferrer"},"Ouvrir en plein écran ↗"),
+    el("p",{class:"meta",style:"margin-top:10px"},
+      "Sur iPhone, l'aperçu intégré peut rester blanc : utilise alors le bouton ci-dessus."));
+  feuille(nom,c);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANNUAIRE — numéros utiles de la vallée
+   ═══════════════════════════════════════════════════════════ */
+const CAT_ANNU=[
+  {c:"sante",  lib:"Santé & secours",      f:"#FBEAE5", e:"#B44228"},
+  {c:"commerce",lib:"Restaurants & commerces",f:"#FBF0E4", e:"#9C6412"},
+  {c:"transport",lib:"Transports & taxis", f:"#E8F0F5", e:"#2A6183"},
+  {c:"service", lib:"Services & mairie",   f:"#EAF4EE", e:"#2E6B48"}
+];
+const catAnnu=c=>CAT_ANNU.find(x=>x.c===c)||CAT_ANNU[3];
+/* Contacts vérifiés uniquement : les numéros que je n'ai pas pu vérifier
+   ne sont pas inventés, la famille les ajoute au fil de l'eau. */
+const ANNUAIRE_BASE=[
+  {n:"Urgences européennes",cat:"sante",tel:"112",com:"—",
+   note:"Le réflexe en montagne : le CODIS de Gap bascule vers le secours en montagne."},
+  {n:"Secours en montagne — CRS / PGHM 05",cat:"sante",tel:"0492222222",com:"Hautes-Alpes",
+   note:"Numéro d'alerte commun du département."},
+  {n:"SAMU",cat:"sante",tel:"15",com:"—",note:"Urgence médicale."},
+  {n:"Urgences par SMS",cat:"sante",tel:"114",com:"—",note:"Pour alerter sans pouvoir parler."},
+  {n:"Pompiers",cat:"sante",tel:"18",com:"—",note:""},
+  {n:"Mairie de Vallouise-Pelvoux",cat:"service",tel:"0492233019",com:"Vallouise-Pelvoux",
+   adr:"2704 route de Pelvoux, St Antoine, 05340 Vallouise-Pelvoux",
+   horaires:"Du lundi au vendredi, 8h30 – 12h"}
+];
+
+function formContact(k){
+  const c=el("div");
+  c.append(
+    el("label",{},"Nom de l'établissement ou du service"),
+    el("input",{id:"k-n",placeholder:"Boulangerie du village",value:val(k?.n)}),
+    el("label",{},"Catégorie"),
+    el("select",{id:"k-cat",html:CAT_ANNU.map(x=>
+      `<option value="${x.c}" ${k?.cat===x.c?"selected":""}>${x.lib}</option>`).join("")}),
+    el("label",{},"Commune"),
+    el("input",{id:"k-com",placeholder:"Vallouise",value:val(k?.com)}),
+    el("label",{},"Téléphone"),
+    el("input",{id:"k-tel",type:"tel",placeholder:"04 92 …",value:val(k?.tel)}),
+    el("label",{},"Adresse"),
+    el("input",{id:"k-adr",placeholder:"Place de l'Église",value:val(k?.adr)}),
+    el("label",{},"Horaires / notes"),
+    el("textarea",{id:"k-h",placeholder:"Fermé le lundi. Pain au levain le samedi."}),
+    el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
+      const n=$("#k-n").value.trim();
+      if(!n)return toast("Il manque le nom");
+      const d={n,cat:$("#k-cat").value,com:$("#k-com").value.trim(),
+        tel:$("#k-tel").value.replace(/\s+/g,""),adr:$("#k-adr").value.trim(),
+        horaires:$("#k-h").value.trim(),uid:auth.currentUser.uid};
+      ecrire(k?.id?updateDoc(doc(db,"annuaire",k.id),d)
+                 :addDoc(collection(db,"annuaire"),{...d,cree:serverTimestamp()}),
+        "Contact enregistré",fermer);
+    }},k?.id?"Enregistrer":"Ajouter le contact"),
+    k?.id?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
+      if(confirm("Supprimer ce contact ?"))ecrire(deleteDoc(doc(db,"annuaire",k.id)),"Supprimé",fermer);
+    }},"Supprimer"):null);
+  feuille(k?.id?"Modifier le contact":"Nouveau contact",c,()=>{$("#k-h").value=val(k?.horaires);});
+}
+
+function carteContact(k){
+  const cat=catAnnu(k.cat);
+  const carte=el("div",{class:"carte"},
+    el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
+      el("h3",{},k.n),
+      el("span",{class:"vt-niv",style:`background:${cat.f};color:${cat.e}`},cat.lib)),
+    el("div",{class:"meta",style:"margin-top:3px"},
+      [val(k.com),val(k.adr)].filter(Boolean).join("  ·  ")),
+    k.horaires?el("p",{class:"txt"},val(k.horaires)):null,
+    k.note?el("p",{class:"txt"},val(k.note)):null);
+  const actions=el("div",{class:"rangee",style:"margin-top:12px;flex-wrap:wrap;gap:7px"});
+  if(k.tel) actions.append(el("a",{class:"btn accent",href:"tel:"+k.tel,
+    style:"flex:1;justify-content:center"},"Appeler"));
+  if(k.adr||k.com) actions.append(el("a",{class:"btn fant",target:"_blank",rel:"noopener noreferrer",
+    style:"flex:1;justify-content:center",
+    href:"https://maps.apple.com/?q="+encodeURIComponent([k.n,k.adr,k.com].filter(Boolean).join(", "))},
+    "Itinéraire"));
+  carte.append(actions);
+  if(k.id && k.uid===auth.currentUser.uid)
+    carte.append(el("button",{class:"mini",style:"margin-top:9px",onclick:()=>formContact(k)},"Modifier"));
+  return carte;
+}
+
+let annuFiltre="";
+function ouvrirAnnuaire(){
+  const corps=el("div");
+  const zo=el("div",{class:"onglets",style:"flex-wrap:wrap"});
+  const zl=el("div");
+  const tous=()=>[...ANNUAIRE_BASE,...S.annuaire];
+
+  const dessiner=()=>{
+    const l=tous().filter(k=>!annuFiltre||k.cat===annuFiltre);
+    zl.innerHTML="";
+    if(!l.length){zl.append(el("div",{class:"vide"},el("b",{},"Aucun contact"),
+      "Ajoute le premier numéro de cette catégorie."));return;}
+    CAT_ANNU.forEach(cat=>{
+      const g=l.filter(k=>k.cat===cat.c);
+      if(!g.length)return;
+      zl.append(el("div",{class:"titre-bloc"},cat.lib));
+      g.forEach(k=>zl.append(carteContact(k)));
+    });
+  };
+
+  [{c:"",lib:"Tous"},...CAT_ANNU].forEach(o=>zo.append(el("button",{
+    class:o.c===annuFiltre?"on":"",style:"flex:1 0 45%",onclick:e=>{
+      annuFiltre=o.c;
+      [...zo.children].forEach(b=>b.classList.toggle("on",b===e.currentTarget));
+      dessiner();
+    }},o.lib)));
+
+  corps.append(zo,zl,
+    el("button",{class:"btn accent plein",style:"margin-top:14px",
+      onclick:()=>formContact()},"+ Ajouter un numéro"),
+    el("p",{class:"meta",style:"margin:14px 2px 0;line-height:1.6"},
+      "Les numéros d'urgence et celui de la mairie sont vérifiés. Les commerces, taxis et "+
+      "professionnels de santé sont à ajouter par la famille : je préfère un annuaire court et "+
+      "juste qu'une liste inventée."));
+  feuille("Numéros utiles",corps,dessiner);
+}
+
+/* ══════════════════════════════════════════════════════════
    10. PÊCHE
    ═══════════════════════════════════════════════════════════ */
 const ESPECES=["Truite fario","Truite arc-en-ciel","Omble chevalier","Saumon de fontaine",
@@ -1785,32 +2182,66 @@ function rendrePlans(){
    13. L'APPART
    ═══════════════════════════════════════════════════════════ */
 function formInfo(i){
+  let pdf=i?.pdf||null, pdfNom=i?.pdfNom||"";
+  const zp=el("div",{class:"recap",style:"margin-top:6px"});
+  const majPdf=()=>{zp.innerHTML="";
+    zp.append(pdf
+      ? el("div",{},el("b",{},pdfNom||"Document joint"),
+          el("span",{class:"meta"},Math.round(pdf.length/1400)+" ko environ"),
+          el("button",{class:"btn danger",onclick:()=>{pdf=null;pdfNom="";majPdf();}},"Retirer le document"))
+      : el("span",{class:"meta"},"Aucun document. Un PDF de moins de 700 ko peut être joint (notice, plan, contrat…)."));};
+  majPdf();
   const c=el("div");
   c.append(
     el("label",{},"Titre"),
-    el("input",{id:"i-t",placeholder:"Wifi, chauffage, poubelles, clés…",value:val(i?.titre)}),
+    el("input",{id:"i-t",placeholder:"Chauffage, poubelles, clés…",value:val(i?.titre)}),
     el("label",{},"Contenu"),
     el("textarea",{id:"i-c",style:"min-height:130px"}),
+    el("label",{},"Document PDF (facultatif)"),
+    el("input",{type:"file",id:"i-pdf",accept:"application/pdf"}),
+    zp,
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const t=$("#i-t").value.trim();if(!t)return toast("Il manque le titre");
-      const d={titre:t,texte:$("#i-c").value.trim(),uid:auth.currentUser.uid};
+      const d={titre:t,texte:$("#i-c").value.trim(),pdf,pdfNom,uid:auth.currentUser.uid};
       ecrire(i?updateDoc(doc(db,"infos",i.id),d):addDoc(collection(db,"infos"),{...d,cree:serverTimestamp()}),
         "Fiche enregistrée",fermer);
     }},i?"Enregistrer":"Ajouter la fiche"),
     i?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
       if(confirm("Supprimer cette fiche ?"))ecrire(deleteDoc(doc(db,"infos",i.id)),"Fiche supprimée",fermer);
     }},"Supprimer la fiche"):null);
-  feuille(i?"Modifier la fiche":"Nouvelle fiche pratique",c,()=>{$("#i-c").value=val(i?.texte);});
+  feuille(i?"Modifier la fiche":"Nouvelle fiche pratique",c,()=>{
+    $("#i-c").value=val(i?.texte);
+    $("#i-pdf").onchange=async e=>{
+      const f=e.target.files[0];if(!f)return;
+      if(f.size>LIMITE_PDF){e.target.value="";
+        return toast(`PDF trop lourd (${Math.round(f.size/1024)} ko). Limite : 700 ko.`,true);}
+      try{pdf=await lirePDF(f);pdfNom=f.name;majPdf();toast("Document joint");}
+      catch(err){toast("Lecture du PDF impossible",true);}
+    };
+  });
 }
 function rendreInfos(){
   const z=$("#liste-infos");if(!z)return;z.innerHTML="";
+  z.append(blocWifi());
+  z.append(el("div",{class:"titre-bloc"},"Numéros utiles"));
+  z.append(el("div",{class:"carte"},
+    el("p",{class:"txt",style:"margin:0 0 12px"},
+      "Secours, mairie, commerces et taxis de la vallée, avec appel et itinéraire en un geste."),
+    el("button",{class:"btn plein",onclick:ouvrirAnnuaire},"Ouvrir l'annuaire")));
   z.append(el("div",{class:"titre-bloc"},"Le mode d'emploi de l'appart"));
-  if(!S.infos.length)z.append(el("div",{class:"vide"},el("b",{},"Rien de noté"),
-    "Le code du wifi, la vanne d'eau, le jour des poubelles."));
-  S.infos.forEach(i=>z.append(el("div",{class:"carte"},
-    el("div",{class:"entre"},el("h3",{},i.titre),
-      el("button",{class:"mini",onclick:()=>formInfo(i)},"Modifier")),
-    el("p",{class:"txt"},val(i.texte)))));
+  const fiches=S.infos.filter(i=>i.wifi!==true);
+  if(!fiches.length)z.append(el("div",{class:"vide"},el("b",{},"Rien de noté"),
+    "La vanne d'eau, le jour des poubelles, la notice du poêle."));
+  fiches.forEach(i=>{
+    const carte=el("div",{class:"carte"},
+      el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
+        el("h3",{},i.titre),
+        el("button",{class:"mini",onclick:()=>formInfo(i)},"✎ Éditer")));
+    if(val(i.texte)) carte.append(el("p",{class:"txt"},val(i.texte)));
+    if(i.pdf) carte.append(el("button",{class:"btn fant plein",style:"margin-top:12px",
+      onclick:()=>ouvrirPDF(val(i.pdfNom)||i.titre,i.pdf)},"Consulter le document PDF"));
+    z.append(carte);
+  });
   z.append(el("button",{class:"btn fant plein",style:"margin-top:6px",onclick:()=>formInfo()},"+ Ajouter une fiche"));
 }
 
@@ -2373,6 +2804,12 @@ function rendreAccueil(){
   z.append(blocSuggestions());
 
   /* ── Webcam en direct ─────────────────────────────────────── */
+  z.append(el("div",{class:"titre-bloc"},"Numéros utiles"));
+  z.append(el("div",{class:"carte"},
+    el("p",{class:"txt",style:"margin:0 0 12px"},
+      "Secours, mairie, commerces et taxis de la vallée : appel et itinéraire en un geste."),
+    el("button",{class:"btn plein",onclick:ouvrirAnnuaire},"Ouvrir l'annuaire")));
+
   z.append(el("div",{class:"titre-bloc"},"Infos mairie"));
   z.append(el("div",{class:"carte"},
     el("p",{class:"txt",style:"margin:0 0 12px"},
@@ -2458,15 +2895,15 @@ $$("nav button").forEach(b=>b.onclick=()=>aller(b.dataset.vue));
 $$(".onglets button[data-sortie]").forEach(b=>b.onclick=()=>{
   S.sortie=b.dataset.sortie;
   $$(".onglets button[data-sortie]").forEach(x=>x.classList.toggle("on",x===b));
-  $("#liste-randos").hidden=S.sortie!=="randos";
-  $("#liste-peche").hidden=S.sortie!=="peche";
+  ["randos","vtt","peche"].forEach(k=>$("#liste-"+k).hidden=S.sortie!==k);
 });
 $("#prev").onclick=()=>{S.curseur.setMonth(S.curseur.getMonth()-1);dessinerCal();};
 $("#next").onclick=()=>{S.curseur.setMonth(S.curseur.getMonth()+1);dessinerCal();};
 $("#mois").onclick=()=>{S.curseur=new Date();dessinerCal();toast("Retour au mois en cours");};
 $("#poser").onclick=demarrerSel;
 $("#fab").onclick=()=>{
-  if(S.vue==="sorties") return S.sortie==="peche"?formPrise():formRando();
+  if(S.vue==="sorties")
+    return S.sortie==="peche"?formPrise():S.sortie==="vtt"?formVTT():formRando();
   if(S.vue==="plans")   return formPlan();
   if(S.vue==="photos")  return formPhoto();
 };
@@ -2560,7 +2997,8 @@ function ecouter(nom,champ,tri,rendu){
   onSnapshot(query(collection(db,nom),...(tri?[orderBy(...tri)]:[])),
     snap=>{
       S[champ]=snap.docs.map(d=>({id:d.id,...d.data()}))
-        .filter(x=>!(champ==="randos"&&randosMasquees.has(x.id)));
+        .filter(x=>!(champ==="randos"&&randosMasquees.has(x.id)))
+        .filter(x=>!(champ==="vtt"&&vttMasquees.has(x.id)));
       rendu();},
     err=>{console.error(nom,err);
       toast(`Lecture de « ${nom} » refusée — les règles Firestore doivent être mises à jour.`,true);});
@@ -2583,7 +3021,7 @@ onAuthStateChanged(auth,user=>{
       const p=$("#ma-pastille");p.style.background=S.moi.couleur;p.textContent=S.moi.nom[0].toUpperCase();
       delete $("#voile").dataset.bloque;
     } else demanderNom(true);
-    rendreSejours();rendreRandos();rendrePlans();rendrePhotos();rendrePeche();rendreAccueil();
+    rendreSejours();rendreRandos();rendrePlans();rendrePhotos();rendrePeche();rendreVTT();rendreAccueil();
     if(S.vue==="accueil") chargerMeteo();
   },err=>{console.error(err);
     toast("Lecture des membres refusée — les règles Firestore doivent être mises à jour.",true);});
@@ -2603,6 +3041,8 @@ onAuthStateChanged(auth,user=>{
       toast("Lecture des photos refusée — règles Firestore à mettre à jour.",true);});
   ecouter("infos","infos",["titre","asc"],rendreInfos);
   ecouter("prises","prises",null,rendrePeche);
+  ecouter("vtt","vtt",null,rendreVTT);
+  ecouter("annuaire","annuaire",null,()=>{});
   ecouter("liens","liens",["titre","asc"],()=>{rendreAccueil();chargerMeteo();});
 });
 

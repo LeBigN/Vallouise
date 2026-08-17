@@ -45,11 +45,11 @@ service cloud.firestore {
 
     // Contenus : tout le monde lit, l'auteur seul modifie et supprime
     match /{col}/{id} {
-      allow read:   if connecte() && col in ['sejours','randos','plans','photos','infos','prises','liens'];
+      allow read:   if connecte() && col in ['sejours','randos','plans','photos','infos','prises','liens','vtt','annuaire'];
       allow create: if connecte() && request.resource.data.uid == request.auth.uid;
       allow update: if connecte() && (proprio()
                       // randos, fiches pratiques et liens sont collaboratifs
-                      || col == 'randos' || col == 'infos' || col == 'liens');
+                      || col == 'randos' || col == 'infos' || col == 'liens' || col == 'annuaire');
       // le mur photo est commun : chacun peut y faire le ménage
       allow delete: if connecte() && (proprio() || col == 'photos');
     }
