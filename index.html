@@ -140,10 +140,12 @@ html[data-theme="auto"] .recap{background:#212E2B}
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:var(--neve)}
+html{background:var(--neve);overscroll-behavior:none}
 html,body{margin:0;padding:0}
-body{background:var(--neve);min-height:100dvh;touch-action:manipulation;-webkit-text-size-adjust:100%;color:var(--nuit);font-family:var(--corps);
-  font-size:15px;line-height:1.45;padding-bottom:var(--nav-h);overscroll-behavior-y:none}
+body{background:var(--neve);min-height:100dvh;max-height:none;touch-action:pan-y;
+  -webkit-text-size-adjust:100%;color:var(--nuit);font-family:var(--corps);
+  font-size:15px;line-height:1.45;padding-bottom:calc(var(--nav-h) + 10px);
+  overscroll-behavior:none;overscroll-behavior-y:none}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 :focus-visible{outline:2.5px solid var(--meleze);outline-offset:2px;border-radius:6px}
@@ -303,9 +305,13 @@ textarea{min-height:78px;resize:vertical}
 @media(min-width:640px){.feuille{max-width:100%}}
 
 /* ── Navigation ─────────────────────────────────────────────── */
-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.94);
-  backdrop-filter:blur(12px);border-top:1px solid var(--brume);
-  display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:var(--marge-bas);background:var(--blanc)}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:1000;
+  background:var(--blanc);border-top:1px solid var(--bord);
+  display:grid;grid-template-columns:repeat(6,1fr);
+  padding-bottom:env(safe-area-inset-bottom, 16px)}
+/* le fond descend sous la barre : plus de bande blanche pendant le rebond */
+nav::after{content:"";position:absolute;left:0;right:0;top:100%;height:120px;
+  background:var(--blanc)}
 nav button{padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
 nav button svg.i{width:21px;height:21px}
 nav button span.l{font-family:var(--corps);font-size:9.5px;font-weight:600;letter-spacing:.03em;white-space:nowrap}
@@ -355,7 +361,11 @@ nav button.on span.l{color:var(--meleze)}
   .lb-prev{left:4px} .lb-next{right:4px}}
 .lb p{color:var(--neve);text-align:center;margin:14px 0 0;max-width:520px;
   padding:0 60px}   /* on dégage les flèches latérales */
-.lb img{min-height:120px;object-fit:contain}
+.lb-scene{position:relative;width:100%;flex:0 0 auto;display:flex;align-items:center;
+  justify-content:center;background:#000;overflow:hidden;border-radius:10px;
+  height:68vh;max-height:68vh}
+.lb img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;
+  object-fit:contain;background:#000;border-radius:0}
 .ptr{position:fixed;top:0;left:0;right:0;z-index:55;display:flex;justify-content:center;
   pointer-events:none;opacity:0;transform:translateY(0)}
 .ptr-rond{width:34px;height:34px;border-radius:50%;background:var(--blanc);
@@ -663,7 +673,7 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
   <button class="lb-x" id="lb-x" aria-label="Fermer">✕</button>
   <div class="lb-compteur" id="lb-n"></div>
   <button class="lb-nav lb-prev" id="lb-prev" aria-label="Photo précédente">‹</button>
-  <img id="lb-img" alt="">
+  <div class="lb-scene"><img id="lb-img" alt=""></div>
   <button class="lb-nav lb-next" id="lb-next" aria-label="Photo suivante">›</button>
   <p id="lb-txt"></p>
 </div>
@@ -808,6 +818,10 @@ function ecrire(promesse,msgOk,apres){
         : "Échec de l'enregistrement — "+(err?.message||c||"raison inconnue"), true);});
 }
 addEventListener("unhandledrejection",e=>console.error(e.reason));
+addEventListener("error",e=>{
+  console.error(e.error||e.message);
+  toast("Anomalie : "+(e.message||"erreur inattendue")+" — signale-le si ça se reproduit.",true);
+});
 
 function majReseau(){
   const z=$("#reseau"), t=$("#reseau-txt");
@@ -1017,6 +1031,17 @@ function demanderNom(force){
       z.append(b);});
     if(force) $("#voile").dataset.bloque="1";
   });
+}
+/* Si la session anonyme a expiré, auth.currentUser vaut null et toute écriture
+   échouait sans un mot : la cause du « rien ne se passe » sur le formulaire contact. */
+function monUid(){
+  const u=auth.currentUser?.uid;
+  if(!u){
+    toast("Reconnexion en cours, réessaie dans deux secondes.",true);
+    signInAnonymously(auth).catch(e=>toast("Connexion impossible : "+(e.code||e.message),true));
+    return null;
+  }
+  return u;
 }
 const membre=uid=>S.membres[uid]||{nom:"?",couleur:"#7F8A86"};
 const pastille=uid=>{const m=membre(uid);
@@ -1241,10 +1266,14 @@ function naviguerLB(pas){
 function afficherLB(){
   const p=lbListe[lbIndex];
   if(!p){ $("#lb").classList.remove("on"); return; }
+  // on vide la scène avant de charger : la photo précédente ne peut plus
+  // rester visible derrière une image de format différent
   const img=$("#lb-img");
+  img.removeAttribute("src");
+  img.style.display="none";
   img.style.opacity="0";
+  img.onload=()=>{img.style.display="block";img.style.opacity="1";};
   img.src=p.data;
-  img.onload=()=>{img.style.opacity="1";};
 
   const rd=p.rando?S.randos.find(x=>x.id===p.rando):null;
   const pk=p.prise?S.prises.find(x=>x.id===p.prise):null;
@@ -2014,9 +2043,10 @@ function formContact(k){
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const n=$("#k-n").value.trim();
       if(!n)return toast("Il manque le nom");
+      const u=monUid(); if(!u) return;
       const d={n,cat:$("#k-cat").value,com:$("#k-com").value.trim(),
         tel:$("#k-tel").value.replace(/\s+/g,""),adr:$("#k-adr").value.trim(),
-        horaires:$("#k-h").value.trim(),uid:auth.currentUser.uid};
+        horaires:$("#k-h").value.trim(),uid:u};
       ecrire(k?.id?updateDoc(doc(db,"annuaire",k.id),d)
                  :addDoc(collection(db,"annuaire"),{...d,cree:serverTimestamp()}),
         "Contact enregistré",fermer);
@@ -2079,12 +2109,11 @@ function ouvrirAnnuaire(){
       dessiner();
     }},o.lib)));
 
-  corps.append(zo,zl,el("div",{style:"height:70px"}));
-  feuille("Numéros utiles",corps,()=>{
-    dessiner();
-    $("#feuille").append(el("button",{class:"fab fab-modale","aria-label":"Ajouter un numéro",
-      onclick:()=>formContact()},"+"));
-  });
+  corps.append(
+    el("button",{class:"btn accent plein",style:"margin-bottom:14px",
+      onclick:()=>formContact()},"+ Ajouter un numéro"),
+    zo, zl);
+  feuille("Numéros utiles",corps,dessiner);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2435,6 +2464,9 @@ function rendrePlans(){
    ═══════════════════════════════════════════════════════════ */
 function formInfo(i){
   let pdf=i?.pdf||null, pdfNom=i?.pdfNom||"";
+  const nouvelles=[];
+  const zPh=el("div",{class:"bande-photos",style:"margin-top:8px"});
+  const majPh=()=>vignettesForm(zPh, i?photosVisibles().filter(x=>x.info===i.id):[], nouvelles, majPh);
   const zp=el("div",{class:"recap",style:"margin-top:6px"});
   const majPdf=()=>{zp.innerHTML="";
     zp.append(pdf
@@ -2449,20 +2481,29 @@ function formInfo(i){
     el("input",{id:"i-t",placeholder:"Chauffage, poubelles, clés…",value:val(i?.titre)}),
     el("label",{},"Contenu"),
     el("textarea",{id:"i-c",style:"min-height:130px"}),
+    el("label",{},"Photos"),
+    el("input",{type:"file",id:"i-ph",accept:"image/*",multiple:""}),
+    zPh,
     el("label",{},"Document PDF (facultatif)"),
     el("input",{type:"file",id:"i-pdf",accept:"application/pdf"}),
     zp,
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const t=$("#i-t").value.trim();if(!t)return toast("Il manque le titre");
-      const d={titre:t,texte:$("#i-c").value.trim(),pdf,pdfNom,uid:auth.currentUser.uid};
-      ecrire(i?updateDoc(doc(db,"infos",i.id),d):addDoc(collection(db,"infos"),{...d,cree:serverTimestamp()}),
+      const u=monUid(); if(!u) return;
+      const d={titre:t,texte:$("#i-c").value.trim(),pdf,pdfNom,uid:u};
+      const ref=i?doc(db,"infos",i.id):doc(collection(db,"infos"));
+      ecrire(i?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
         "Fiche enregistrée",fermer);
+      nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),
+        {data,legende:t,date:auj(),rando:null,prise:null,plan:null,vtt:null,info:ref.id,
+         uid:u,cree:serverTimestamp()})));
     }},i?"Enregistrer":"Ajouter la fiche"),
     i?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
       if(confirm("Supprimer cette fiche ?"))ecrire(deleteDoc(doc(db,"infos",i.id)),"Fiche supprimée",fermer);
     }},"Supprimer la fiche"):null);
   feuille(i?"Modifier la fiche":"Nouvelle fiche pratique",c,()=>{
     $("#i-c").value=val(i?.texte);
+    majPh(); selecteurPhotos($("#i-ph"),zPh,nouvelles,majPh);
     $("#i-pdf").onchange=async e=>{
       const f=e.target.files[0];if(!f)return;
       if(f.size>LIMITE_PDF){e.target.value="";
@@ -2490,6 +2531,13 @@ function rendreInfos(){
         el("h3",{},i.titre),
         el("button",{class:"mini",onclick:()=>formInfo(i)},"✎ Éditer")));
     if(val(i.texte)) carte.append(el("p",{class:"txt"},val(i.texte)));
+    const ph=photosVisibles().filter(x=>x.info===i.id);
+    if(ph.length){
+      const bande=el("div",{class:"bande-photos"});
+      ph.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",
+        onclick:()=>ouvrirPhoto(x,ph)})));
+      carte.append(bande);
+    }
     if(i.pdf) carte.append(el("button",{class:"btn fant plein",style:"margin-top:12px",
       onclick:()=>ouvrirPDF(val(i.pdfNom)||i.titre,i.pdf)},"Consulter le document PDF"));
     z.append(carte);
@@ -3010,23 +3058,42 @@ function formLien(l){
       el("div",{},el("label",{},"jusqu'au"),el("input",{type:"date",id:"l-fin",value:val(l?.fin)}))),
     el("label",{},"Lien"),
     el("input",{id:"l-u",type:"url",placeholder:"https://",value:val(l?.url)}),
-    el("label",{},"Illustration"),
+    el("label",{},"Illustration principale"),
     el("input",{type:"file",id:"l-i",accept:"image/*"}),
     zi,
+    el("label",{},"Photos complémentaires"),
+    el("input",{type:"file",id:"l-ph",accept:"image/*",multiple:""}),
+    zLph,
+    el("label",{},"Document PDF (facultatif)"),
+    el("input",{type:"file",id:"l-pdf",accept:"application/pdf"}),
+    zLpdf,
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const t=$("#l-t").value.trim();
       if(!t)return toast("Il manque le titre");
+      const u=monUid(); if(!u) return;
       const d={titre:t,statut:$("#l-s").value,resume:$("#l-r").value.trim(),
         texte:$("#l-x").value.trim(),date:$("#l-d").value,
         debut:$("#l-deb").value,fin:$("#l-fin").value,
-        url:$("#l-u").value.trim(),image,uid:auth.currentUser.uid};
-      ecrire(l?updateDoc(doc(db,"liens",l.id),d):addDoc(collection(db,"liens"),{...d,cree:serverTimestamp()}),
+        url:$("#l-u").value.trim(),image,pdf:pdfA,pdfNom:pdfANom,uid:u};
+      const refA=l?doc(db,"liens",l.id):doc(collection(db,"liens"));
+      ecrire(l?updateDoc(refA,d):setDoc(refA,{...d,cree:serverTimestamp()}),
         "Actualité enregistrée",fermer);
+      nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),
+        {data,legende:t,date:d.date||auj(),rando:null,prise:null,plan:null,vtt:null,
+         info:null,actu:refA.id,uid:u,cree:serverTimestamp()})));
     }},l?"Enregistrer":"Publier l'actualité"),
     l?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
       if(confirm("Supprimer cette actualité ?"))ecrire(deleteDoc(doc(db,"liens",l.id)),"Supprimée",fermer);
     }},"Supprimer"):null);
   feuille(l?"Modifier l'actualité":"Nouvelle actualité",c,()=>{
+    majLph(); selecteurPhotos($("#l-ph"),zLph,nouvelles,majLph);
+    $("#l-pdf").onchange=async e=>{
+      const f=e.target.files[0];if(!f)return;
+      if(f.size>LIMITE_PDF){e.target.value="";
+        return toast(`PDF trop lourd (${Math.round(f.size/1024)} ko). Limite : 700 ko.`,true);}
+      try{pdfA=await lirePDF(f);pdfANom=f.name;majLpdf();toast("Document joint");}
+      catch(err){toast("Lecture du PDF impossible",true);}
+    };
     $("#l-r").value=val(l?.resume);
     $("#l-x").value=val(l?.texte);
     $("#l-i").onchange=async e=>{
@@ -3152,31 +3219,6 @@ function detailActu(a){
   feuille("L'actu",c);
 }
 
-let actuFiltre="";
-function toutesActus(){
-  const corps=el("div");
-  const zo=el("div",{class:"onglets",style:"flex-wrap:wrap"});
-  const zl=el("div");
-  const dessiner=()=>{
-    const l=fluxActus().filter(a=>!actuFiltre||a.statut===actuFiltre);
-    zl.innerHTML="";
-    if(!l.length){zl.append(el("div",{class:"vide"},el("b",{},"Rien à signaler"),
-      "Aucune actualité dans cette catégorie."));return;}
-    l.forEach(a=>zl.append(carteActu(a)));
-  };
-  [{c:"",lib:"Tout"},{c:"alerte",lib:"Alertes"},{c:"info",lib:"Infos"},{c:"evenement",lib:"Événements"}]
-    .forEach(o=>zo.append(el("button",{class:o.c===actuFiltre?"on":"",style:"flex:1 0 45%",
-      onclick:e=>{actuFiltre=o.c;
-        [...zo.children].forEach(b=>b.classList.toggle("on",b===e.currentTarget));
-        dessiner();}},o.lib)));
-  corps.append(zo,zl,el("div",{style:"height:70px"}));
-  feuille("Flash info Vallouise",corps,()=>{
-    dessiner();
-    $("#feuille").append(el("button",{class:"fab fab-modale","aria-label":"Publier une actu",
-      onclick:()=>formLien()},"+"));
-  });
-}
-
 function blocFlash(){
   const f=document.createDocumentFragment();
   const l=fluxActus();
@@ -3189,8 +3231,8 @@ function blocFlash(){
     l.slice(0,3).forEach(a=>z.append(carteActu(a,true)));
     f.append(z);
   }
-  f.append(el("button",{class:"btn fant plein",style:"margin-top:8px",onclick:toutesActus},
-    l.length>3?`Voir les ${l.length} actus`:"Voir toutes les actus"));
+  f.append(el("button",{class:"btn fant plein",style:"margin-top:8px",onclick:infosMairie},
+    "Voir toutes les actus"));
   return f;
 }
 
@@ -3247,12 +3289,6 @@ function rendreAccueil(){
       "Secours, mairie, commerces et taxis de la vallée : appel et itinéraire en un geste."),
     el("button",{class:"btn plein",onclick:ouvrirAnnuaire},"Ouvrir l'annuaire")));
 
-  z.append(el("div",{class:"titre-bloc"},"Infos mairie"));
-  z.append(el("div",{class:"carte"},
-    el("p",{class:"txt",style:"margin:0 0 12px"},
-      "Arrêtés de circulation, actualités de la commune et bulletins municipaux, "+
-      "avec le fil d'alertes Illiwap."),
-    el("button",{class:"btn plein",onclick:infosMairie},"Ouvrir les infos mairie")));
 
   /* ── Actualités ───────────────────────────────────────────── */
   z.append(el("div",{class:"titre-bloc"},"Liens utiles"));
