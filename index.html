@@ -672,6 +672,13 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
    ═══════════════════════════════════════════════════════════ */
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
+/* append() insère littéralement « null » ou « undefined » quand on lui passe
+   ces valeurs : on les filtre une fois pour toutes, pour tous les appels de l'app. */
+[Element.prototype, DocumentFragment.prototype].forEach(proto=>{
+  const brut=proto.append;
+  proto.append=function(...k){ brut.apply(this, k.filter(x=>x!=null&&x!==false&&x!=="")); };
+});
+
 const el = (t,p={},...k)=>{const n=document.createElement(t);
   for(const[a,v]of Object.entries(p)){
     if(v==null||v===false) continue;
