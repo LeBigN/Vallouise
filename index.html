@@ -341,10 +341,16 @@ nav button.on span.l{color:var(--meleze)}
 .vignette .sup:active{background:var(--alerte)}
 .non-sync{position:absolute;left:5px;bottom:5px;background:rgba(18,33,31,.62);color:#fff;
   font-size:11px;border-radius:8px;padding:2px 6px}
-.lb{position:fixed;inset:0;background:rgba(18,33,31,.96);z-index:70;display:none;
-  flex-direction:column;align-items:center;justify-content:center;padding:20px}
+/* La visionneuse recouvre tout, barre de navigation comprise. */
+.lb{position:fixed;top:0;left:0;width:100vw;height:100dvh;
+  background:#0A0F0E;z-index:99999;display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(16px + env(safe-area-inset-top, 0px)) 16px
+          calc(20px + env(safe-area-inset-bottom, 20px))}
+/* et la barre est retirée du flux pendant l'affichage */
+body.lb-ouverte nav{display:none}
 .lb.on{display:flex}
-.lb img{max-width:100%;max-height:68vh;border-radius:10px;transition:opacity .16s ease}
+.lb img{transition:opacity .16s ease}
 .lb-x{position:absolute;top:calc(16px + env(safe-area-inset-top, 0px));right:16px;z-index:9999;
   width:42px;height:42px;border-radius:50%;background:rgba(244,246,244,.16);color:#fff;
   font-size:18px;display:grid;place-items:center;backdrop-filter:blur(4px)}
@@ -359,11 +365,12 @@ nav button.on span.l{color:var(--meleze)}
 .lb-prev{left:10px} .lb-next{right:10px}
 @media(max-width:400px){.lb-nav{width:40px;height:40px;font-size:23px}
   .lb-prev{left:4px} .lb-next{right:4px}}
-.lb p{color:var(--neve);text-align:center;margin:14px 0 0;max-width:520px;
-  padding:0 60px}   /* on dégage les flèches latérales */
-.lb-scene{position:relative;width:100%;flex:0 0 auto;display:flex;align-items:center;
-  justify-content:center;background:#000;overflow:hidden;border-radius:10px;
-  height:68vh;max-height:68vh}
+.lb p{color:var(--neve);text-align:center;margin:12px 0 0;max-width:520px;
+  padding:0 60px;flex:0 0 auto}
+.lb-compteur{flex:0 0 auto}
+/* la scène prend la place restante : les boutons ne sont jamais poussés hors écran */
+.lb-scene{position:relative;width:100%;flex:1 1 auto;min-height:0;display:flex;
+  align-items:center;justify-content:center;background:#000;overflow:hidden;border-radius:10px}
 .lb img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;
   object-fit:contain;background:#000;border-radius:0}
 .ptr{position:fixed;top:0;left:0;right:0;z-index:55;display:flex;justify-content:center;
@@ -1257,6 +1264,7 @@ function ouvrirPhoto(p,liste){
   if(lbIndex<0) {lbListe=[p];lbIndex=0;}
   afficherLB();
   $("#lb").classList.add("on");
+  document.body.classList.add("lb-ouverte");
 }
 function naviguerLB(pas){
   if(lbListe.length<2) return;
@@ -1295,7 +1303,7 @@ function afficherLB(){
         const suivante=lbListe.length>1;
         supprimerPhoto(p);
         lbListe=lbListe.filter(x=>x.id!==p.id);
-        if(suivante&&lbListe.length){ lbIndex=lbIndex%lbListe.length; afficherLB(); $("#lb").classList.add("on"); }
+        if(suivante&&lbListe.length){ lbIndex=lbIndex%lbListe.length; afficherLB(); $("#lb").classList.add("on"); document.body.classList.add("lb-ouverte"); }
         else fermerLB();
       }}},"Supprimer")));
 
@@ -1305,7 +1313,10 @@ function afficherLB(){
   $("#lb-prev").style.display=multi?"grid":"none";
   $("#lb-next").style.display=multi?"grid":"none";
 }
-const fermerLB=()=>$("#lb").classList.remove("on");
+const fermerLB=()=>{
+  $("#lb").classList.remove("on");
+  document.body.classList.remove("lb-ouverte");   // la barre de navigation revient
+};
 
 $("#lb-x").onclick=fermerLB;
 $("#lb-prev").onclick=e=>{e.stopPropagation();naviguerLB(-1);};
