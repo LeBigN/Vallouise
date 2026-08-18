@@ -1138,11 +1138,9 @@ function rendrePhotos(){
     z.append(el("div",{class:"titre-bloc"},k==="—"?"Sans date":jolie(k)));
     const g=el("div",{class:"photos"});
     parDate[k].forEach(p=>{
+      // miniature nue : modification et suppression se font en plein écran
       const v=el("div",{class:"vignette"},
         el("img",{src:p.data,alt:val(p.legende),loading:"lazy",onclick:()=>ouvrirPhoto(p,visibles)}));
-      v.append(el("button",{class:"sup",style:"right:36px",onclick:()=>formPhotoEdit(p)},"✎"));
-      v.append(el("button",{class:"sup",onclick:()=>{
-        if(confirm("Supprimer cette photo ?")) supprimerPhoto(p);}},"✕"));
       if(p._local) v.append(el("span",{class:"non-sync",title:"Pas encore envoyée au serveur"},"⌛"));
       g.append(v);});
     z.append(g);});
