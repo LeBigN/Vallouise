@@ -350,7 +350,7 @@ nav button.on span.l{color:var(--meleze)}
 /* et la barre est retirée du flux pendant l'affichage */
 body.lb-ouverte nav{display:none}
 .lb.on{display:flex}
-.lb img{transition:opacity .16s ease}
+.lb img{transition:opacity .16s ease;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.45)}
 .lb-x{position:absolute;top:calc(16px + env(safe-area-inset-top, 0px));right:16px;z-index:9999;
   width:42px;height:42px;border-radius:50%;background:rgba(244,246,244,.16);color:#fff;
   font-size:18px;display:grid;place-items:center;backdrop-filter:blur(4px)}
@@ -368,11 +368,12 @@ body.lb-ouverte nav{display:none}
 .lb p{color:var(--neve);text-align:center;margin:12px 0 0;max-width:520px;
   padding:0 60px;flex:0 0 auto}
 .lb-compteur{flex:0 0 auto}
-/* la scène prend la place restante : les boutons ne sont jamais poussés hors écran */
+/* la scène prend la place restante ; son fond est celui de la visionneuse,
+   donc aucune bande noire ne se détache autour d'une photo paysage */
 .lb-scene{position:relative;width:100%;flex:1 1 auto;min-height:0;display:flex;
-  align-items:center;justify-content:center;background:#000;overflow:hidden;border-radius:10px}
+  align-items:center;justify-content:center;background:transparent;overflow:hidden}
 .lb img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;
-  object-fit:contain;background:#000;border-radius:0}
+  object-fit:contain;background:transparent}
 .ptr{position:fixed;top:0;left:0;right:0;z-index:55;display:flex;justify-content:center;
   pointer-events:none;opacity:0;transform:translateY(0)}
 .ptr-rond{width:34px;height:34px;border-radius:50%;background:var(--blanc);
@@ -1246,13 +1247,7 @@ function supprimerPhoto(p,apres){
 function photosVisibles(){ return S.photos.filter(p=>!supprimees.has(p.id)); }
 function rafraichirPhotos(){ rendrePhotos(); rendreRandos(); rendrePeche(); rendrePlans(); rendreVTT(); rendreAccueil(); }
 
-function telechargerPhoto(p){
-  const nom=(val(p.legende)||"vallouise-"+(val(p.date)||auj())).replace(/[^\w\-]+/g,"-").toLowerCase();
-  const a=document.createElement("a");
-  a.href=p.data; a.download=nom+".jpg";
-  document.body.append(a); a.click(); a.remove();
-  toast("Photo enregistrée");
-}
+
 /* ═══════════════════════════════════════════════════════════
    VISIONNEUSE PLEIN ÉCRAN — flèches, balayage, boucle
    ═══════════════════════════════════════════════════════════ */
@@ -1296,7 +1291,6 @@ function afficherLB(){
   const t=$("#lb-txt"); t.innerHTML="";
   t.append(titre.join(" — "));
   t.append(el("div",{class:"rangee",style:"margin-top:16px;justify-content:center;flex-wrap:wrap;gap:8px"},
-    el("button",{class:"btn fant",onclick:()=>telechargerPhoto(p)},"Télécharger"),
     el("button",{class:"btn fant",onclick:()=>{fermerLB();formPhotoEdit(p);}},"Modifier"),
     el("button",{class:"btn rouge",onclick:()=>{
       if(confirm("Supprimer cette photo ?")){
