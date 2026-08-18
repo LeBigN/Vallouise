@@ -408,14 +408,16 @@ nav button.on span.l{color:var(--meleze)}
   padding:8px 0;border-bottom:1px solid var(--bord)}
 .wifi-ligne:last-of-type{border-bottom:0}
 .wifi-mdp{font-variant-numeric:tabular-nums;letter-spacing:.03em;word-break:break-all;text-align:right}
-/* Zone d'aperçu : hauteur adaptée à la fenêtre, défilement interne propre,
-   aucun rognage à droite ni en bas. */
+/* Le document est cadré à 100 % du conteneur : ni zoom, ni débordement. */
+/* Le document occupe exactement son conteneur : ni zoom, ni dépassement.
+   Le rapport A4 (1 / 1,414) évite les bandes vides autour de la page. */
 .pdf-zone{width:100%;max-width:100%;border:1px solid var(--bord);border-radius:12px;
-  background:var(--blanc);overflow:hidden;
-  height:clamp(300px, calc(100dvh - 330px), 74dvh)}
-.pdf-cadre{display:block;width:100%;height:100%;border:0;background:var(--blanc);
-  -webkit-overflow-scrolling:touch}
-@media(max-height:520px){.pdf-zone{height:60dvh}}
+  background:var(--blanc);overflow:hidden;position:relative;
+  aspect-ratio:1 / 1.414;
+  max-height:clamp(280px, calc(100dvh - 300px), 72dvh)}
+.pdf-cadre{position:absolute;inset:0;display:block;width:100%;max-width:100%;
+  height:100%;max-height:100%;border:none;object-fit:contain;background:var(--blanc)}
+@media(max-height:560px){.pdf-zone{aspect-ratio:auto;height:58dvh}}
 .meteo-auj{display:flex;align-items:center;gap:13px}
 .meteo-auj .ico{width:46px;height:46px;flex:none;color:var(--ardoise)}
 .meteo-auj .ico svg{width:100%;height:100%}
@@ -1873,37 +1875,22 @@ function ouvrirPDF(nom,data){
     return new Blob([buf],{type:"application/pdf"});
   })();
   const url=URL.createObjectURL(blob);
-  /* Deux cadrages : « Largeur » remplit la largeur sans rogner à droite,
-     « Page entière » montre la page complète. Les paramètres après le # sont
-     lus par le lecteur PDF du navigateur, pas par le serveur. */
-  let vue="FitH";
-  const zone=el("div",{class:"pdf-zone"});
-  const majVue=()=>{
-    zone.innerHTML="";
-    zone.append(el("iframe",{class:"pdf-cadre",title:nom,
-      src:`${url}#page=1&view=${vue}&toolbar=0&navpanes=0&scrollbar=1`}));
-  };
-  const bascule=el("div",{class:"onglets",style:"margin-bottom:10px"},
-    el("button",{class:"on",onclick:e=>{
-      vue="FitH";[...e.currentTarget.parentNode.children].forEach(b=>b.classList.toggle("on",b===e.currentTarget));
-      majVue();}},"Largeur"),
-    el("button",{onclick:e=>{
-      vue="Fit";[...e.currentTarget.parentNode.children].forEach(b=>b.classList.toggle("on",b===e.currentTarget));
-      majVue();}},"Page entière"));
-  majVue();
-
+  /* view=Fit : la page entière tient dans le cadre, sans zoom ni débordement.
+     toolbar / navpanes / scrollbar à 0 : aucun habillage du lecteur natif. */
+  const src=`${url}#page=1&view=Fit&toolbar=0&navpanes=0&scrollbar=0`;
   const c=el("div");
-  c.append(bascule, zone,
+  c.append(
+    el("div",{class:"pdf-zone"},
+      el("iframe",{class:"pdf-cadre",title:nom,src,scrolling:"no"})),
     el("a",{class:"btn accent plein",style:"margin-top:12px",href:url,
       target:"_blank",rel:"noopener noreferrer"},"Ouvrir en plein écran ↗"),
     el("a",{class:"btn fant plein",style:"margin-top:7px",href:url,
       download:(val(nom)||"document").replace(/[^\w\-. ]+/g,"-")+(/\.pdf$/i.test(nom)?"":".pdf")},
       "Télécharger le PDF"),
     el("p",{class:"meta",style:"margin-top:10px;line-height:1.55"},
-      "Sur iPhone, l'aperçu intégré n'affiche parfois que la première page, ou reste blanc : "+
-      "le bouton plein écran ouvre alors le document dans le lecteur du téléphone."));
+      "Sur iPhone, l'aperçu intégré n'affiche parfois que la première page : "+
+      "le bouton plein écran ouvre le document dans le lecteur du téléphone."));
   feuille(nom,c);
-  // on libère la mémoire à la fermeture de la fiche
   const relacher=()=>{ if(!$("#voile").classList.contains("on")){
     URL.revokeObjectURL(url); clearInterval(veille); } };
   const veille=setInterval(relacher,1500);
