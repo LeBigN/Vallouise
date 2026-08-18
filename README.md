@@ -170,7 +170,20 @@ en direct, sans relancer l'app.
 
 ---
 
-## 10. Dépannage
+## 10. Lecteur PDF
+
+Les fiches pratiques peuvent porter un PDF (700 ko maximum, limite d'un document Firestore).
+L'aperçu ne passe **pas** par une iframe : iOS y ignore les paramètres `#view=Fit` et rend le
+document à son échelle native, rogné sur les bords. La page est donc dessinée sur un canevas avec
+**PDF.js** (chargé depuis cdnjs, mis en cache par le service worker), à l'échelle qui la fait tenir
+entière dans la boîte, puis centrée. Navigation page à page si le document en compte plusieurs.
+
+Si PDF.js ne peut pas être chargé (première ouverture hors ligne), l'app retombe automatiquement sur
+le lecteur natif du navigateur, avec le bouton plein écran comme voie de secours.
+
+---
+
+## 11. Dépannage
 
 **Un bouton ne fait rien / rien ne s'enregistre.** L'app affiche désormais un bandeau rouge ou un message
 d'erreur explicite dans les trois cas possibles :
@@ -205,7 +218,7 @@ côté serveur et reste visible pour les autres membres. Un message discret le r
 
 ---
 
-## 11. Cartes de randos, webcams, actualités
+## 12. Cartes de randos, webcams, actualités
 
 **Cartes de randos suggérées** : format compact, sans image — nom, commune, distance, dénivelé,
 durée, badge de difficulté et lien vers la fiche Visorando. Les photos restent réservées aux randos
@@ -223,7 +236,7 @@ sources permanentes (office de tourisme, station, parc national, vigilance).
 
 ---
 
-## 12. Traces GPX et app Exercice d'Apple
+## 13. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -242,7 +255,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 13. Idées pour la suite
+## 14. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
