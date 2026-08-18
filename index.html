@@ -258,22 +258,28 @@ input:focus,select:focus,textarea:focus{border-color:var(--ardoise);outline:none
 textarea{min-height:78px;resize:vertical}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .duo>*,.trio>*{min-width:0}          /* sinon les champs poussent la grille */
-.feuille>div{max-width:100%}
+.feuille>div:not(.feuille-tete){max-width:100%}
 .recap{background:var(--blanc);border-radius:var(--r-s);padding:13px 15px;margin-top:4px;
   border:1px solid var(--bord);border-left:3px solid var(--meleze)}
 .recap b{font-family:var(--display);font-size:16px;display:block}
 
 /* ── Feuille modale ─────────────────────────────────────────── */
-.voile{position:fixed;inset:0;background:rgba(18,33,31,.55);z-index:60;
+/* La fenêtre couvre tout l'écran sur téléphone : plus rien de l'app
+   ne transparaît derrière pendant le défilement. */
+.voile{position:fixed;inset:0;background:rgba(18,33,31,.55);z-index:9999;
   display:none;align-items:flex-end;backdrop-filter:blur(2px)}
 .voile.on{display:flex}
-.feuille{background:var(--neve);width:100%;max-width:600px;margin:0 auto;
-  max-height:min(92dvh, 100dvh - 20px);overflow-y:auto;overscroll-behavior:contain;
-  border-radius:20px 20px 0 0;
-  padding:0 16px calc(30px + env(safe-area-inset-bottom, 20px));
+.feuille{position:relative;background:var(--neve);width:100vw;max-width:100vw;margin:0;
+  height:100dvh;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain;
+  border-radius:0;padding:0 16px calc(30px + env(safe-area-inset-bottom, 20px));
   animation:monte-f .26s cubic-bezier(.2,.8,.3,1) both}
-.feuille-tete{position:sticky;top:0;z-index:9999;background:var(--neve);
-  padding:calc(16px + env(safe-area-inset-top, 0px)) 16px 10px;margin:0 -16px 2px}
+/* Entête propre à la fenêtre : titre + croix, toujours au-dessus du contenu
+   qui défile dessous, et dégagé de l'encoche. */
+.feuille-tete{position:sticky;top:0;z-index:10;background:var(--neve);
+  padding:calc(16px + env(safe-area-inset-top, 0px)) 16px 12px;
+  margin:0 -16px 2px;width:auto;max-width:none;box-sizing:border-box;
+  box-shadow:0 1px 0 transparent;transition:box-shadow .2s}
+.feuille.defile .feuille-tete{box-shadow:0 1px 0 var(--bord), 0 6px 14px rgba(18,33,31,.05)}
 .tete-ligne{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 @keyframes monte-f{from{transform:translateY(100%)}to{transform:none}}
 .fermer-x{position:relative;width:36px;height:36px;flex:none;border-radius:50%;
@@ -284,6 +290,7 @@ textarea{min-height:78px;resize:vertical}
 .feuille h2{padding-right:0;flex:1;min-width:0}
 .poignee{width:44px;height:5px;border-radius:3px;background:#D3DAD6;margin:0 auto 10px;
   cursor:grab;flex:none}
+@media(max-width:639px){.poignee{display:none}}
 .feuille{will-change:transform}
 .feuille h2{font-family:var(--display);font-size:var(--t-h2);margin:0;font-weight:700;
   letter-spacing:-.02em;line-height:1.25}
@@ -292,8 +299,8 @@ textarea{min-height:78px;resize:vertical}
   .borne h1{font-size:20px}
   .borne .lieu{margin-bottom:3px}
 }
-@media(min-width:640px){.voile{align-items:center;justify-content:center}
-  .feuille{border-radius:20px;animation:none;max-height:min(86dvh, 100dvh - 60px)}}
+/* Plein écran quelle que soit la taille : plus de format pop-up. */
+@media(min-width:640px){.feuille{max-width:100%}}
 
 /* ── Navigation ─────────────────────────────────────────────── */
 nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.94);
@@ -307,8 +314,10 @@ nav button.on span.l{color:var(--meleze)}
 
 /* ── Divers ─────────────────────────────────────────────────── */
 .fab{position:fixed;right:16px;bottom:calc(var(--nav-h) + 14px);z-index:45;
-  width:56px;height:56px;border-radius:19px;background:var(--meleze);color:#fff;
+  width:56px;height:56px;border-radius:50%;background:var(--meleze);color:#fff;
   font-size:26px;display:grid;place-items:center;box-shadow:0 6px 20px rgba(224,122,31,.4)}
+.fab-modale{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index:10001;width:56px;height:56px;border-radius:50%}
 .puce{display:inline-flex;align-items:center;gap:5px;font-family:var(--corps);font-size:11px;font-weight:600;
   padding:3px 8px;border-radius:20px;background:var(--brume);color:var(--ardoise);
   letter-spacing:.05em;text-transform:uppercase}
@@ -423,6 +432,20 @@ nav button.on span.l{color:var(--meleze)}
 @media(max-height:560px){.pdf-zone{height:62dvh;max-height:62dvh}}
 html[data-theme="dark"] .pdf-zone{background:#111A19}
 html[data-theme="auto"] .pdf-zone{background:#111A19}
+.actu-liste{display:flex;flex-direction:column;gap:8px}
+.actu-l{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);
+  padding:14px 15px;box-shadow:var(--ombre);cursor:pointer;transition:transform .12s}
+.actu-l:active{transform:scale(.99)}
+.actu-l h4{font-family:var(--display);font-size:16px;margin:7px 0 0;font-weight:700;
+  line-height:1.25;letter-spacing:-.015em}
+.actu-l.compact h4{font-size:15.5px}
+.actu-haut{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.actu-badge{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;
+  border-radius:20px;font-weight:700;white-space:nowrap}
+.actu-res{margin:6px 0 0;font-size:13.5px;line-height:1.45;color:#3A4A47;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html[data-theme="dark"] .actu-res{color:#B4C1BD}
+html[data-theme="auto"] .actu-res{color:#B4C1BD}
 .meteo-auj{display:flex;align-items:center;gap:13px}
 .meteo-auj .ico{width:46px;height:46px;flex:none;color:var(--ardoise)}
 .meteo-auj .ico svg{width:100%;height:100%}
@@ -726,6 +749,8 @@ function feuille(titre,corps,apres){
         el("button",{class:"fermer-x","aria-label":"Fermer",onclick:fermer},"✕"))),
     corps);
   f.scrollTop=0;
+  f.classList.remove("defile");
+  f.onscroll=()=>f.classList.toggle("defile", f.scrollTop>4);
   // verrou de défilement de l'arrière-plan
   scrollY=window.scrollY;
   document.body.style.position="fixed";
@@ -1340,7 +1365,7 @@ function ligneSejour(s,dansFeuille){
       el("button",{class:"mini",onclick:()=>{
         if(confirm("Annuler ce séjour ?"))
           ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",dansFeuille?fermer:null);
-      }},"🗑 Annuler")):null);
+      }},"Supprimer")):null);
 }
 function toucherJour(date,dessus){
   if(S.selMode){
@@ -1540,12 +1565,7 @@ function blocSuggestions(){
       el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px;margin-top:auto"},
         el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
           href:"https://www.google.com/search?q="+encodeURIComponent("site:visorando.com "+sg.n+" Vallouise")},
-          "Fiche Visorando ↗"),
-        el("button",{class:"mini",onclick:()=>{
-          ecrire(addDoc(collection(db,"randos"),{nom:sg.n,date:auj(),depart:sg.d,denivele:String(sg.dp),
-            duree:String(sg.h),niveau:sg.niv,texte:"",liens:[],trace:null,gps:null,faite:[],
-            uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
-        }},"+ Mon carnet"))));
+          "Fiche Visorando ↗"))));
   });
   f.append(car);
   f.append(el("button",{class:"btn fant plein",style:"margin-top:4px",onclick:listeSecteur},
@@ -1614,18 +1634,10 @@ function rendreRandos(){
         href:`https://www.google.com/maps/search/?api=1&query=${r.gps.lat},${r.gps.lon}`},"📍 Départ ↗"));
       carte.append(zl);}
     carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
-      el("button",{class:"mini",onclick:()=>{
-        const l=new Set(r.faite||[]);
-        faite?l.delete(auth.currentUser.uid):l.add(auth.currentUser.uid);
-        ecrire(updateDoc(doc(db,"randos",r.id),{faite:[...l]}));}},faite?"✓ Tu l'as faite":"Marquer comme faite"),
-      (r.faite||[]).length?el("span",{class:"meta"},
-        (r.faite||[]).map(u=>membre(u).nom).join(", ")+" y "+((r.faite||[]).length>1?"sont allés":"est allé")):null,
-      el("button",{class:"mini",onclick:()=>formPhoto({type:"rando",id:r.id,nom:r.nom})},"📷 Photo"),
       el("button",{class:"mini",onclick:()=>partager(texteRando(r))},"Partager"),
-      el("button",{class:"mini",onclick:()=>pdfRando(r)},"PDF"),
       mien?el("button",{class:"mini",onclick:()=>formRando(r)},"Modifier"):null,
       mien?el("button",{class:"mini",onclick:()=>{
-        if(confirm("Supprimer cette rando ?")) supprimerRando(r);}},"🗑"):null));
+        if(confirm("Supprimer cette rando ?")) supprimerRando(r);}},"Supprimer"):null));
     z.append(carte);});
 }
 const texteRando=r=>[`🥾 ${r.nom}`,
@@ -1775,14 +1787,10 @@ function rendreVTT(){
         onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
     carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
-      el("button",{class:"mini",onclick:()=>formPhoto({type:"vtt",id:v.id,nom:v.nom})},"Photo"),
-      v.gps?el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
-        href:`https://www.google.com/maps/search/?api=1&query=${v.gps.lat},${v.gps.lon}`},"Départ ↗"):null,
-      v.trace?el("button",{class:"mini",onclick:()=>exporterGPX(v)},"Export GPX"):null,
       el("button",{class:"mini",onclick:()=>partager(texteVTT(v))},"Partager"),
       mien?el("button",{class:"mini",onclick:()=>formVTT(v)},"Modifier"):null,
       mien?el("button",{class:"mini",onclick:()=>{
-        if(confirm("Supprimer cette sortie ?")) supprimerVTT(v);}},"🗑"):null));
+        if(confirm("Supprimer cette sortie ?")) supprimerVTT(v);}},"Supprimer"):null));
     z.append(carte);
   });
 }
@@ -1975,13 +1983,13 @@ const catAnnu=c=>CAT_ANNU.find(x=>x.c===c)||CAT_ANNU[3];
 /* Contacts vérifiés uniquement : les numéros que je n'ai pas pu vérifier
    ne sont pas inventés, la famille les ajoute au fil de l'eau. */
 const ANNUAIRE_BASE=[
-  {n:"Urgences européennes",cat:"sante",tel:"112",com:"—",
+  {n:"Urgences européennes",cat:"sante",tel:"112",com:"",
    note:"Le réflexe en montagne : le CODIS de Gap bascule vers le secours en montagne."},
   {n:"Secours en montagne — CRS / PGHM 05",cat:"sante",tel:"0492222222",com:"Hautes-Alpes",
    note:"Numéro d'alerte commun du département."},
-  {n:"SAMU",cat:"sante",tel:"15",com:"—",note:"Urgence médicale."},
-  {n:"Urgences par SMS",cat:"sante",tel:"114",com:"—",note:"Pour alerter sans pouvoir parler."},
-  {n:"Pompiers",cat:"sante",tel:"18",com:"—",note:""},
+  {n:"SAMU",cat:"sante",tel:"15",com:"",note:"Urgence médicale."},
+  {n:"Urgences par SMS",cat:"sante",tel:"114",com:"",note:"Pour alerter sans pouvoir parler."},
+  {n:"Pompiers",cat:"sante",tel:"18",com:"",note:""},
   {n:"Mairie de Vallouise-Pelvoux",cat:"service",tel:"0492233019",com:"Vallouise-Pelvoux",
    adr:"2704 route de Pelvoux, St Antoine, 05340 Vallouise-Pelvoux",
    horaires:"Du lundi au vendredi, 8h30 – 12h"}
@@ -2025,8 +2033,10 @@ function carteContact(k){
     el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
       el("h3",{},k.n),
       el("span",{class:"vt-niv",style:`background:${cat.f};color:${cat.e}`},cat.lib)),
-    el("div",{class:"meta",style:"margin-top:3px"},
-      [val(k.com),val(k.adr)].filter(Boolean).join("  ·  ")),
+    ([val(k.com),val(k.adr)].filter(Boolean).length
+      ? el("div",{class:"meta",style:"margin-top:3px"},
+          [val(k.com),val(k.adr)].filter(Boolean).join("  ·  "))
+      : null),
     k.horaires?el("p",{class:"txt"},val(k.horaires)):null,
     k.note?el("p",{class:"txt"},val(k.note)):null);
   const actions=el("div",{class:"rangee",style:"margin-top:12px;flex-wrap:wrap;gap:7px"});
@@ -2069,14 +2079,12 @@ function ouvrirAnnuaire(){
       dessiner();
     }},o.lib)));
 
-  corps.append(zo,zl,
-    el("button",{class:"btn accent plein",style:"margin-top:14px",
-      onclick:()=>formContact()},"+ Ajouter un numéro"),
-    el("p",{class:"meta",style:"margin:14px 2px 0;line-height:1.6"},
-      "Les numéros d'urgence et celui de la mairie sont vérifiés. Les commerces, taxis et "+
-      "professionnels de santé sont à ajouter par la famille : je préfère un annuaire court et "+
-      "juste qu'une liste inventée."));
-  feuille("Numéros utiles",corps,dessiner);
+  corps.append(zo,zl,el("div",{style:"height:70px"}));
+  feuille("Numéros utiles",corps,()=>{
+    dessiner();
+    $("#feuille").append(el("button",{class:"fab fab-modale","aria-label":"Ajouter un numéro",
+      onclick:()=>formContact()},"+"));
+  });
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2173,16 +2181,14 @@ function rendrePeche(){
       photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",
         onclick:()=>ouvrirPhoto(x,photos)})));
       carte.append(bande);}
-    carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
+    carte.append(el("div",{class:"rangee",style:"margin-top:9px;flex-wrap:wrap"},
       el("span",{class:"puce"},val(p.devenir)||"—"),
-      el("span",{class:"meta"},"par "+membre(p.uid).nom),
-      p.gps?el("a",{class:"mini",target:"_blank",rel:"noopener",
-        href:`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`},"📍 Le spot ↗"):null,
-      el("button",{class:"mini",onclick:()=>formPhoto({type:"prise",id:p.id,nom:p.espece})},"📷 Photo"),
+      el("span",{class:"meta"},"par "+membre(p.uid).nom)));
+    carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
       el("button",{class:"mini",onclick:()=>partager(textePrise(p))},"Partager"),
       mien?el("button",{class:"mini",onclick:()=>formPrise(p)},"Modifier"):null,
       mien?el("button",{class:"mini",onclick:()=>{
-        if(confirm("Supprimer cette prise ?"))ecrire(deleteDoc(doc(db,"prises",p.id)),"Prise supprimée");}},"🗑"):null));
+        if(confirm("Supprimer cette prise ?"))ecrire(deleteDoc(doc(db,"prises",p.id)),"Prise supprimée");}},"Supprimer"):null));
     z.append(carte);});
 }
 const horodatage=p=>p.date?jolie(p.date)+(p.heure?" à "+val(p.heure).replace(":","h"):""):"";
@@ -2413,14 +2419,13 @@ function rendrePlans(){
             href:"https://www.google.com/maps/search/?api=1&query="+cible},"Google Maps")));
       }
       carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
-        el("button",{class:"mini",onclick:()=>formPhoto({type:"plan",id:p.id,nom:p.nom})},"📷 Photo"),
           el("span",{class:"meta"},"par "+membre(p.uid).nom),
           el("button",{class:"mini",onclick:()=>partager([`📍 ${p.nom}`,val(p.adresse),val(p.texte),
           p.gps?`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`:null]
           .filter(Boolean).join("\n"))},"Partager"),
           mien?el("button",{class:"mini",onclick:()=>formPlan(p)},"Modifier"):null,
         mien?el("button",{class:"mini",onclick:()=>{
-          if(confirm("Supprimer ?"))ecrire(deleteDoc(doc(db,"plans",p.id)),"Supprimé");}},"🗑"):null));
+          if(confirm("Supprimer ?"))ecrire(deleteDoc(doc(db,"plans",p.id)),"Supprimé");}},"Supprimer"):null));
       z.append(carte);});
   });
 }
@@ -2934,6 +2939,10 @@ async function chargerMeteo(){
       +"&timezone=Europe%2FParis&forecast_days=5";
     const r=await fetch(u); if(!r.ok) throw new Error("indisponible");
     const m=await r.json();
+    const premiere=!derniereMeteo;
+    derniereMeteo=m;
+    // les alertes météo n'existent qu'une fois le relevé reçu : on redessine le flash
+    if(premiere){const zf=$("#flash"); if(zf){zf.innerHTML="";zf.append(blocFlash());}}
     const [lib,ico]=METEO[m.current.weather_code]||["—","•"];
     z.innerHTML="";
     z.append(
@@ -2987,10 +2996,18 @@ function formLien(l){
   c.append(
     el("label",{},"Titre"),
     el("input",{id:"l-t",placeholder:"Fête du village le 15 août",value:val(l?.titre)}),
-    el("label",{},"Résumé"),
+    el("label",{},"Statut"),
+    el("select",{id:"l-s",html:[["info","Info"],["alerte","Alerte"],["evenement","Événement"]]
+      .map(([v,t])=>`<option value="${v}" ${l?.statut===v?"selected":""}>${t}</option>`).join("")}),
+    el("label",{},"Résumé (affiché sur l'accueil)"),
     el("textarea",{id:"l-r",style:"min-height:64px",placeholder:"Bal, buvette et feu d'artifice sur la place."}),
-    el("label",{},"Date"),
+    el("label",{},"Texte complet (facultatif)"),
+    el("textarea",{id:"l-x",style:"min-height:100px",placeholder:"Le détail, les horaires, les consignes…"}),
+    el("label",{},"Date de publication"),
     el("input",{type:"date",id:"l-d",value:val(l?.date)||auj()}),
+    el("div",{class:"duo"},
+      el("div",{},el("label",{},"Valable du"),el("input",{type:"date",id:"l-deb",value:val(l?.debut)})),
+      el("div",{},el("label",{},"jusqu'au"),el("input",{type:"date",id:"l-fin",value:val(l?.fin)}))),
     el("label",{},"Lien"),
     el("input",{id:"l-u",type:"url",placeholder:"https://",value:val(l?.url)}),
     el("label",{},"Illustration"),
@@ -2999,7 +3016,9 @@ function formLien(l){
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const t=$("#l-t").value.trim();
       if(!t)return toast("Il manque le titre");
-      const d={titre:t,resume:$("#l-r").value.trim(),date:$("#l-d").value,
+      const d={titre:t,statut:$("#l-s").value,resume:$("#l-r").value.trim(),
+        texte:$("#l-x").value.trim(),date:$("#l-d").value,
+        debut:$("#l-deb").value,fin:$("#l-fin").value,
         url:$("#l-u").value.trim(),image,uid:auth.currentUser.uid};
       ecrire(l?updateDoc(doc(db,"liens",l.id),d):addDoc(collection(db,"liens"),{...d,cree:serverTimestamp()}),
         "Actualité enregistrée",fermer);
@@ -3009,6 +3028,7 @@ function formLien(l){
     }},"Supprimer"):null);
   feuille(l?"Modifier l'actualité":"Nouvelle actualité",c,()=>{
     $("#l-r").value=val(l?.resume);
+    $("#l-x").value=val(l?.texte);
     $("#l-i").onchange=async e=>{
       const f=e.target.files[0];if(!f)return;
       toast("Préparation…");
@@ -3033,10 +3053,155 @@ function visuelActu(titre,teinte){
     <path d="M-5 118 L70 56 L104 88 L138 50 L200 118 Z" fill="rgba(255,255,255,.20)"/>`;
   return svg;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   FLASH INFO — actualités de Vallouise-Pelvoux
+   Trois sources, toutes réelles. Rien n'est inventé ici :
+   1. les alertes déduites des prévisions Open-Meteo,
+   2. les actus publiées par la famille (collection liens),
+   3. le relevé mairie (mairie.json, régénéré par scrape-mairie.py).
+   ═══════════════════════════════════════════════════════════ */
+const STATUTS={
+  alerte:   {lib:"Alerte",   f:"#FBEAE5", e:"#B44228", ordre:0},
+  evenement:{lib:"Événement",f:"#F3EEFA", e:"#6B3FA0", ordre:2},
+  info:     {lib:"Info",     f:"#E8F0F5", e:"#2A6183", ordre:1}
+};
+const statutDe=k=>STATUTS[k]||STATUTS.info;
+let derniereMeteo=null;
+
+/* Une actualité = {id, statut, titre, resume, texte, date, debut, fin, url, image, source, edit} */
+function fluxActus(){
+  const out=[];
+
+  // 1. météo : une seule entrée de synthèse, le bloc Vigilance juste au-dessus
+  //    détaillant déjà chaque risque, inutile de le répéter trois fois.
+  if(derniereMeteo){
+    const al=alertesDe(derniereMeteo);
+    if(al.length) out.push({
+      id:"meteo", statut:"alerte",
+      titre:al.length>1?`${al.length} alertes météo sur la vallée`:al[0].titre,
+      resume:al.map(a=>a.titre).join(" · "),
+      texte:al.map(a=>a.titre+" — "+a.txt).join("\n\n"),
+      date:auj(), source:"Estimé d'après les prévisions Open-Meteo. La vigilance officielle fait foi.",
+      url:"https://vigilance.meteofrance.fr/fr"});
+  }
+
+  // 2. publications de la famille
+  S.liens.forEach(l=>out.push({
+    id:l.id, statut:val(l.statut)||"info", titre:l.titre, resume:val(l.resume),
+    texte:val(l.texte)||val(l.resume), date:val(l.date), debut:val(l.debut), fin:val(l.fin),
+    url:val(l.url), image:l.image||null, source:"Publié par "+membre(l.uid).nom,
+    edit:l.uid===auth.currentUser.uid?l:null}));
+
+  // 3. relevé mairie — deux garde-fous :
+  //    · statut « Info » quoi qu'il arrive : un arrêté n'est pas une alerte en cours,
+  //      sa date est celle de mise en ligne, pas sa période d'effet ;
+  //    · seulement les 60 derniers jours, pour ne pas ressortir de vieux actes.
+  const limite=decale(auj(),-60);
+  (MAIRIE?.pubs||[]).filter(p=>p.d).forEach(p=>{
+    const d=/^\d{4}-\d{2}$/.test(p.d)?p.d+"-01":(p.d.length===4?p.d+"-01-01":p.d);
+    if(d<limite) return;
+    out.push({id:"mairie-"+p.i, statut:"info", titre:p.t,
+      resume:[p.i,p.o].filter(Boolean).join(" · "), texte:"", date:d,
+      url:p.f||p.u,
+      source:"Mairie de Vallouise-Pelvoux · relevé du "+jolie(MAIRIE.releve)
+        +". La date affichée est celle de mise en ligne, pas la période d'effet."});
+  });
+
+  const jour=auj();
+  return out
+    // une actu dont la période de validité est passée ne remonte plus
+    .filter(a=>!a.fin||a.fin>=jour)
+    .sort((a,b)=>{
+      const pa=statutDe(a.statut).ordre, pb=statutDe(b.statut).ordre;
+      if(pa!==pb) return pa-pb;
+      return (b.date||"")<(a.date||"")?-1:1;
+    });
+}
+
+function carteActu(a,compact){
+  const st=statutDe(a.statut);
+  const c=el("div",{class:"actu-l"+(compact?" compact":""),onclick:()=>detailActu(a)},
+    el("div",{class:"actu-haut"},
+      el("span",{class:"actu-badge",style:`background:${st.f};color:${st.e}`},st.lib),
+      el("span",{class:"meta"},a.date?jolie(a.date):"")),
+    el("h4",{},a.titre),
+    a.resume?el("p",{class:"actu-res"},a.resume):null);
+  return c;
+}
+
+function detailActu(a){
+  const st=statutDe(a.statut);
+  const c=el("div");
+  c.append(
+    el("div",{class:"rangee",style:"gap:8px;flex-wrap:wrap"},
+      el("span",{class:"actu-badge",style:`background:${st.f};color:${st.e}`},st.lib),
+      a.date?el("span",{class:"meta"},jolie(a.date)):null),
+    a.image?el("img",{src:a.image,style:"width:100%;border-radius:12px;margin-top:12px"}):null,
+    el("h3",{style:"font-family:var(--display);font-size:20px;margin:14px 0 0;line-height:1.25"},a.titre),
+    (a.debut||a.fin)?el("div",{class:"meta",style:"margin-top:6px"},
+      "Valable "+[a.debut?"du "+jolie(a.debut):null,a.fin?"jusqu'au "+jolie(a.fin):null]
+        .filter(Boolean).join(" ")):null,
+    a.texte?el("p",{class:"txt"},a.texte):(a.resume?el("p",{class:"txt"},a.resume):null),
+    a.source?el("p",{class:"meta",style:"margin-top:14px"},a.source):null,
+    a.url?el("a",{class:"btn accent plein",style:"margin-top:14px",href:a.url,
+      target:"_blank",rel:"noopener noreferrer"},
+      /\.pdf($|\?)/i.test(a.url)?"Ouvrir le document ↗":"Consulter la source ↗"):null,
+    a.edit?el("button",{class:"btn fant plein",style:"margin-top:8px",
+      onclick:()=>formLien(a.edit)},"Modifier cette actu"):null);
+  feuille("L'actu",c);
+}
+
+let actuFiltre="";
+function toutesActus(){
+  const corps=el("div");
+  const zo=el("div",{class:"onglets",style:"flex-wrap:wrap"});
+  const zl=el("div");
+  const dessiner=()=>{
+    const l=fluxActus().filter(a=>!actuFiltre||a.statut===actuFiltre);
+    zl.innerHTML="";
+    if(!l.length){zl.append(el("div",{class:"vide"},el("b",{},"Rien à signaler"),
+      "Aucune actualité dans cette catégorie."));return;}
+    l.forEach(a=>zl.append(carteActu(a)));
+  };
+  [{c:"",lib:"Tout"},{c:"alerte",lib:"Alertes"},{c:"info",lib:"Infos"},{c:"evenement",lib:"Événements"}]
+    .forEach(o=>zo.append(el("button",{class:o.c===actuFiltre?"on":"",style:"flex:1 0 45%",
+      onclick:e=>{actuFiltre=o.c;
+        [...zo.children].forEach(b=>b.classList.toggle("on",b===e.currentTarget));
+        dessiner();}},o.lib)));
+  corps.append(zo,zl,el("div",{style:"height:70px"}));
+  feuille("Flash info Vallouise",corps,()=>{
+    dessiner();
+    $("#feuille").append(el("button",{class:"fab fab-modale","aria-label":"Publier une actu",
+      onclick:()=>formLien()},"+"));
+  });
+}
+
+function blocFlash(){
+  const f=document.createDocumentFragment();
+  const l=fluxActus();
+  f.append(el("div",{class:"titre-bloc"},"Flash info Vallouise"));
+  if(!l.length){
+    f.append(el("div",{class:"vide"},el("b",{},"Rien à signaler aujourd'hui"),
+      "Pas d'alerte météo, pas d'actualité publiée."));
+  } else {
+    const z=el("div",{class:"actu-liste"});
+    l.slice(0,3).forEach(a=>z.append(carteActu(a,true)));
+    f.append(z);
+  }
+  f.append(el("button",{class:"btn fant plein",style:"margin-top:8px",onclick:toutesActus},
+    l.length>3?`Voir les ${l.length} actus`:"Voir toutes les actus"));
+  return f;
+}
+
 function rendreAccueil(){
   const z=$("#accueil");if(!z)return;
   z.innerHTML="";
   z.append(el("div",{id:"vigilance"}));
+
+  const zFlash=el("div",{id:"flash"});
+  zFlash.append(blocFlash());
+  z.append(zFlash);
 
   const futurs=S.sejours.filter(s=>s.fin>=auj()).sort((a,b)=>a.debut<b.debut?-1:1);
   const enCours=futurs.find(s=>s.debut<=auj()), prochain=enCours||futurs[0];
@@ -3094,23 +3259,6 @@ function rendreAccueil(){
   const ca=el("div",{class:"carrousel"});
   const TEINTES=[["#3E7C9B","#8FB8CC"],["#3F7D5A","#8FC0A4"],["#B65D0F","#E0A26A"],
                  ["#2C4A47","#7F9E99"],["#8E5AA8","#BFA0D0"]];
-  const actus=[...S.liens].sort((a,b)=>(val(b.date))<(val(a.date))?-1:1);
-  actus.forEach((a,i)=>{
-    const img=el("div",{class:"img"});
-    img.append(a.image?el("img",{src:a.image,alt:"",loading:"lazy"})
-                      :visuelActu(a.titre,TEINTES[i%TEINTES.length]));
-    const carte=el("div",{class:"actu"},img,
-      el("div",{class:"cnt"},
-        el("div",{class:"meta"},a.date?jolie(a.date):"—"),
-        el("h4",{},a.titre),
-        a.resume?el("div",{class:"res"},val(a.resume)):null,
-        el("div",{class:"bas"},
-          el("div",{class:"rangee",style:"flex-wrap:wrap;gap:6px"},
-            a.url?el("a",{class:"mini",href:a.url,target:"_blank",rel:"noopener"},"Lire ↗"):null,
-            a.uid===auth.currentUser.uid?el("button",{class:"mini",
-              onclick:()=>formLien(a)},"Modifier"):null))));
-    ca.append(carte);
-  });
   /* sources permanentes, présentées comme des bulles */
   LIENS_VILLAGE.forEach((l,i)=>{
     const img=el("div",{class:"img"});

@@ -127,7 +127,31 @@ Sans cette mise en place, l'app affiche l'instantané embarqué du 17/08/2026, a
 
 ---
 
-## 7. Randonnées du secteur (données Visorando)
+## 7. Flash info Vallouise
+
+Section en tête d'accueil : les 3 actualités les plus importantes, badge de statut (Alerte / Info /
+Événement) et date, puis une vue plein écran filtrable pour tout consulter.
+
+**Trois sources, aucune inventée :**
+
+| Source | Origine | Statut |
+|---|---|---|
+| Alertes météo | prévisions Open-Meteo, recalculées à chaque ouverture | Alerte |
+| Actus de la famille | collection Firestore `liens`, publiées depuis l'app | au choix de l'auteur |
+| Relevé mairie | `mairie.json`, régénéré par `scrape-mairie.py` | Info uniquement |
+
+**Deux garde-fous délibérés.** Un arrêté municipal n'est jamais présenté comme une alerte en cours :
+sa date est celle de mise en ligne, pas sa période d'effet, et seuls les actes des 60 derniers jours
+remontent. Les alertes météo sont regroupées en une entrée de synthèse plutôt que répétées, le bloc
+Vigilance juste au-dessus les détaillant déjà.
+
+**Publier une actu** : bouton flottant dans la vue plein écran. Champs : titre, statut, résumé,
+texte complet, date, période de validité, lien, illustration. Une actu dont la date de fin est
+passée disparaît automatiquement du flux.
+
+---
+
+## 8. Randonnées du secteur (données Visorando)
 
 38 itinéraires relevés sur `visorando.com/randonnee-vallouise.html` (départs Vallouise, Pelvoux,
 Puy-Saint-Vincent, Les Vigneaux) sont **embarqués dans l'app** : aucun appel réseau, tout fonctionne
@@ -150,7 +174,7 @@ la page et relancer le script.
 
 ---
 
-## 8. Géolocalisation des bons plans
+## 9. Géolocalisation des bons plans
 
 Le bouton « Me géolocaliser » du formulaire Bons plans convertit les coordonnées en adresse via
 **Nominatim (OpenStreetMap)**, un service gratuit mais soumis à conditions : une requête par seconde
@@ -160,7 +184,7 @@ l'adresse est perdu. Le champ reste modifiable à la main dans tous les cas.
 
 ---
 
-## 9. Apparence
+## 10. Apparence
 
 Onglet **L'appart › Apparence** : Automatique (suit le réglage du téléphone), Clair ou Sombre.
 Le choix est retenu dans `localStorage` (`vl-theme`) et appliqué avant le premier affichage par un
@@ -170,7 +194,7 @@ en direct, sans relancer l'app.
 
 ---
 
-## 10. Lecteur PDF
+## 11. Lecteur PDF
 
 Les fiches pratiques peuvent porter un PDF (700 ko maximum, limite d'un document Firestore).
 L'aperçu ne passe **pas** par une iframe : iOS y ignore les paramètres `#view=Fit` et rend le
@@ -183,7 +207,7 @@ le lecteur natif du navigateur, avec le bouton plein écran comme voie de secour
 
 ---
 
-## 11. Dépannage
+## 12. Dépannage
 
 **Un bouton ne fait rien / rien ne s'enregistre.** L'app affiche désormais un bandeau rouge ou un message
 d'erreur explicite dans les trois cas possibles :
@@ -218,7 +242,7 @@ côté serveur et reste visible pour les autres membres. Un message discret le r
 
 ---
 
-## 12. Cartes de randos, webcams, actualités
+## 13. Cartes de randos, webcams, actualités
 
 **Cartes de randos suggérées** : format compact, sans image — nom, commune, distance, dénivelé,
 durée, badge de difficulté et lien vers la fiche Visorando. Les photos restent réservées aux randos
@@ -236,7 +260,7 @@ sources permanentes (office de tourisme, station, parc national, vigilance).
 
 ---
 
-## 13. Traces GPX et app Exercice d'Apple
+## 14. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -255,7 +279,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 14. Idées pour la suite
+## 15. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
