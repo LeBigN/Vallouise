@@ -207,7 +207,21 @@ le lecteur natif du navigateur, avec le bouton plein écran comme voie de secour
 
 ---
 
-## 12. Dépannage
+## 12. Droits d'accès
+
+**Toute personne disposant du lien peut tout modifier et tout supprimer.** Il n'y a plus de notion
+d'auteur ni d'administrateur : les boutons Modifier et Supprimer sont visibles sur l'intégralité des
+contenus, pour tout le monde. C'est un choix assumé pour un carnet familial, mais il faut en mesurer
+la portée : aucune corbeille, aucun historique, aucun retour arrière. Une suppression est définitive.
+
+Les règles Firestore doivent être alignées (voir étape 2) : sans `col == '...'` dans les lignes
+`allow update` et `allow delete`, l'interface proposera des actions que le serveur refusera.
+
+Le lien de l'app est donc la seule clé : ne le diffusez qu'aux personnes de confiance.
+
+---
+
+## 13. Dépannage
 
 **Un bouton ne fait rien / rien ne s'enregistre.** L'app affiche désormais un bandeau rouge ou un message
 d'erreur explicite dans les trois cas possibles :
@@ -242,7 +256,7 @@ côté serveur et reste visible pour les autres membres. Un message discret le r
 
 ---
 
-## 13. Cartes de randos, webcams, actualités
+## 14. Cartes de randos, webcams, actualités
 
 **Cartes de randos suggérées** : format compact, sans image — nom, commune, distance, dénivelé,
 durée, badge de difficulté et lien vers la fiche Visorando. Les photos restent réservées aux randos
@@ -260,7 +274,7 @@ sources permanentes (office de tourisme, station, parc national, vigilance).
 
 ---
 
-## 14. Traces GPX et app Exercice d'Apple
+## 15. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -279,7 +293,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 15. Idées pour la suite
+## 16. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API

@@ -194,6 +194,17 @@ main{padding:16px 14px calc(26px + env(safe-area-inset-bottom, 0px));
   font-weight:600;font-size:14.5px;display:inline-flex;align-items:center;gap:7px;
   transition:transform .12s,filter .12s}
 .btn:active{transform:scale(.975);filter:brightness(.94)}
+/* Confort à la souris : survol perceptible et curseurs explicites */
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{filter:brightness(1.07)}
+  .mini:hover{background:var(--brume);color:var(--nuit)}
+  .carte:hover{box-shadow:var(--ombre-h)}
+  .vignette img:hover,.bande-photos img:hover{filter:brightness(1.06);cursor:zoom-in}
+  nav button:hover{color:var(--nuit)}
+  .fermer-x:hover{background:var(--brume)}
+}
+button,a,select,label.bascule{cursor:pointer}
+input,textarea{cursor:text}
 .btn.accent{background:var(--meleze);color:#fff}
 .btn.rouge{background:var(--alerte);color:#fff}
 a.btn,a.mini{text-decoration:none}
@@ -201,7 +212,10 @@ a.btn,a.mini{text-decoration:none}
 .btn.fant{background:var(--brume);color:var(--ardoise)}
 .btn.danger{background:transparent;color:var(--alerte);padding:6px 0;font-size:13px;font-weight:600}
 .btn[disabled]{opacity:.5;pointer-events:none}
-.mini{font-family:var(--cote);font-size:11px;color:var(--granit);padding:4px 8px;border-radius:8px;background:var(--brume)}
+.mini{font-family:var(--corps);font-size:12.5px;font-weight:500;color:var(--ardoise);
+  padding:8px 13px;min-height:36px;border-radius:9px;background:#EDF1EF;
+  display:inline-flex;align-items:center;justify-content:center;text-decoration:none;
+  transition:background .12s,color .12s}
 
 /* ── Calendrier ─────────────────────────────────────────────── */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
@@ -300,7 +314,19 @@ textarea{min-height:78px;resize:vertical}
   .borne .lieu{margin-bottom:3px}
 }
 /* Plein écran quelle que soit la taille : plus de format pop-up. */
-@media(min-width:640px){.feuille{max-width:100%}}
+@media(min-width:640px){
+  .feuille{max-width:100%}
+  main{max-width:720px}
+  .btn{padding:13px 20px;font-size:15px}
+  .mini{font-size:13px;padding:9px 15px;min-height:38px}
+  .photos{grid-template-columns:repeat(4,1fr)}
+  .sugg,.actu{width:264px}
+}
+@media(min-width:1000px){
+  main{max-width:860px}
+  .photos{grid-template-columns:repeat(5,1fr)}
+  nav{padding-left:calc(50vw - 430px);padding-right:calc(50vw - 430px)}
+}
 
 /* ── Navigation ─────────────────────────────────────────────── */
 nav{position:fixed;bottom:0;left:0;right:0;z-index:1000;
@@ -725,7 +751,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v40";   // affiché dans Appart › Maintenance
+const APP_VERSION="v41";   // affiché dans Appart › Maintenance
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 /* append() insère littéralement « null » ou « undefined » quand on lui passe
@@ -1238,7 +1264,6 @@ function memoriserMasquee(id){
 /* Mur commun : le bouton de suppression est proposé sur TOUTES les photos,
    sans condition d'auteur. Le seul arbitre restant est la règle Firestore. */
 function estMien(){ return true; }
-const estAuteur=p=>p.uid===auth.currentUser?.uid;
 function supprimerPhoto(p,apres){
   const id=p.id;
   // 1. disparition immédiate, avant toute réponse du serveur
@@ -1405,7 +1430,7 @@ function dessinerCal(){
   lg.style.display=uids.size?"flex":"none";
 }
 function ligneSejour(s,dansFeuille){
-  const m=membre(s.uid), mien=s.uid===auth.currentUser.uid;
+  const m=membre(s.uid), mien=true;   // tout membre peut modifier
   return el("div",{class:"carte"},
     el("div",{class:"rangee"},pastille(s.uid),
       el("div",{style:"flex:1"},el("h3",{},val(s.titre)||("Séjour de "+m.nom)),
@@ -1664,7 +1689,7 @@ function rendreRandos(){
     `${mes.length} rando${mes.length>1?"s":""} enregistrée${mes.length>1?"s":""}`));
   [...mes].sort((a,b)=>(val(b.date)||"")<(val(a.date)||"")?-1:1).forEach(r=>{
     const faite=(r.faite||[]).includes(auth.currentUser.uid);
-    const mien=r.uid===auth.currentUser.uid;
+    const mien=true;   // carnet commun : chacun peut corriger
     const photos=photosVisibles().filter(p=>p.rando===r.id);
     const carte=el("div",{class:"carte"},
       el("div",{class:"entre"},el("h3",{},r.nom),el("span",{class:"puce o"},val(r.niveau)||"—")),
@@ -1817,7 +1842,7 @@ function rendreVTT(){
     `${mes.length} sortie${mes.length>1?"s":""} · ${nb(mes.reduce((s,v)=>s+(v.km||0),0).toFixed(0))} km cumulés`));
 
   [...mes].sort((a,b)=>(val(b.date)||"")<(val(a.date)||"")?-1:1).forEach(v=>{
-    const n=nivVTT(v.niveau), mien=v.uid===auth.currentUser.uid;
+    const n=nivVTT(v.niveau), mien=true;
     const photos=photosVisibles().filter(p=>p.vtt===v.id);
     const carte=el("div",{class:"carte"},
       el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
@@ -2099,7 +2124,7 @@ function carteContact(k){
     href:"https://maps.apple.com/?q="+encodeURIComponent([k.n,k.adr,k.com].filter(Boolean).join(", "))},
     "Itinéraire"));
   carte.append(actions);
-  if(k.id && k.uid===auth.currentUser.uid)
+  if(k.id)
     carte.append(el("button",{class:"mini",style:"margin-top:9px",onclick:()=>formContact(k)},"Modifier"));
   return carte;
 }
@@ -2220,7 +2245,7 @@ function rendrePeche(){
     el("button",{class:"btn fant plein",style:"margin-top:12px",onclick:pdfPeche},"Exporter le carnet en PDF")));
   z.append(el("div",{class:"titre-bloc"},"Le carnet de prises"));
   [...S.prises].sort((a,b)=>((b.date||"")+(b.heure||""))<((a.date||"")+(a.heure||""))?-1:1).forEach(p=>{
-    const mien=p.uid===auth.currentUser.uid;
+    const mien=true;
     const photos=photosVisibles().filter(x=>x.prise===p.id);
     const carte=el("div",{class:"carte"},
       el("div",{class:"entre"},el("h3",{},p.espece),el("span",{class:"puce o"},p.taille+" cm")),
@@ -2448,7 +2473,7 @@ function rendrePlans(){
     const l=S.plans.filter(p=>p.cat===cat);if(!l.length)return;
     z.append(el("div",{class:"titre-bloc"},cat));
     l.sort((a,b)=>(b.note||0)-(a.note||0)).forEach(p=>{
-      const mien=p.uid===auth.currentUser.uid;
+      const mien=true;
       const photos=photosVisibles().filter(x=>x.plan===p.id);
       const carte=el("div",{class:"carte"},
         el("div",{class:"entre"},el("h3",{},p.nom),el("span",{class:"etoiles"},"★".repeat(p.note||0))),
@@ -3171,7 +3196,7 @@ function fluxActus(){
     id:l.id, statut:val(l.statut)||"info", titre:l.titre, resume:val(l.resume),
     texte:val(l.texte)||val(l.resume), date:val(l.date), debut:val(l.debut), fin:val(l.fin),
     url:val(l.url), image:l.image||null, source:"Publié par "+membre(l.uid).nom,
-    edit:l.uid===auth.currentUser.uid?l:null}));
+    edit:l}));
 
   // 2. relevé mairie — deux garde-fous :
   //    · statut « Info » quoi qu'il arrive : un arrêté n'est pas une alerte en cours,
