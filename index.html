@@ -339,6 +339,7 @@ nav button.on span.l{color:var(--meleze)}
 .vignette .sup:active{background:var(--alerte)}
 .non-sync{position:absolute;left:5px;bottom:5px;background:rgba(18,33,31,.62);color:#fff;
   font-size:11px;border-radius:8px;padding:2px 6px}
+.bande-photos .hors-mur{outline:2px solid rgba(224,122,31,.55);outline-offset:-2px}
 /* La visionneuse recouvre tout, barre de navigation comprise. */
 .lb{position:fixed;top:0;left:0;width:100vw;height:100dvh;
   background:#0A0F0E;z-index:99999;display:none;
@@ -445,6 +446,12 @@ body.lb-ouverte nav{display:none}
 .pdf-cadre{width:100%;height:100%;border:none;object-fit:contain;background:#f9f9f9}
 .pdf-barre{display:flex;align-items:center;justify-content:center;gap:12px;
   margin-top:10px;min-height:22px}
+.bascule{display:grid;grid-template-columns:auto 1fr;gap:4px 11px;align-items:center;
+  background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r-s);
+  padding:13px 14px;margin:0;text-transform:none;letter-spacing:0;font-size:14.5px;
+  font-weight:500;color:var(--nuit)}
+.bascule input{width:22px;height:22px;margin:0;accent-color:var(--meleze);grid-row:1 / span 2}
+.bascule small{grid-column:2;font-size:12.5px;color:var(--granit);line-height:1.4}
 @media(max-height:560px){.pdf-zone{height:62dvh;max-height:62dvh}}
 html[data-theme="dark"] .pdf-zone{background:#111A19}
 html[data-theme="auto"] .pdf-zone{background:#111A19}
@@ -655,6 +662,15 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
     </div>
     <div class="titre-bloc">Maintenance</div>
     <div class="carte">
+      <div class="entre">
+        <div><b>Version installée</b><div class="meta" id="version-app">—</div></div>
+        <button class="btn fant" id="maj-btn">Forcer la mise à jour</button>
+      </div>
+      <p class="txt" style="white-space:normal;margin-top:10px">Si l'app ne se comporte pas comme
+      annoncé après un dépôt sur GitHub, c'est presque toujours l'ancienne version qui tourne encore
+      en cache. Ce bouton la remplace immédiatement.</p>
+    </div>
+    <div class="carte">
       <b>Réinitialiser l'application</b>
       <p class="txt" style="white-space:normal">Vide le cache local de cet appareil : données hors ligne, prénom retenu, contact d'urgence et configuration. <b>Rien n'est supprimé pour les autres</b> — tout ce qui est déjà synchronisé revient au prochain lancement.</p>
       <button class="btn rouge plein" id="reset-btn" style="margin-top:12px">Réinitialiser</button>
@@ -709,6 +725,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
+const APP_VERSION="v40";   // affiché dans Appart › Maintenance
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 /* append() insère littéralement « null » ou « undefined » quand on lui passe
@@ -784,7 +801,12 @@ const fermer=()=>{
   document.body.style.width="";document.body.style.overflow="";
   window.scrollTo(0,scrollY);
 };
-$("#voile").addEventListener("click",e=>{if(e.target.id==="voile"&&!$("#voile").dataset.bloque)fermer();});
+$("#voile").addEventListener("click",e=>{
+  // sur téléphone la fiche occupe tout l'écran : le fond n'est jamais visible,
+  // donc un « clic sur le fond » ne peut être qu'un geste mal interprété
+  if(window.innerWidth<640) return;
+  if(e.target.id==="voile"&&!$("#voile").dataset.bloque) fermer();
+});
 
 /* Aucune fermeture au glissement : le défilement vers le bas ne sert qu'à lire.
    La fiche se ferme par la croix en haut à droite (ou par le voile sur grand écran). */
@@ -1144,10 +1166,15 @@ function formPhoto(ctx){
     el("input",{type:"date",id:"ph-d",value:auj()}),
     el("label",{},"Légende (commune à la sélection)"),
     el("input",{id:"ph-l",placeholder:"Lever de soleil sur le Pelvoux"}),
+    ctx?el("label",{class:"bascule",style:"margin-top:14px"},
+      el("input",{type:"checkbox",id:"ph-hide"}),
+      el("span",{},"Masquer du mur principal"),
+      el("small",{},"Pour une carte ou une capture : elle ne restera que dans cette fiche.")):null,
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       if(!nouvelles.length) return toast("Choisis au moins une photo");
       const date=$("#ph-d").value||auj(), legende=$("#ph-l").value.trim(), n=nouvelles.length;
-      nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),{data,legende,date,
+      const horsMur=!!$("#ph-hide")?.checked;
+      nouvelles.forEach(data=>ecrire(addDoc(collection(db,"photos"),{data,legende,date,horsMur,
         rando:ctx?.type==="rando"?ctx.id:null, prise:ctx?.type==="prise"?ctx.id:null,
         plan:ctx?.type==="plan"?ctx.id:null, vtt:ctx?.type==="vtt"?ctx.id:null,
         uid:auth.currentUser.uid,cree:serverTimestamp()})));
@@ -1163,8 +1190,14 @@ function formPhotoEdit(p){
     el("input",{type:"date",id:"pe-d",value:val(p.date)||auj()}),
     el("label",{},"Légende"),
     el("input",{id:"pe-l",value:val(p.legende)}),
+    el("label",{},"Mur photos"),
+    el("label",{class:"bascule"},
+      el("input",{type:"checkbox",id:"pe-hide",...(p.horsMur?{checked:""}:{})}),
+      el("span",{},"Masquer du mur principal"),
+      el("small",{},"Elle restera visible dans la fiche où elle a été ajoutée.")),
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
-      ecrire(updateDoc(doc(db,"photos",p.id),{date:$("#pe-d").value,legende:$("#pe-l").value.trim()}),
+      ecrire(updateDoc(doc(db,"photos",p.id),{date:$("#pe-d").value,
+        legende:$("#pe-l").value.trim(),horsMur:$("#pe-hide").checked}),
         "Photo mise à jour",fermer);}},"Enregistrer"),
     el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
       if(confirm("Supprimer cette photo ?")) supprimerPhoto(p,fermer);
@@ -1173,9 +1206,13 @@ function formPhotoEdit(p){
 }
 function rendrePhotos(){
   const z=$("#liste-photos");if(!z)return;z.innerHTML="";
-  const visibles=photosVisibles();
+  // le mur exclut les photos marquées « hors mur » ; elles restent dans leur fiche
+  const visibles=photosVisibles().filter(p=>!p.horsMur);
+  const masquees=photosVisibles().filter(p=>p.horsMur).length;
   if(!visibles.length){z.append(el("div",{class:"vide"},
-    el("b",{},"Mur vide"),"Ajoute-en plusieurs d'un coup avec le bouton +."));return;}
+    el("b",{},"Mur vide"),
+    masquees?`${masquees} photo${masquees>1?"s":""} masquée${masquees>1?"s":""} du mur, visible${masquees>1?"s":""} dans leur fiche.`
+            :"Ajoute-en plusieurs d'un coup avec le bouton +."));return;}
   const parDate={};
   visibles.forEach(p=>{const k=val(p.date)||"—";(parDate[k]=parDate[k]||[]).push(p);});
   Object.keys(parDate).sort().reverse().forEach(k=>{
@@ -1637,7 +1674,7 @@ function rendreRandos(){
       dessinerTrace(r.trace),
       r.texte?el("p",{class:"txt"},val(r.texte)):null);
     if(photos.length){const bande=el("div",{class:"bande-photos"});
-      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",
+      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",class:p.horsMur?"hors-mur":null,
         onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
     const liens=liensDe(r);
@@ -1797,7 +1834,7 @@ function rendreVTT(){
       dessinerTrace(v.trace),
       v.texte?el("p",{class:"txt"},val(v.texte)):null);
     if(photos.length){const bande=el("div",{class:"bande-photos"});
-      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",
+      photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",class:p.horsMur?"hors-mur":null,
         onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
     carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
@@ -2192,7 +2229,7 @@ function rendrePeche(){
          val(p.leurre)||val(p.technique)].filter(Boolean).join("  ·  ")),
       p.notes?el("p",{class:"txt"},val(p.notes)):null);
     if(photos.length){const bande=el("div",{class:"bande-photos"});
-      photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",
+      photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",class:x.horsMur?"hors-mur":null,
         onclick:()=>ouvrirPhoto(x,photos)})));
       carte.append(bande);}
     carte.append(el("div",{class:"rangee",style:"margin-top:9px;flex-wrap:wrap"},
@@ -3341,6 +3378,22 @@ async function reinitialiser(){
     toast("Réinitialisation incomplète : "+(e.message||e),true);
   }
 }
+/* Remplace la version en cache sans toucher aux données */
+async function forcerMaj(){
+  const b=$("#maj-btn"); b.disabled=true; b.textContent="Mise à jour…";
+  try{
+    if(window.caches) for(const k of await caches.keys()) await caches.delete(k);
+    if(navigator.serviceWorker){
+      const rs=await navigator.serviceWorker.getRegistrations();
+      for(const r of rs) await r.unregister();
+    }
+  }catch(e){ console.error(e); }
+  location.replace(location.pathname+"?maj="+Date.now());
+}
+$("#maj-btn").onclick=forcerMaj;
+$("#version-app").textContent=APP_VERSION+" · déposée le "+
+  new Date(document.lastModified).toLocaleDateString("fr-FR");
+
 $("#reset-btn").onclick=()=>{
   if(!confirm("Réinitialiser l'application sur cet appareil ?\n\nTes données partagées sont conservées sur le serveur, mais les saisies pas encore synchronisées seront perdues."))
     return;

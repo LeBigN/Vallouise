@@ -1,6 +1,6 @@
 /* Vallouise — service worker
    Bump CACHE à chaque déploiement pour forcer la mise à jour des PWA installées. */
-const CACHE = "vallouise-v38";
+const CACHE = "vallouise-v40";
 const COQUILLE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 /* mairie.json est volontairement hors coquille : toujours réseau d'abord,
    pour ne jamais afficher un vieil arrêté comme s'il était en cours. */
@@ -33,7 +33,21 @@ self.addEventListener("fetch", e => {
     return;
   }
 
-  // Fichiers de l'app : réseau d'abord, cache en secours
+  // index.html : TOUJOURS le réseau en premier, jamais servi depuis le cache
+  // tant qu'une réponse fraîche est disponible — sinon une correction déposée
+  // sur GitHub peut rester invisible pendant des heures.
+  if (url.pathname.endsWith("/") || url.pathname.endsWith("index.html")) {
+    e.respondWith(
+      fetch(e.request, {cache: "no-store"}).then(res => {
+        const copie = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copie));
+        return res;
+      }).catch(() => caches.match(e.request).then(r => r || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // Autres fichiers de l'app : réseau d'abord, cache en secours
   e.respondWith(
     fetch(e.request).then(res => {
       const copie = res.clone();
