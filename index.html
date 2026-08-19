@@ -3145,27 +3145,18 @@ let derniereMeteo=null;
 function fluxActus(){
   const out=[];
 
-  // 1. météo : une seule entrée de synthèse, le bloc Vigilance juste au-dessus
-  //    détaillant déjà chaque risque, inutile de le répéter trois fois.
-  if(derniereMeteo){
-    const al=alertesDe(derniereMeteo);
-    if(al.length) out.push({
-      id:"meteo", statut:"alerte",
-      titre:al.length>1?`${al.length} alertes météo sur la vallée`:al[0].titre,
-      resume:al.map(a=>a.titre).join(" · "),
-      texte:al.map(a=>a.titre+" — "+a.txt).join("\n\n"),
-      date:auj(), source:"Estimé d'après les prévisions Open-Meteo. La vigilance officielle fait foi.",
-      url:"https://vigilance.meteofrance.fr/fr"});
-  }
+  // La météo n'entre PAS dans ce fil : le bloc Vigilance, juste au-dessus sur
+  // l'accueil, affiche déjà le niveau et le détail de chaque risque. L'y répéter
+  // donnait deux fois la même alerte à l'écran.
 
-  // 2. publications de la famille
+  // 1. publications de la famille
   S.liens.forEach(l=>out.push({
     id:l.id, statut:val(l.statut)||"info", titre:l.titre, resume:val(l.resume),
     texte:val(l.texte)||val(l.resume), date:val(l.date), debut:val(l.debut), fin:val(l.fin),
     url:val(l.url), image:l.image||null, source:"Publié par "+membre(l.uid).nom,
     edit:l.uid===auth.currentUser.uid?l:null}));
 
-  // 3. relevé mairie — deux garde-fous :
+  // 2. relevé mairie — deux garde-fous :
   //    · statut « Info » quoi qu'il arrive : un arrêté n'est pas une alerte en cours,
   //      sa date est celle de mise en ligne, pas sa période d'effet ;
   //    · seulement les 60 derniers jours, pour ne pas ressortir de vieux actes.
@@ -3229,8 +3220,10 @@ function blocFlash(){
   const l=fluxActus();
   f.append(el("div",{class:"titre-bloc"},"Flash info Vallouise"));
   if(!l.length){
-    f.append(el("div",{class:"vide"},el("b",{},"Rien à signaler aujourd'hui"),
-      "Pas d'alerte météo, pas d'actualité publiée."));
+    f.append(el("div",{class:"vide"},
+      el("b",{},"Aucune alerte en cours pour la commune"),
+      "Ni arrêté municipal récent, ni publication de la famille. "+
+      "Les alertes immédiates de la mairie restent diffusées sur Illiwap."));
   } else {
     const z=el("div",{class:"actu-liste"});
     l.slice(0,3).forEach(a=>z.append(carteActu(a,true)));
