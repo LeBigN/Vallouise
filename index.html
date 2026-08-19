@@ -212,6 +212,19 @@ a.btn,a.mini{text-decoration:none}
 .btn.fant{background:var(--brume);color:var(--ardoise)}
 .btn.danger{background:transparent;color:var(--alerte);padding:6px 0;font-size:13px;font-weight:600}
 .btn[disabled]{opacity:.5;pointer-events:none}
+.act{width:38px;height:38px;flex:none;border-radius:50%;background:#EDF1EF;
+  color:var(--ardoise);display:inline-grid;place-items:center;
+  transition:background .14s,color .14s,transform .1s}
+.act svg{width:19px;height:19px}
+.act:active{transform:scale(.9);background:var(--brume)}
+.act-danger{color:var(--alerte)}
+.act-barre{display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  margin-top:12px;flex-wrap:wrap}
+.act-barre .mini{margin-right:auto}   /* les liens restent à gauche */
+@media (hover:hover) and (pointer:fine){
+  .act:hover{background:var(--brume);color:var(--nuit)}
+  .act-danger:hover{background:#FBEAE5;color:var(--alerte)}
+}
 .mini{font-family:var(--corps);font-size:12.5px;font-weight:500;color:var(--ardoise);
   padding:8px 13px;min-height:36px;border-radius:9px;background:#EDF1EF;
   display:inline-flex;align-items:center;justify-content:center;text-decoration:none;
@@ -751,7 +764,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v41";   // affiché dans Appart › Maintenance
+const APP_VERSION="v42";   // affiché dans Appart › Maintenance
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 /* append() insère littéralement « null » ou « undefined » quand on lui passe
@@ -1128,6 +1141,30 @@ function geolocaliser(bouton,ok){
     {enableHighAccuracy:true,timeout:15000,maximumAge:0});
 }
 
+
+/* ═══════════════════════════════════════════════════════════
+   ACTIONS DES CARTES — trois pictogrammes au trait, sans émoji
+   ═══════════════════════════════════════════════════════════ */
+const SVG_ACTION=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC_PARTAGE=SVG_ACTION(`<circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/>
+  <circle cx="18" cy="19" r="2.6"/><path d="M8.4 10.8 15.6 6.7M8.4 13.2l7.2 4.1"/>`);
+const IC_CRAYON =SVG_ACTION(`<path d="M16.5 4.5a2.1 2.1 0 0 1 3 3L8.4 18.6l-4 1 1-4Z"/><path d="M14.8 6.2l3 3"/>`);
+const IC_POUBELLE=SVG_ACTION(`<path d="M4 7h16M9.5 7V5.4A1.4 1.4 0 0 1 10.9 4h2.2a1.4 1.4 0 0 1 1.4 1.4V7"/>
+  <path d="M6.4 7l.9 12.1A1.5 1.5 0 0 0 8.8 20.5h6.4a1.5 1.5 0 0 0 1.5-1.4L17.6 7"/>
+  <path d="M10.4 11v5.4M13.6 11v5.4"/>`);
+
+/* Bouton rond : le libellé passe en infobulle et reste lu par les lecteurs d'écran */
+function actionIcone(icone,libelle,onclick,variante){
+  return el("button",{class:"act"+(variante?" act-"+variante:""),title:libelle,
+    "aria-label":libelle,onclick,html:icone});
+}
+const actPartager=fn=>actionIcone(IC_PARTAGE,"Partager",fn);
+const actModifier=fn=>actionIcone(IC_CRAYON,"Modifier",fn);
+const actSupprimer=fn=>actionIcone(IC_POUBELLE,"Supprimer",fn,"danger");
+/* Les trois actions regroupées et alignées à droite de la carte */
+const barreActions=(...enfants)=>el("div",{class:"act-barre"},...enfants);
+
 /* ═══════════════════════════════════════════════════════════
    7. PHOTOS — import multiple, date modifiable
    ═══════════════════════════════════════════════════════════ */
@@ -1436,12 +1473,10 @@ function ligneSejour(s,dansFeuille){
       el("div",{style:"flex:1"},el("h3",{},val(s.titre)||("Séjour de "+m.nom)),
         el("div",{class:"meta"},`${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`))),
     s.note?el("p",{class:"txt"},val(s.note)):null,
-    mien?el("div",{class:"rangee",style:"margin-top:10px"},
-      el("button",{class:"mini",onclick:()=>formSejour(s.debut,s.fin,s)},"Modifier"),
-      el("button",{class:"mini",onclick:()=>{
-        if(confirm("Annuler ce séjour ?"))
-          ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",dansFeuille?fermer:null);
-      }},"Supprimer")):null);
+    barreActions(
+      actModifier(()=>formSejour(s.debut,s.fin,s)),
+      actSupprimer(()=>{ if(confirm("Annuler ce séjour ?"))
+        ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",dansFeuille?fermer:null); })));
 }
 function toucherJour(date,dessus){
   if(S.selMode){
@@ -1709,11 +1744,10 @@ function rendreRandos(){
       if(r.gps)zl.append(el("a",{class:"mini",target:"_blank",rel:"noopener",
         href:`https://www.google.com/maps/search/?api=1&query=${r.gps.lat},${r.gps.lon}`},"📍 Départ ↗"));
       carte.append(zl);}
-    carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
-      el("button",{class:"mini",onclick:()=>partager(texteRando(r))},"Partager"),
-      mien?el("button",{class:"mini",onclick:()=>formRando(r)},"Modifier"):null,
-      mien?el("button",{class:"mini",onclick:()=>{
-        if(confirm("Supprimer cette rando ?")) supprimerRando(r);}},"Supprimer"):null));
+    carte.append(barreActions(
+      actPartager(()=>partager(texteRando(r))),
+      actModifier(()=>formRando(r)),
+      actSupprimer(()=>{ if(confirm("Supprimer cette rando ?")) supprimerRando(r); })));
     z.append(carte);});
 }
 const texteRando=r=>[`🥾 ${r.nom}`,
@@ -1862,11 +1896,10 @@ function rendreVTT(){
       photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",class:p.horsMur?"hors-mur":null,
         onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
-    carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
-      el("button",{class:"mini",onclick:()=>partager(texteVTT(v))},"Partager"),
-      mien?el("button",{class:"mini",onclick:()=>formVTT(v)},"Modifier"):null,
-      mien?el("button",{class:"mini",onclick:()=>{
-        if(confirm("Supprimer cette sortie ?")) supprimerVTT(v);}},"Supprimer"):null));
+    carte.append(barreActions(
+      actPartager(()=>partager(texteVTT(v))),
+      actModifier(()=>formVTT(v)),
+      actSupprimer(()=>{ if(confirm("Supprimer cette sortie ?")) supprimerVTT(v); })));
     z.append(carte);
   });
 }
@@ -2124,8 +2157,10 @@ function carteContact(k){
     href:"https://maps.apple.com/?q="+encodeURIComponent([k.n,k.adr,k.com].filter(Boolean).join(", "))},
     "Itinéraire"));
   carte.append(actions);
-  if(k.id)
-    carte.append(el("button",{class:"mini",style:"margin-top:9px",onclick:()=>formContact(k)},"Modifier"));
+  if(k.id) carte.append(barreActions(
+    actModifier(()=>formContact(k)),
+    actSupprimer(()=>{ if(confirm("Supprimer ce contact ?"))
+      ecrire(deleteDoc(doc(db,"annuaire",k.id)),"Contact supprimé"); })));
   return carte;
 }
 
@@ -2260,11 +2295,11 @@ function rendrePeche(){
     carte.append(el("div",{class:"rangee",style:"margin-top:9px;flex-wrap:wrap"},
       el("span",{class:"puce"},val(p.devenir)||"—"),
       el("span",{class:"meta"},"par "+membre(p.uid).nom)));
-    carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
-      el("button",{class:"mini",onclick:()=>partager(textePrise(p))},"Partager"),
-      mien?el("button",{class:"mini",onclick:()=>formPrise(p)},"Modifier"):null,
-      mien?el("button",{class:"mini",onclick:()=>{
-        if(confirm("Supprimer cette prise ?"))ecrire(deleteDoc(doc(db,"prises",p.id)),"Prise supprimée");}},"Supprimer"):null));
+    carte.append(barreActions(
+      actPartager(()=>partager(textePrise(p))),
+      actModifier(()=>formPrise(p)),
+      actSupprimer(()=>{ if(confirm("Supprimer cette prise ?"))
+        ecrire(deleteDoc(doc(db,"prises",p.id)),"Prise supprimée"); })));
     z.append(carte);});
 }
 const horodatage=p=>p.date?jolie(p.date)+(p.heure?" à "+val(p.heure).replace(":","h"):""):"";
@@ -2494,14 +2529,14 @@ function rendrePlans(){
             rel:"noopener noreferrer",
             href:"https://www.google.com/maps/search/?api=1&query="+cible},"Google Maps")));
       }
-      carte.append(el("div",{class:"rangee",style:"margin-top:11px;flex-wrap:wrap"},
-          el("span",{class:"meta"},"par "+membre(p.uid).nom),
-          el("button",{class:"mini",onclick:()=>partager([`📍 ${p.nom}`,val(p.adresse),val(p.texte),
+      carte.append(barreActions(
+        el("span",{class:"mini",style:"background:none;padding:0"},"par "+membre(p.uid).nom),
+        actPartager(()=>partager([`${p.nom}`,val(p.adresse),val(p.texte),
           p.gps?`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`:null]
-          .filter(Boolean).join("\n"))},"Partager"),
-          mien?el("button",{class:"mini",onclick:()=>formPlan(p)},"Modifier"):null,
-        mien?el("button",{class:"mini",onclick:()=>{
-          if(confirm("Supprimer ?"))ecrire(deleteDoc(doc(db,"plans",p.id)),"Supprimé");}},"Supprimer"):null));
+          .filter(Boolean).join("\n"))),
+        actModifier(()=>formPlan(p)),
+        actSupprimer(()=>{ if(confirm("Supprimer ce bon plan ?"))
+          ecrire(deleteDoc(doc(db,"plans",p.id)),"Supprimé"); })));
       z.append(carte);});
   });
 }
@@ -2576,7 +2611,7 @@ function rendreInfos(){
     const carte=el("div",{class:"carte"},
       el("div",{class:"entre",style:"align-items:flex-start;gap:8px"},
         el("h3",{},i.titre),
-        el("button",{class:"mini",onclick:()=>formInfo(i)},"✎ Éditer")));
+        actModifier(()=>formInfo(i))));
     if(val(i.texte)) carte.append(el("p",{class:"txt"},val(i.texte)));
     const ph=photosVisibles().filter(x=>x.info===i.id);
     if(ph.length){
@@ -3252,8 +3287,11 @@ function detailActu(a){
     a.url?el("a",{class:"btn accent plein",style:"margin-top:14px",href:a.url,
       target:"_blank",rel:"noopener noreferrer"},
       /\.pdf($|\?)/i.test(a.url)?"Ouvrir le document ↗":"Consulter la source ↗"):null,
-    a.edit?el("button",{class:"btn fant plein",style:"margin-top:8px",
-      onclick:()=>formLien(a.edit)},"Modifier cette actu"):null);
+    a.edit?barreActions(
+      actPartager(()=>partager([a.titre,val(a.resume),val(a.url)].filter(Boolean).join("\n"))),
+      actModifier(()=>formLien(a.edit)),
+      actSupprimer(()=>{ if(confirm("Supprimer cette actualité ?"))
+        ecrire(deleteDoc(doc(db,"liens",a.edit.id)),"Actualité supprimée"); })):null);
   feuille("L'actu",c);
 }
 
