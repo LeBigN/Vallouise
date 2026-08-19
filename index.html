@@ -142,10 +142,15 @@ html[data-theme="auto"] .recap{background:#212E2B}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--neve);overscroll-behavior:none}
 html,body{margin:0;padding:0}
-body{background:var(--neve);min-height:100dvh;max-height:none;touch-action:pan-y;
-  -webkit-text-size-adjust:100%;color:var(--nuit);font-family:var(--corps);
-  font-size:15px;line-height:1.45;padding-bottom:calc(var(--nav-h) + 10px);
-  overscroll-behavior:none;overscroll-behavior-y:none}
+/* L'application occupe exactement l'écran : la barre de navigation est un
+   élément de la colonne, jamais emportée par le défilement du contenu. */
+body{background:var(--neve);height:100dvh;max-height:100dvh;overflow:hidden;
+  display:flex;flex-direction:column;
+  touch-action:pan-y;-webkit-text-size-adjust:100%;color:var(--nuit);
+  font-family:var(--corps);font-size:15px;line-height:1.45;
+  overscroll-behavior:none}
+#ecran{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 :focus-visible{outline:2.5px solid var(--meleze);outline-offset:2px;border-radius:6px}
@@ -165,8 +170,7 @@ button{cursor:pointer;border:none;background:none}
   white-space:nowrap;line-height:1.5}
 .alt b{display:block;font-size:15px;color:var(--neve);font-weight:500}
 
-main{padding:16px 14px calc(26px + env(safe-area-inset-bottom, 0px));
-  max-width:600px;margin:0 auto;width:100%}
+main{padding:16px 14px 24px;max-width:600px;margin:0 auto;width:100%}
 .vue{display:none;animation:monte .22s ease both}
 .vue.on{display:block}
 @keyframes monte{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -176,8 +180,8 @@ main{padding:16px 14px calc(26px + env(safe-area-inset-bottom, 0px));
 .titre-bloc::after{content:"";flex:1;height:1px;background:var(--bord)}
 .titre-bloc:first-child{margin-top:2px}
 
-.carte{background:var(--blanc);border-radius:var(--r);padding:15px 16px;border:1px solid var(--bord);
-  box-shadow:var(--ombre);margin-bottom:10px}
+.carte{background:var(--blanc);border-radius:var(--r);padding:15px 16px 12px;
+  border:1px solid var(--bord);box-shadow:var(--ombre);margin-bottom:10px}
 .carte h3{font-family:var(--display);font-size:var(--t-h3);margin:0 0 2px;font-weight:700;
   letter-spacing:-.015em;line-height:1.25}
 .meta{font-family:var(--corps);font-size:12.5px;font-weight:400;color:var(--granit);
@@ -219,7 +223,8 @@ a.btn,a.mini{text-decoration:none}
 .act:active{transform:scale(.9);background:var(--brume)}
 .act-danger{color:var(--alerte)}
 .act-barre{display:flex;align-items:center;justify-content:flex-end;gap:8px;
-  margin-top:12px;flex-wrap:wrap}
+  margin-top:8px;flex-wrap:wrap}
+.act-barre:last-child{margin-bottom:-2px}
 .act-barre .mini{margin-right:auto}   /* les liens restent à gauche */
 @media (hover:hover) and (pointer:fine){
   .act:hover{background:var(--brume);color:var(--nuit)}
@@ -342,13 +347,10 @@ textarea{min-height:78px;resize:vertical}
 }
 
 /* ── Navigation ─────────────────────────────────────────────── */
-nav{position:fixed;bottom:0;left:0;right:0;z-index:1000;
+nav{flex:0 0 auto;z-index:1000;position:relative;
   background:var(--blanc);border-top:1px solid var(--bord);
   display:grid;grid-template-columns:repeat(6,1fr);
   padding-bottom:env(safe-area-inset-bottom, 16px)}
-/* le fond descend sous la barre : plus de bande blanche pendant le rebond */
-nav::after{content:"";position:absolute;left:0;right:0;top:100%;height:120px;
-  background:var(--blanc)}
 nav button{padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
 nav button svg.i{width:21px;height:21px}
 nav button span.l{font-family:var(--corps);font-size:9.5px;font-weight:600;letter-spacing:.03em;white-space:nowrap}
@@ -356,7 +358,7 @@ nav button.on{color:var(--nuit)}
 nav button.on span.l{color:var(--meleze)}
 
 /* ── Divers ─────────────────────────────────────────────────── */
-.fab{position:fixed;right:16px;bottom:calc(var(--nav-h) + 14px);z-index:45;
+.fab{position:fixed;right:16px;bottom:calc(var(--nav-h) + 14px);z-index:1001;
   width:56px;height:56px;border-radius:50%;background:var(--meleze);color:#fff;
   font-size:26px;display:grid;place-items:center;box-shadow:0 6px 20px rgba(224,122,31,.4)}
 .fab-modale{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom, 0px));
@@ -452,7 +454,9 @@ body.lb-ouverte nav{display:none}
 .rd-chiffres{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;font-weight:500;
   color:var(--ardoise);margin:9px 0 10px}
 .rd-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.rd-actions{margin-top:2px}
 .rd-actions .btn{font-size:14px}
+.rd-carte{padding-bottom:13px}
 .so-onglets button{display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:5px;padding:10px 4px;font-size:13px;line-height:1.2;
   transition:background .15s ease,color .15s ease}
@@ -622,6 +626,8 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 </head>
 <body>
 
+<div id="ecran">
+
 <header class="borne">
   <svg class="fond" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
     <g fill="none" stroke="#E07A1F" stroke-width="1">
@@ -718,6 +724,8 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
   </section>
 </main>
 
+</div><!-- /#ecran -->
+
 <button class="fab" id="fab" aria-label="Ajouter">+</button>
 
 <nav>
@@ -764,7 +772,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v42";   // affiché dans Appart › Maintenance
+const APP_VERSION="v44";   // affiché dans Appart › Maintenance
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 /* append() insère littéralement « null » ou « undefined » quand on lui passe
@@ -824,21 +832,16 @@ function feuille(titre,corps,apres){
   f.classList.remove("defile");
   f.onscroll=()=>f.classList.toggle("defile", f.scrollTop>4);
   // verrou de défilement de l'arrière-plan
-  scrollY=window.scrollY;
-  document.body.style.position="fixed";
-  document.body.style.top=`-${scrollY}px`;
-  document.body.style.left="0";document.body.style.right="0";document.body.style.bottom="0";
-  document.body.style.width="100%";
-  document.body.style.overflow="hidden";
+  // #ecran ne défile plus tant que la fiche est ouverte ; le corps est déjà figé
+  scrollY=$("#ecran").scrollTop;
+  $("#ecran").style.overflow="hidden";
   $("#voile").classList.add("on");apres?.();
 }
 const fermer=()=>{
   const f=$("#feuille");f.style.transition="";f.style.transform="";
   $("#voile").classList.remove("on");
-  document.body.style.position="";document.body.style.top="";
-  document.body.style.left="";document.body.style.right="";document.body.style.bottom="";
-  document.body.style.width="";document.body.style.overflow="";
-  window.scrollTo(0,scrollY);
+  $("#ecran").style.overflow="";
+  $("#ecran").scrollTop=scrollY;
 };
 $("#voile").addEventListener("click",e=>{
   // sur téléphone la fiche occupe tout l'écran : le fond n'est jamais visible,
@@ -1091,6 +1094,21 @@ function monUid(){
   }
   return u;
 }
+/* Modifier la fiche d'un autre ne doit pas lui voler la paternité :
+   on conserve l'auteur d'origine et on note qui a retouché. */
+function auteurConserve(existant){
+  const u=auth.currentUser?.uid;
+  return existant?.uid
+    ? {uid:existant.uid, majPar:u, majLe:serverTimestamp()}
+    : {uid:u};
+}
+/* « par X », suivi de « retouchée par Y » si quelqu'un d'autre est passé après */
+function ligneAuteur(o){
+  const t="par "+membre(o.uid).nom
+    +(o.majPar && o.majPar!==o.uid ? " · retouchée par "+membre(o.majPar).nom : "");
+  return el("span",{class:"mini",style:"background:none;padding:0"},t);
+}
+
 const membre=uid=>S.membres[uid]||{nom:"?",couleur:"#7F8A86"};
 const pastille=uid=>{const m=membre(uid);
   return el("div",{class:"pastille",style:`background:${m.couleur}`},m.nom[0]?.toUpperCase()||"?");};
@@ -1466,17 +1484,20 @@ function dessinerCal(){
     lg.append(el("span",{},el("i",{style:`background:${m.couleur}`}),m.nom));});
   lg.style.display=uids.size?"flex":"none";
 }
-function ligneSejour(s,dansFeuille){
-  const m=membre(s.uid), mien=true;   // tout membre peut modifier
-  return el("div",{class:"carte"},
+/* lectureSeule : l'encart de l'accueil informe, il ne modifie rien.
+   L'édition reste dans l'onglet Séjours. */
+function ligneSejour(s,dansFeuille,lectureSeule){
+  const m=membre(s.uid);
+  const c=el("div",{class:"carte"},
     el("div",{class:"rangee"},pastille(s.uid),
       el("div",{style:"flex:1"},el("h3",{},val(s.titre)||("Séjour de "+m.nom)),
         el("div",{class:"meta"},`${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`))),
-    s.note?el("p",{class:"txt"},val(s.note)):null,
-    barreActions(
-      actModifier(()=>formSejour(s.debut,s.fin,s)),
-      actSupprimer(()=>{ if(confirm("Annuler ce séjour ?"))
-        ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",dansFeuille?fermer:null); })));
+    s.note?el("p",{class:"txt"},val(s.note)):null);
+  if(!lectureSeule) c.append(barreActions(
+    actModifier(()=>formSejour(s.debut,s.fin,s)),
+    actSupprimer(()=>{ if(confirm("Annuler ce séjour ?"))
+      ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",dansFeuille?fermer:null); })));
+  return c;
 }
 function toucherJour(date,dessus){
   if(S.selMode){
@@ -1512,7 +1533,7 @@ function formSejour(debut,fin,s){
       const deb=$("#f-deb").value,f=$("#f-fin").value;
       if(!deb||!f||f<=deb)return toast("Le départ doit suivre l'arrivée");
       const d={debut:deb,fin:f,titre:$("#f-tit").value.trim(),note:$("#f-note").value.trim(),
-        uid:auth.currentUser.uid};
+        ...auteurConserve(s)};
       ecrire(s?updateDoc(doc(db,"sejours",s.id),d):addDoc(collection(db,"sejours"),{...d,cree:serverTimestamp()}),
         s?"Séjour modifié":"Séjour réservé",fermer);
     }},s?"Enregistrer":"Réserver ces dates"));
@@ -1630,7 +1651,8 @@ function formRando(r){
       const liens=[...document.querySelectorAll("#r-liens input")].map(i=>i.value.trim()).filter(Boolean);
       const d={nom,date:$("#r-date").value||auj(),depart:$("#r-dep").value.trim(),
         denivele:$("#r-den").value,duree:$("#r-dur").value,niveau:$("#r-niv").value,
-        texte:$("#r-txt").value.trim(),liens,trace,gps,uid:auth.currentUser.uid};
+        texte:$("#r-txt").value.trim(),liens,trace,gps,
+        ...auteurConserve(r)};
       const ref=r?doc(db,"randos",r.id):doc(collection(db,"randos"));
       ecrire(r?updateDoc(ref,d):setDoc(ref,{...d,faite:[],cree:serverTimestamp()}),
         r?"Fiche mise à jour":"Rando ajoutée",fermer);
@@ -1745,6 +1767,7 @@ function rendreRandos(){
         href:`https://www.google.com/maps/search/?api=1&query=${r.gps.lat},${r.gps.lon}`},"📍 Départ ↗"));
       carte.append(zl);}
     carte.append(barreActions(
+      ligneAuteur(r),
       actPartager(()=>partager(texteRando(r))),
       actModifier(()=>formRando(r)),
       actSupprimer(()=>{ if(confirm("Supprimer cette rando ?")) supprimerRando(r); })));
@@ -1843,7 +1866,7 @@ function formVTT(v){
         dplus:$("#v-dp").value?+$("#v-dp").value:(trace?trace.dplus:null),
         duree:$("#v-h").value?+$("#v-h").value:null,
         pratique:$("#v-prat").value,niveau:$("#v-niv").value,
-        texte:$("#v-txt").value.trim(),trace,gps,uid:auth.currentUser.uid};
+        texte:$("#v-txt").value.trim(),trace,gps,...auteurConserve(v)};
       const ref=v?doc(db,"vtt",v.id):doc(collection(db,"vtt"));
       ecrire(v?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
         v?"Sortie mise à jour":"Sortie VTT enregistrée",fermer);
@@ -1897,6 +1920,7 @@ function rendreVTT(){
         onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
     carte.append(barreActions(
+      ligneAuteur(v),
       actPartager(()=>partager(texteVTT(v))),
       actModifier(()=>formVTT(v)),
       actSupprimer(()=>{ if(confirm("Supprimer cette sortie ?")) supprimerVTT(v); })));
@@ -2126,7 +2150,7 @@ function formContact(k){
       const u=monUid(); if(!u) return;
       const d={n,cat:$("#k-cat").value,com:$("#k-com").value.trim(),
         tel:$("#k-tel").value.replace(/\s+/g,""),adr:$("#k-adr").value.trim(),
-        horaires:$("#k-h").value.trim(),uid:u};
+        horaires:$("#k-h").value.trim(),...auteurConserve(k)};
       ecrire(k?.id?updateDoc(doc(db,"annuaire",k.id),d)
                  :addDoc(collection(db,"annuaire"),{...d,cree:serverTimestamp()}),
         "Contact enregistré",fermer);
@@ -2248,7 +2272,7 @@ function formPrise(pr){
       const d={espece:$("#pk-esp").value,taille:+taille,poids:$("#pk-p").value?+$("#pk-p").value:null,
         date:$("#pk-d").value,heure:$("#pk-h").value,lieu:$("#pk-l").value.trim(),gps,
         technique:$("#pk-tec").value,leurre:$("#pk-lr").value.trim(),devenir:$("#pk-rel").value,
-        notes:$("#pk-n").value.trim(),uid:auth.currentUser.uid};
+        notes:$("#pk-n").value.trim(),...auteurConserve(pr)};
       const ref=pr?doc(db,"prises",pr.id):doc(collection(db,"prises"));
       ecrire(pr?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
         pr?"Prise mise à jour":"Prise enregistrée",fermer);
@@ -2293,9 +2317,9 @@ function rendrePeche(){
         onclick:()=>ouvrirPhoto(x,photos)})));
       carte.append(bande);}
     carte.append(el("div",{class:"rangee",style:"margin-top:9px;flex-wrap:wrap"},
-      el("span",{class:"puce"},val(p.devenir)||"—"),
-      el("span",{class:"meta"},"par "+membre(p.uid).nom)));
+      el("span",{class:"puce"},val(p.devenir)||"—")));
     carte.append(barreActions(
+      ligneAuteur(p),
       actPartager(()=>partager(textePrise(p))),
       actModifier(()=>formPrise(p)),
       actSupprimer(()=>{ if(confirm("Supprimer cette prise ?"))
@@ -2457,7 +2481,7 @@ function formPlan(p){
       const nom=$("#p-nom").value.trim();if(!nom)return toast("Il manque le nom");
       const d={nom,cat:$("#p-cat").value,note:+$("#p-note").value,
         adresse:$("#p-adr").value.trim(),gps,
-        texte:$("#p-txt").value.trim(),uid:auth.currentUser.uid};
+        texte:$("#p-txt").value.trim(),...auteurConserve(p)};
       const ref=p?doc(db,"plans",p.id):doc(collection(db,"plans"));
       ecrire(p?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
         p?"Bon plan mis à jour":"Bon plan partagé",fermer);
@@ -2530,7 +2554,7 @@ function rendrePlans(){
             href:"https://www.google.com/maps/search/?api=1&query="+cible},"Google Maps")));
       }
       carte.append(barreActions(
-        el("span",{class:"mini",style:"background:none;padding:0"},"par "+membre(p.uid).nom),
+        ligneAuteur(p),
         actPartager(()=>partager([`${p.nom}`,val(p.adresse),val(p.texte),
           p.gps?`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`:null]
           .filter(Boolean).join("\n"))),
@@ -2572,7 +2596,7 @@ function formInfo(i){
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const t=$("#i-t").value.trim();if(!t)return toast("Il manque le titre");
       const u=monUid(); if(!u) return;
-      const d={titre:t,texte:$("#i-c").value.trim(),pdf,pdfNom,uid:u};
+      const d={titre:t,texte:$("#i-c").value.trim(),pdf,pdfNom,...auteurConserve(i)};
       const ref=i?doc(db,"infos",i.id):doc(collection(db,"infos"));
       ecrire(i?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
         "Fiche enregistrée",fermer);
@@ -2937,14 +2961,7 @@ function carteRando(r){
       el("span",{class:"puce"},r.ty)),
     el("div",{class:"rd-actions"},
       el("a",{class:"btn accent plein",href:r.u,target:"_blank",rel:"noopener noreferrer"},
-        "Voir la fiche Visorando ↗"),
-      el("button",{class:"btn fant plein",style:"margin-top:7px",onclick:()=>{
-        ecrire(addDoc(collection(db,"randos"),{nom:r.n,date:auj(),depart:r.c,
-          denivele:String(r.dp),duree:String(Math.round(r.m/6)/10),
-          niveau:(r.d==="Facile"?"Facile":r.d==="Moyenne"?"Moyen":r.d==="Difficile"?"Sportif":"Alpin"),
-          texte:"",liens:[r.u],trace:null,gps:null,faite:[],
-          uid:auth.currentUser.uid,cree:serverTimestamp()}),"Ajoutée à ton carnet");
-      }},"+ Ajouter à mon carnet")));
+        "Voir la fiche Visorando ↗")));
 }
 
 function listeSecteur(){
@@ -3156,7 +3173,7 @@ function formLien(l){
       const d={titre:t,statut:$("#l-s").value,resume:$("#l-r").value.trim(),
         texte:$("#l-x").value.trim(),date:$("#l-d").value,
         debut:$("#l-deb").value,fin:$("#l-fin").value,
-        url:$("#l-u").value.trim(),image,pdf:pdfA,pdfNom:pdfANom,uid:u};
+        url:$("#l-u").value.trim(),image,pdf:pdfA,pdfNom:pdfANom,...auteurConserve(l)};
       const refA=l?doc(db,"liens",l.id):doc(collection(db,"liens"));
       ecrire(l?updateDoc(refA,d):setDoc(refA,{...d,cree:serverTimestamp()}),
         "Actualité enregistrée",fermer);
@@ -3326,7 +3343,7 @@ function rendreAccueil(){
   const futurs=S.sejours.filter(s=>s.fin>=auj()).sort((a,b)=>a.debut<b.debut?-1:1);
   const enCours=futurs.find(s=>s.debut<=auj()), prochain=enCours||futurs[0];
   z.append(el("div",{class:"titre-bloc"},enCours?"En ce moment à l'appart":"Prochain séjour"));
-  z.append(prochain?ligneSejour(prochain)
+  z.append(prochain?ligneSejour(prochain,false,true)
     :el("div",{class:"vide"},el("b",{},"Personne d'annoncé"),"Va dans Séjours pour poser tes dates."));
 
   z.append(el("div",{class:"titre-bloc"},"Météo du village"));
@@ -3398,7 +3415,7 @@ function aller(v){
   $("#sous").textContent=ALTITUDES[v][1];
   $("#fab").style.display=(v==="appart"||v==="sejours"||v==="accueil")?"none":"grid";
   if(v==="accueil") chargerMeteo();
-  window.scrollTo({top:0});
+  $("#ecran").scrollTop=0;
 }
 $$("nav button").forEach(b=>b.onclick=()=>aller(b.dataset.vue));
 $$(".onglets button[data-sortie]").forEach(b=>b.onclick=()=>{
@@ -3481,10 +3498,11 @@ async function rafraichirTout(){
   document.body.append(ind);
   let y0=0,dy=0,actif=false,occupe=false;
   const bloque=()=>occupe || $("#voile").classList.contains("on") || $("#lb").classList.contains("on");
-  addEventListener("touchstart",e=>{
-    if(window.scrollY>0||bloque())return;
+  const zone=$("#ecran");
+  zone.addEventListener("touchstart",e=>{
+    if(zone.scrollTop>0||bloque())return;
     y0=e.touches[0].clientY;dy=0;actif=true;ind.style.transition="none";},{passive:true});
-  addEventListener("touchmove",e=>{
+  zone.addEventListener("touchmove",e=>{
     if(!actif)return;
     dy=e.touches[0].clientY-y0;
     if(dy<=0){actif=false;ind.style.transform="";return;}
@@ -3504,7 +3522,7 @@ async function rafraichirTout(){
         ind.style.transform="";ind.style.opacity="0"; }
     } else { ind.style.transform="";ind.style.opacity="0";ind.classList.remove("pret"); }
   };
-  addEventListener("touchend",fin);addEventListener("touchcancel",fin);
+  zone.addEventListener("touchend",fin);zone.addEventListener("touchcancel",fin);
 })();
 
 let x0=null;
