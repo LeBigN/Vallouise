@@ -68,7 +68,7 @@ html[data-theme="dark"] .feuille-tete{background:var(--neve)}
 html[data-theme="dark"] .fermer-x:active{background:#33413E}
 html[data-theme="dark"] .poignee{background:#33413E}
 html[data-theme="dark"] .vide{background:#1B2725;border-color:#2B3937}
-html[data-theme="dark"] nav{background:rgba(20,30,28,.93)}
+html[data-theme="dark"] nav{background:var(--blanc)}   /* opaque, identique au fond racine */
 html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#141E1C;border-color:#2B3937;color:#EDF1EF}
 html[data-theme="dark"] input:focus,html[data-theme="dark"] select:focus,html[data-theme="dark"] textarea:focus{box-shadow:0 0 0 3px rgba(224,122,31,.18)}
 html[data-theme="dark"] .jour.passe{color:#3C4A47}
@@ -116,7 +116,7 @@ html[data-theme="auto"] .feuille-tete{background:var(--neve)}
 html[data-theme="auto"] .fermer-x:active{background:#33413E}
 html[data-theme="auto"] .poignee{background:#33413E}
 html[data-theme="auto"] .vide{background:#1B2725;border-color:#2B3937}
-html[data-theme="auto"] nav{background:rgba(20,30,28,.93)}
+html[data-theme="auto"] nav{background:var(--blanc)}   /* opaque, identique au fond racine */
 html[data-theme="auto"] input,html[data-theme="auto"] select,html[data-theme="auto"] textarea{background:#141E1C;border-color:#2B3937;color:#EDF1EF}
 html[data-theme="auto"] input:focus,html[data-theme="auto"] select:focus,html[data-theme="auto"] textarea:focus{box-shadow:0 0 0 3px rgba(224,122,31,.18)}
 html[data-theme="auto"] .jour.passe{color:#3C4A47}
@@ -144,20 +144,18 @@ html[data-theme="auto"] .recap{background:#212E2B}
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:var(--neve);overscroll-behavior:none}
+html{background:var(--blanc);overscroll-behavior:none}   /* = fond de la barre */
 html,body{margin:0;padding:0}
 /* L'application occupe exactement l'écran : la barre de navigation est un
    élément de la colonne, jamais emportée par le défilement du contenu. */
-/* Hauteur mesurée en JavaScript (--vh) : ni 100dvh ni inset:0 ne sont fiables
-   sur iOS, où la fenêtre visible change au fil du défilement et des barres système. */
-body{background:var(--blanc);position:fixed;top:0;left:0;right:0;
-  height:var(--vh, 100dvh);overflow:hidden;
-  display:flex;flex-direction:column;
+/* Retour à l'ossature simple : la page défile normalement, la barre est fixée
+   au bas de la fenêtre. C'est le comportement le plus fiable sur iOS. */
+body{background:var(--neve);margin:0;padding:0;min-height:100dvh;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
   touch-action:pan-y;-webkit-text-size-adjust:100%;color:var(--nuit);
   font-family:var(--corps);font-size:15px;line-height:1.45;
-  overscroll-behavior:none}
-#ecran{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;background:var(--neve)}
+  overscroll-behavior-y:none}
+#ecran{display:block}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 :focus-visible{outline:2.5px solid var(--meleze);outline-offset:2px;border-radius:6px}
@@ -366,10 +364,11 @@ textarea{min-height:78px;resize:vertical}
 }
 
 /* ── Navigation ─────────────────────────────────────────────── */
-nav{flex:0 0 auto;z-index:1000;position:relative;
+nav{position:fixed;bottom:0;left:0;right:0;width:100%;z-index:9999;
+  margin:0;transform:none;
   background:var(--blanc);border-top:1px solid var(--bord);
   display:grid;grid-template-columns:repeat(6,1fr);
-  padding-bottom:env(safe-area-inset-bottom, 0px);margin-bottom:0}
+  padding-bottom:env(safe-area-inset-bottom, 0px)}
 nav button{padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
 nav button svg.i{width:21px;height:21px}
 nav button span.l{font-family:var(--corps);font-size:9.5px;font-weight:600;letter-spacing:.03em;white-space:nowrap}
@@ -791,23 +790,8 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v47";   // affiché dans Appart › Maintenance
+const APP_VERSION="v48";   // affiché dans Appart › Maintenance
 
-/* On aligne la hauteur de l'app sur la fenêtre RÉELLEMENT visible.
-   visualViewport suit les barres système d'iOS, contrairement aux unités CSS. */
-function majHauteurEcran(){
-  const h = window.visualViewport?.height || window.innerHeight;
-  document.documentElement.style.setProperty("--vh", Math.round(h)+"px");
-}
-majHauteurEcran();
-addEventListener("resize", majHauteurEcran);
-addEventListener("orientationchange", ()=>setTimeout(majHauteurEcran,250));
-if(window.visualViewport){
-  visualViewport.addEventListener("resize", majHauteurEcran);
-  visualViewport.addEventListener("scroll", majHauteurEcran);
-}
-/* iOS met parfois un instant à stabiliser sa fenêtre après l'ouverture */
-[80,300,900].forEach(d=>setTimeout(majHauteurEcran,d));
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 /* append() insère littéralement « null » ou « undefined » quand on lui passe
@@ -867,16 +851,19 @@ function feuille(titre,corps,apres){
   f.classList.remove("defile");
   f.onscroll=()=>f.classList.toggle("defile", f.scrollTop>4);
   // verrou de défilement de l'arrière-plan
-  // #ecran ne défile plus tant que la fiche est ouverte ; le corps est déjà figé
-  scrollY=$("#ecran").scrollTop;
-  $("#ecran").style.overflow="hidden";
+  scrollY=window.scrollY;
+  document.body.style.position="fixed";
+  document.body.style.top=`-${scrollY}px`;
+  document.body.style.left="0";document.body.style.right="0";
+  document.body.style.width="100%";
   $("#voile").classList.add("on");apres?.();
 }
 const fermer=()=>{
   const f=$("#feuille");f.style.transition="";f.style.transform="";
   $("#voile").classList.remove("on");
-  $("#ecran").style.overflow="";
-  $("#ecran").scrollTop=scrollY;
+  document.body.style.position="";document.body.style.top="";
+  document.body.style.left="";document.body.style.right="";document.body.style.width="";
+  window.scrollTo(0,scrollY);
 };
 $("#voile").addEventListener("click",e=>{
   // sur téléphone la fiche occupe tout l'écran : le fond n'est jamais visible,
@@ -3443,7 +3430,7 @@ function aller(v){
   $("#sous").textContent=ALTITUDES[v][1];
   $("#fab").style.display=(v==="appart"||v==="sejours"||v==="accueil")?"none":"grid";
   if(v==="accueil") chargerMeteo();
-  $("#ecran").scrollTop=0;
+  window.scrollTo({top:0});
 }
 $$("nav button").forEach(b=>b.onclick=()=>aller(b.dataset.vue));
 $$(".onglets button[data-sortie]").forEach(b=>b.onclick=()=>{
@@ -3526,9 +3513,9 @@ async function rafraichirTout(){
   document.body.append(ind);
   let y0=0,dy=0,actif=false,occupe=false;
   const bloque=()=>occupe || $("#voile").classList.contains("on") || $("#lb").classList.contains("on");
-  const zone=$("#ecran");
+  const zone=window;
   zone.addEventListener("touchstart",e=>{
-    if(zone.scrollTop>0||bloque())return;
+    if(window.scrollY>0||bloque())return;
     y0=e.touches[0].clientY;dy=0;actif=true;ind.style.transition="none";},{passive:true});
   zone.addEventListener("touchmove",e=>{
     if(!actif)return;
