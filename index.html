@@ -58,6 +58,8 @@ html[data-theme="dark"]{
 
 html[data-theme="dark"] .txt{color:#C7D3D0}
 html[data-theme="dark"] .mini{background:#26332F;color:#C2CFCB}
+html[data-theme="dark"] .act{background:#26332F;color:#C2CFCB}
+html[data-theme="dark"] .act-danger{background:#2E1D1A;color:#E8836A}
 html[data-theme="dark"] .mini:active{background:#33413E}
 html[data-theme="dark"] .onglets{background:#212E2B}
 html[data-theme="dark"] .onglets button.on{background:#33413E;color:#EDF1EF;box-shadow:none}
@@ -104,6 +106,8 @@ html[data-theme="auto"]{
 
 html[data-theme="auto"] .txt{color:#C7D3D0}
 html[data-theme="auto"] .mini{background:#26332F;color:#C2CFCB}
+html[data-theme="auto"] .act{background:#26332F;color:#C2CFCB}
+html[data-theme="auto"] .act-danger{background:#2E1D1A;color:#E8836A}
 html[data-theme="auto"] .mini:active{background:#33413E}
 html[data-theme="auto"] .onglets{background:#212E2B}
 html[data-theme="auto"] .onglets button.on{background:#33413E;color:#EDF1EF;box-shadow:none}
@@ -144,9 +148,10 @@ html{background:var(--neve);overscroll-behavior:none}
 html,body{margin:0;padding:0}
 /* L'application occupe exactement l'écran : la barre de navigation est un
    élément de la colonne, jamais emportée par le défilement du contenu. */
-/* inset:0 colle l'app aux bords réels de la fenêtre : contrairement à 100dvh,
-   aucune bande ne peut apparaître sous la barre quand iOS recalcule sa hauteur. */
-body{background:var(--blanc);position:fixed;inset:0;overflow:hidden;
+/* Hauteur mesurée en JavaScript (--vh) : ni 100dvh ni inset:0 ne sont fiables
+   sur iOS, où la fenêtre visible change au fil du défilement et des barres système. */
+body{background:var(--blanc);position:fixed;top:0;left:0;right:0;
+  height:var(--vh, 100dvh);overflow:hidden;
   display:flex;flex-direction:column;
   touch-action:pan-y;-webkit-text-size-adjust:100%;color:var(--nuit);
   font-family:var(--corps);font-size:15px;line-height:1.45;
@@ -182,7 +187,7 @@ main{padding:12px 14px 20px;max-width:600px;margin:0 auto;width:100%}
 .titre-bloc::after{content:"";flex:1;height:1px;background:var(--bord)}
 .titre-bloc:first-child{margin-top:2px}
 
-.carte{background:var(--blanc);border-radius:var(--r);padding:13px 14px 11px;
+.carte{background:var(--blanc);border-radius:var(--r);padding:13px 14px 8px;
   border:1px solid var(--bord);box-shadow:var(--ombre);margin-bottom:8px}
 /* Séjours : nom, dates et actions sur une seule ligne */
 .sej-ligne{display:flex;align-items:center;justify-content:space-between;gap:11px}
@@ -230,10 +235,16 @@ a.btn,a.mini{text-decoration:none}
 .act svg{width:19px;height:19px}
 .act:active{transform:scale(.9);background:var(--brume)}
 .act-danger{color:var(--alerte)}
-.act-barre{display:flex;align-items:center;justify-content:flex-end;gap:8px;
-  margin-top:8px;flex-wrap:wrap}
-.act-barre:last-child{margin-bottom:-2px}
-.act-barre .mini{margin-right:auto}   /* les liens restent à gauche */
+/* Une seule ligne : liens à gauche, actions à droite, sans retour à la ligne */
+.act-barre{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-top:8px;margin-bottom:0;flex-wrap:nowrap}
+.carte>.act-barre:last-child{margin-bottom:-1px}
+.liens-gauche{display:flex;align-items:center;gap:6px;flex:1 1 auto;min-width:0;
+  overflow-x:auto;scrollbar-width:none}
+.liens-gauche::-webkit-scrollbar{display:none}
+.liens-gauche .mini{flex:none}
+.act-barre>.act{flex:none}
+.act-barre>.act:first-child{margin-left:auto}   /* sans liens, les icônes restent à droite */
 @media (hover:hover) and (pointer:fine){
   .act:hover{background:var(--brume);color:var(--nuit)}
   .act-danger:hover{background:#FBEAE5;color:var(--alerte)}
@@ -780,7 +791,23 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v45";   // affiché dans Appart › Maintenance
+const APP_VERSION="v47";   // affiché dans Appart › Maintenance
+
+/* On aligne la hauteur de l'app sur la fenêtre RÉELLEMENT visible.
+   visualViewport suit les barres système d'iOS, contrairement aux unités CSS. */
+function majHauteurEcran(){
+  const h = window.visualViewport?.height || window.innerHeight;
+  document.documentElement.style.setProperty("--vh", Math.round(h)+"px");
+}
+majHauteurEcran();
+addEventListener("resize", majHauteurEcran);
+addEventListener("orientationchange", ()=>setTimeout(majHauteurEcran,250));
+if(window.visualViewport){
+  visualViewport.addEventListener("resize", majHauteurEcran);
+  visualViewport.addEventListener("scroll", majHauteurEcran);
+}
+/* iOS met parfois un instant à stabiliser sa fenêtre après l'ouverture */
+[80,300,900].forEach(d=>setTimeout(majHauteurEcran,d));
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 /* append() insère littéralement « null » ou « undefined » quand on lui passe
@@ -1766,15 +1793,13 @@ function rendreRandos(){
       photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",class:p.horsMur?"hors-mur":null,
         onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
-    const liens=liensDe(r);
-    if(liens.length||r.gps){
-      const zl=el("div",{class:"rangee",style:"margin-top:10px;flex-wrap:wrap"});
-      liens.forEach(l=>zl.append(el("a",{class:"mini",href:l,target:"_blank",rel:"noopener"},sourceLien(l)+" ↗")));
-      if(r.gps)zl.append(el("a",{class:"mini",target:"_blank",rel:"noopener",
-        href:`https://www.google.com/maps/search/?api=1&query=${r.gps.lat},${r.gps.lon}`},"📍 Départ ↗"));
-      carte.append(zl);}
-    carte.append(barreActions(
-      ligneAuteur(r),
+    // liens à gauche, actions à droite, sur une seule et même ligne
+    const zl=el("div",{class:"liens-gauche"});
+    liensDe(r).forEach(l=>zl.append(el("a",{class:"mini",href:l,target:"_blank",
+      rel:"noopener noreferrer"},sourceLien(l)+" ↗")));
+    if(r.gps)zl.append(el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
+      href:`https://www.google.com/maps/search/?api=1&query=${r.gps.lat},${r.gps.lon}`},"Départ ↗"));
+    carte.append(barreActions(zl,
       actPartager(()=>partager(texteRando(r))),
       actModifier(()=>formRando(r)),
       actSupprimer(()=>{ if(confirm("Supprimer cette rando ?")) supprimerRando(r); })));
@@ -2550,18 +2575,14 @@ function rendrePlans(){
         photos.forEach(x=>bande.append(el("img",{src:x.data,alt:"",loading:"lazy",
           onclick:()=>ouvrirPhoto(x,photos)})));
         carte.append(bande);}
+      const zlp=el("div",{class:"liens-gauche"});
       if(p.gps||p.adresse){
         const cible=p.gps?`${p.gps.lat},${p.gps.lon}`
           :encodeURIComponent([p.nom,val(p.adresse)].filter(Boolean).join(", "));
-        carte.append(el("div",{class:"rangee",style:"margin-top:12px;gap:7px"},
-          el("a",{class:"btn accent",style:"flex:1;justify-content:center",target:"_blank",
-            rel:"noopener noreferrer",href:"https://maps.apple.com/?"+(p.gps?"ll="+cible:"q="+cible)},"Plans"),
-          el("a",{class:"btn fant",style:"flex:1;justify-content:center",target:"_blank",
-            rel:"noopener noreferrer",
-            href:"https://www.google.com/maps/search/?api=1&query="+cible},"Google Maps")));
+        zlp.append(el("a",{class:"mini",target:"_blank",rel:"noopener noreferrer",
+          href:"https://maps.apple.com/?"+(p.gps?"ll="+cible:"q="+cible)},"Itinéraire ↗"));
       }
-      carte.append(barreActions(
-        ligneAuteur(p),
+      carte.append(barreActions(zlp,
         actPartager(()=>partager([`${p.nom}`,val(p.adresse),val(p.texte),
           p.gps?`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`:null]
           .filter(Boolean).join("\n"))),
