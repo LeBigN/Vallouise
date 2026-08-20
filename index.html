@@ -776,7 +776,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v50";   // affiché dans Appart › Maintenance
+const APP_VERSION="v51";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -2823,6 +2823,70 @@ const MAIRIE_SNAPSHOT={releve:"2026-08-17",pubs:[
 const ILLIWAP="https://station.illiwap.com/fr/public/05101";
 /* Couleurs de la vigilance officielle Météo-France. L'app ne les calcule jamais :
    elle ne fait que restituer ce que le relevé serveur a rapporté. */
+
+/* ═══════════════════════════════════════════════════════════
+   VIGILANCE OFFICIELLE — Hautes-Alpes (05)
+   L'API de Météo-France exige une clé et n'autorise pas les requêtes
+   navigateur. On lit donc le même flux officiel republié par Opendatasoft.
+   Règle absolue : si la lecture échoue ou si un champ manque, on n'affiche
+   AUCUN niveau. Jamais de couleur déduite des prévisions.
+   ═══════════════════════════════════════════════════════════ */
+const VIG_JEU="weatherref-france-vigilance-meteo-departement";
+const VIG_URL="https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
+  +VIG_JEU+"/records?limit=60&refine="+encodeURIComponent('domain_id:"05"');
+const VIG_COULEURS={1:"vert",2:"jaune",3:"orange",4:"rouge"};
+const VIG_RISQUES={1:"Vent violent",2:"Pluie-inondation",3:"Orages",4:"Crues",
+  5:"Neige-verglas",6:"Canicule",7:"Grand froid",8:"Avalanches",9:"Vagues-submersion"};
+
+/* Les noms de colonnes peuvent varier : on prend la première clé plausible. */
+const champVig=(o,...motifs)=>{
+  for(const k of Object.keys(o||{})){
+    const n=k.toLowerCase();
+    if(motifs.some(m=>n.includes(m)) && o[k]!==null && o[k]!=="") return o[k];
+  }
+  return null;
+};
+
+let VIG_DIRECTE=null;
+async function vigilanceOfficielle(){
+  const ctrl=new AbortController();
+  const minuteur=setTimeout(()=>ctrl.abort(),8000);
+  try{
+    const r=await fetch(VIG_URL,{signal:ctrl.signal});
+    if(!r.ok) throw new Error("service indisponible ("+r.status+")");
+    const j=await r.json();
+    const brut=(j.results||j.records||[]).map(x=>x.fields||x);
+    const recs=brut.filter(f=>{
+      const d=String(champVig(f,"domain_id","domain","code_dept","departement")||"");
+      return d==="05"||d==="5";
+    });
+    if(!recs.length) throw new Error("département absent du flux");
+
+    const maintenant=Date.now();
+    let couleur=0, risques=[], quand=null;
+    for(const f of recs){
+      // seuls les bulletins couvrant l'instant présent comptent
+      const deb=Date.parse(champVig(f,"begin_validity","debut","start")||"");
+      const fin=Date.parse(champVig(f,"end_validity","fin","end")||"");
+      if(!isNaN(fin) && fin<maintenant) continue;
+      if(!isNaN(deb) && deb>maintenant+36e5) continue;
+      const c=+(champVig(f,"color_id","couleur_id","max_color","niveau")||0);
+      const ph=+(champVig(f,"phenomenon_id","phenomene_id")||0);
+      if(c>=2 && ph) risques.push(VIG_RISQUES[ph]||("Phénomène "+ph));
+      if(c>couleur) couleur=c;
+      quand=champVig(f,"update","maj","date")||quand;
+    }
+    if(!couleur) throw new Error("aucun bulletin en cours");
+    return {couleur:VIG_COULEURS[couleur],
+            risques:[...new Set(risques)].slice(0,3),
+            releve:quand||new Date().toISOString(),
+            source:"Météo-France (données publiques)"};
+  }catch(e){
+    console.warn("vigilance officielle :",e.message);
+    return null;   // on n'affiche jamais de niveau supposé
+  }finally{ clearTimeout(minuteur); }
+}
+
 const COULEURS_VIG={
   vert:  {c:"vert",  p:"#3F7D5A"},
   jaune: {c:"jaune", p:"#D9A441"},
@@ -3104,18 +3168,20 @@ async function chargerMeteo(){
       z.append(el("div",{class:"titre-bloc",style:"margin-top:2px"},"Conditions annoncées"));
       // Le niveau officiel n'est affiché QUE s'il provient de Météo-France,
       // via mairie.json alimenté côté serveur. Jamais calculé par l'app.
-      const off=MAIRIE.vigilance;
-      const frais=off && (Date.now()-new Date(off.releve).getTime())/36e5 < 12;
+      const off=VIG_DIRECTE || MAIRIE.vigilance;
+      const frais=off && off.couleur && (Date.now()-new Date(off.releve).getTime())/36e5 < 12;
       if(frais){
         const c=COULEURS_VIG[off.couleur]||COULEURS_VIG.vert;
         z.append(el("a",{class:"vig-off n-"+c.c,target:"_blank",rel:"noopener noreferrer",
           href:"https://vigilance.meteofrance.fr/fr/hautes-alpes"},
           el("span",{class:"pastille-v",style:`background:${c.p}`}),
           el("div",{},
-            el("b",{},"Vigilance "+off.couleur+" — Hautes-Alpes"),
+            el("b",{}, off.couleur==="vert"
+              ? "Aucune alerte particulière — Hautes-Alpes"
+              : "Vigilance "+off.couleur+" — Hautes-Alpes"),
             el("div",{class:"vtxt"},
               (off.risques?.length?off.risques.join(", ")+" · ":"")+
-              "Météo-France, relevé "+heureCourte(off.releve))),
+              (off.source||"Météo-France")+", "+heureCourte(off.releve))),
           el("span",{class:"vig-fleche"},"↗")));
       } else {
         z.append(el("a",{class:"vig-off",target:"_blank",rel:"noopener noreferrer",
@@ -3123,8 +3189,8 @@ async function chargerMeteo(){
           el("span",{class:"pastille-v",style:"background:var(--granit)"}),
           el("div",{},
             el("b",{},"Vigilance officielle — Hautes-Alpes"),
-            el("div",{class:"vtxt"},"Non récupérée. Le niveau vert, jaune, orange ou rouge "+
-              "est publié par Météo-France : touche pour l'ouvrir.")),
+            el("div",{class:"vtxt"},"Niveau du jour publié par Météo-France — "+
+              "touche pour l'ouvrir.")),
           el("span",{class:"vig-fleche"},"↗")));
       }
       if(al.length){
@@ -3338,7 +3404,10 @@ function blocFlash(){
     l.slice(0,3).forEach(a=>z.append(carteActu(a,true)));
     f.append(z);
   }
-  f.append(el("button",{class:"btn fant plein",style:"margin-top:8px",onclick:infosMairie},
+  f.append(el("a",{class:"btn rouge plein",style:"margin-top:8px",href:ILLIWAP,
+    target:"_blank",rel:"noopener noreferrer"},
+    "Alertes de la mairie sur Illiwap ↗"));
+  f.append(el("button",{class:"btn fant plein",style:"margin-top:7px",onclick:infosMairie},
     "Voir toutes les actus"));
   return f;
 }
@@ -3569,6 +3638,9 @@ onAuthStateChanged(auth,user=>{
   majUrgence(); majReseau(); rendreTheme(); aller("accueil");
   // relevé mairie (dont la vigilance officielle) dès le démarrage
   chargerMairie().then(()=>{ rendreAccueil(); chargerMeteo(); });
+  // vigilance officielle en direct, puis redessin
+  // vigilance officielle en direct, puis redessin si elle arrive
+  vigilanceOfficielle().then(v=>{ if(v){ VIG_DIRECTE=v; chargerMeteo(); } });
 
   onSnapshot(collection(db,"membres"),snap=>{
     S.membres={};snap.forEach(d=>S.membres[d.id]=d.data());

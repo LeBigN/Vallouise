@@ -1,6 +1,6 @@
 /* Vallouise — service worker
    Bump CACHE à chaque déploiement pour forcer la mise à jour des PWA installées. */
-const CACHE = "vallouise-v50";
+const CACHE = "vallouise-v51";
 const COQUILLE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 /* mairie.json est volontairement hors coquille : toujours réseau d'abord,
    pour ne jamais afficher un vieil arrêté comme s'il était en cours. */
