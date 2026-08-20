@@ -144,13 +144,15 @@ html{background:var(--neve);overscroll-behavior:none}
 html,body{margin:0;padding:0}
 /* L'application occupe exactement l'écran : la barre de navigation est un
    élément de la colonne, jamais emportée par le défilement du contenu. */
-body{background:var(--neve);height:100dvh;max-height:100dvh;overflow:hidden;
+/* inset:0 colle l'app aux bords réels de la fenêtre : contrairement à 100dvh,
+   aucune bande ne peut apparaître sous la barre quand iOS recalcule sa hauteur. */
+body{background:var(--blanc);position:fixed;inset:0;overflow:hidden;
   display:flex;flex-direction:column;
   touch-action:pan-y;-webkit-text-size-adjust:100%;color:var(--nuit);
   font-family:var(--corps);font-size:15px;line-height:1.45;
   overscroll-behavior:none}
 #ecran{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+  -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;background:var(--neve)}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 :focus-visible{outline:2.5px solid var(--meleze);outline-offset:2px;border-radius:6px}
@@ -170,25 +172,31 @@ button{cursor:pointer;border:none;background:none}
   white-space:nowrap;line-height:1.5}
 .alt b{display:block;font-size:15px;color:var(--neve);font-weight:500}
 
-main{padding:16px 14px 24px;max-width:600px;margin:0 auto;width:100%}
+main{padding:12px 14px 20px;max-width:600px;margin:0 auto;width:100%}
 .vue{display:none;animation:monte .22s ease both}
 .vue.on{display:block}
 @keyframes monte{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 .titre-bloc{font-family:var(--corps);font-size:11.5px;font-weight:600;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--granit);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+  text-transform:uppercase;color:var(--granit);margin:18px 0 8px;display:flex;align-items:center;gap:10px}
 .titre-bloc::after{content:"";flex:1;height:1px;background:var(--bord)}
 .titre-bloc:first-child{margin-top:2px}
 
-.carte{background:var(--blanc);border-radius:var(--r);padding:15px 16px 12px;
-  border:1px solid var(--bord);box-shadow:var(--ombre);margin-bottom:10px}
+.carte{background:var(--blanc);border-radius:var(--r);padding:13px 14px 11px;
+  border:1px solid var(--bord);box-shadow:var(--ombre);margin-bottom:8px}
+/* Séjours : nom, dates et actions sur une seule ligne */
+.sej-ligne{display:flex;align-items:center;justify-content:space-between;gap:11px}
+.sej-txt{flex:1;min-width:0}
+.sej-txt h3{margin:0;line-height:1.2}
+.sej-txt .meta{margin-top:1px}
+.sej-act{display:flex;align-items:center;gap:7px;flex:none}
 .carte h3{font-family:var(--display);font-size:var(--t-h3);margin:0 0 2px;font-weight:700;
   letter-spacing:-.015em;line-height:1.25}
 .meta{font-family:var(--corps);font-size:12.5px;font-weight:400;color:var(--granit);
   line-height:1.5;letter-spacing:0}
-.txt{margin:9px 0 0;white-space:pre-wrap;font-size:var(--t-p);line-height:1.55;color:#243B38}
+.txt{margin:7px 0 0;white-space:pre-wrap;font-size:var(--t-p);line-height:1.5;color:#243B38}
 
-.vide{text-align:center;padding:34px 20px;color:var(--granit);
+.vide{text-align:center;padding:24px 20px;color:var(--granit);
   border:1.5px dashed var(--brume);border-radius:var(--r);background:var(--blanc)}
 .vide b{display:block;font-family:var(--display);font-size:16.5px;color:var(--ardoise);
   margin-bottom:5px;letter-spacing:-.015em}
@@ -350,7 +358,7 @@ textarea{min-height:78px;resize:vertical}
 nav{flex:0 0 auto;z-index:1000;position:relative;
   background:var(--blanc);border-top:1px solid var(--bord);
   display:grid;grid-template-columns:repeat(6,1fr);
-  padding-bottom:env(safe-area-inset-bottom, 16px)}
+  padding-bottom:env(safe-area-inset-bottom, 0px);margin-bottom:0}
 nav button{padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
 nav button svg.i{width:21px;height:21px}
 nav button span.l{font-family:var(--corps);font-size:9.5px;font-weight:600;letter-spacing:.03em;white-space:nowrap}
@@ -437,7 +445,7 @@ body.lb-ouverte nav{display:none}
 .mr-live{background:#FCEFEC;border:1px solid #F0CFC7;border-radius:var(--r);padding:15px 16px;margin-bottom:14px}
 .mr-live b{font-family:var(--display);font-size:16px;color:var(--alerte)}
 .mr-carte{background:var(--blanc);border:1px solid var(--bord);border-radius:var(--r);
-  padding:15px 16px;margin-bottom:10px;box-shadow:var(--ombre)}
+  padding:13px 14px 11px;margin-bottom:8px;box-shadow:var(--ombre)}
 .mr-carte h4{font-family:var(--display);font-size:16px;margin:9px 0 0;font-weight:700;
   line-height:1.25;letter-spacing:-.015em}
 .mr-badges{display:flex;flex-wrap:wrap;gap:6px}
@@ -524,7 +532,7 @@ html[data-theme="auto"] .actu-res{color:#B4C1BD}
 .meteo-jours b{font-size:14px}
 svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2px;
   background:var(--neve);border-radius:10px}
-.bande-photos{display:flex;gap:6px;overflow-x:auto;margin-top:11px;padding-bottom:2px;
+.bande-photos{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
 .bande-photos img{height:88px;width:auto;border-radius:8px;flex:none;scroll-snap-align:start;
   background:var(--brume)}
@@ -772,7 +780,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v44";   // affiché dans Appart › Maintenance
+const APP_VERSION="v45";   // affiché dans Appart › Maintenance
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 /* append() insère littéralement « null » ou « undefined » quand on lui passe
@@ -1102,12 +1110,8 @@ function auteurConserve(existant){
     ? {uid:existant.uid, majPar:u, majLe:serverTimestamp()}
     : {uid:u};
 }
-/* « par X », suivi de « retouchée par Y » si quelqu'un d'autre est passé après */
-function ligneAuteur(o){
-  const t="par "+membre(o.uid).nom
-    +(o.majPar && o.majPar!==o.uid ? " · retouchée par "+membre(o.majPar).nom : "");
-  return el("span",{class:"mini",style:"background:none;padding:0"},t);
-}
+/* L'auteur reste enregistré dans les données, mais n'est plus affiché sur les cartes. */
+function ligneAuteur(){ return null; }
 
 const membre=uid=>S.membres[uid]||{nom:"?",couleur:"#7F8A86"};
 const pastille=uid=>{const m=membre(uid);
@@ -1488,15 +1492,18 @@ function dessinerCal(){
    L'édition reste dans l'onglet Séjours. */
 function ligneSejour(s,dansFeuille,lectureSeule){
   const m=membre(s.uid);
-  const c=el("div",{class:"carte"},
-    el("div",{class:"rangee"},pastille(s.uid),
-      el("div",{style:"flex:1"},el("h3",{},val(s.titre)||("Séjour de "+m.nom)),
-        el("div",{class:"meta"},`${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`))),
-    s.note?el("p",{class:"txt"},val(s.note)):null);
-  if(!lectureSeule) c.append(barreActions(
+  // texte à gauche, actions à droite, sur une seule ligne
+  const ligne=el("div",{class:"sej-ligne"},
+    pastille(s.uid),
+    el("div",{class:"sej-txt"},
+      el("h3",{},val(s.titre)||("Séjour de "+m.nom)),
+      el("div",{class:"meta"},`${jolie(s.debut)} → ${jolie(s.fin)} · ${nuitees(s.debut,s.fin)}`)));
+  if(!lectureSeule) ligne.append(el("div",{class:"sej-act"},
     actModifier(()=>formSejour(s.debut,s.fin,s)),
     actSupprimer(()=>{ if(confirm("Annuler ce séjour ?"))
       ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",dansFeuille?fermer:null); })));
+  const c=el("div",{class:"carte"}, ligne,
+    s.note?el("p",{class:"txt"},val(s.note)):null);
   return c;
 }
 function toucherJour(date,dessus){
