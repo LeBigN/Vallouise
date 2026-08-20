@@ -256,7 +256,7 @@ côté serveur et reste visible pour les autres membres. Un message discret le r
 
 ---
 
-## 14. Cartes de randos, webcams, actualités
+## 15. Cartes de randos, webcams, actualités
 
 **Cartes de randos suggérées** : format compact, sans image — nom, commune, distance, dénivelé,
 durée, badge de difficulté et lien vers la fiche Visorando. Les photos restent réservées aux randos
@@ -274,7 +274,7 @@ sources permanentes (office de tourisme, station, parc national, vigilance).
 
 ---
 
-## 15. Traces GPX et app Exercice d'Apple
+## 16. Traces GPX et app Exercice d'Apple
 
 L'app Exercice/Fitness d'Apple **ne fournit pas de lien public partageable** : le partage produit une
 image de résumé, pas une URL exploitable. Pour récupérer une trace d'une séance Apple :
@@ -293,7 +293,7 @@ affichés avec le nom de leur source.
 
 ---
 
-## 16. Idées pour la suite
+## 17. Idées pour la suite
 
 - Liste de courses partagée qui se vide à chaque séjour
 - Météo Vallouise + état d'ouverture des routes (Pré de Mme Carle, col du Lautaret) via une API
