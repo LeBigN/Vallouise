@@ -83,7 +83,7 @@ html[data-theme="dark"] .a-vent {background:#271F14;border-color:#3B2F1D} html[d
 html[data-theme="dark"] html[data-theme="dark"] html[data-theme="dark"] html[data-theme="dark"] html[data-theme="dark"] .cam-onglets button{background:#26332F;color:#C2CFCB}
 html[data-theme="dark"] .sugg .badge{background:rgba(240,244,242,.94);color:#12211F}
 html[data-theme="dark"] .non-sync{background:rgba(0,0,0,.7)}
-html[data-theme="dark"] .lb{background:rgba(6,12,11,.97)}
+html[data-theme="dark"] .lb{background:#0A0F0E}   /* opaque, comme en clair */
 html[data-theme="dark"] .reseau{background:#212E2B;color:#C2CFCB}
 html[data-theme="dark"] .reseau.off{background:#33413E;color:#EDF1EF}
 html[data-theme="dark"] .recap{background:#212E2B}
@@ -125,7 +125,7 @@ html[data-theme="auto"] .a-vent {background:#271F14;border-color:#3B2F1D} html[d
 html[data-theme="auto"] html[data-theme="auto"] html[data-theme="auto"] html[data-theme="auto"] html[data-theme="auto"] .cam-onglets button{background:#26332F;color:#C2CFCB}
 html[data-theme="auto"] .sugg .badge{background:rgba(240,244,242,.94);color:#12211F}
 html[data-theme="auto"] .non-sync{background:rgba(0,0,0,.7)}
-html[data-theme="auto"] .lb{background:rgba(6,12,11,.97)}
+html[data-theme="auto"] .lb{background:#0A0F0E}   /* opaque, comme en clair */
 html[data-theme="auto"] .reseau{background:#212E2B;color:#C2CFCB}
 html[data-theme="auto"] .reseau.off{background:#33413E;color:#EDF1EF}
 html[data-theme="auto"] .recap{background:#212E2B}
@@ -389,13 +389,21 @@ nav button.on span.l{color:var(--meleze)}
   font-size:11px;border-radius:8px;padding:2px 6px}
 .bande-photos .hors-mur{outline:2px solid rgba(224,122,31,.55);outline-offset:-2px}
 /* La visionneuse recouvre tout, barre de navigation comprise. */
-.lb{position:fixed;top:0;left:0;width:100vw;height:100dvh;
+/* inset:0 ancre la visionneuse sur les bords réels de la fenêtre ; 100dvh
+   seul laissait apparaître le fond de la page sous le conteneur. */
+.lb{position:fixed;inset:0;top:0;left:0;right:0;bottom:0;
+  width:100vw;min-height:100dvh;margin:0;overflow:hidden;
   background:#0A0F0E;z-index:99999;display:none;
   flex-direction:column;align-items:center;justify-content:center;
   padding:calc(16px + env(safe-area-inset-top, 0px)) 16px
           calc(20px + env(safe-area-inset-bottom, 20px))}
-/* et la barre est retirée du flux pendant l'affichage */
-body.lb-ouverte nav{display:none}
+/* la barre de navigation est retirée du flux, sans marge résiduelle */
+body.lb-ouverte nav{display:none;margin-bottom:0}
+/* Le fond blanc résiduel venait de la racine du document, pas du corps :
+   la classe est donc posée sur les deux. */
+body.lb-ouverte{background:#0A0F0E;margin-bottom:0}
+html.lb-ouverte{background:#0A0F0E;overflow:hidden}
+html.lb-ouverte body{overflow:hidden}
 .lb.on{display:flex}
 .lb img{transition:opacity .16s ease;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.45)}
 .lb-x{position:absolute;top:calc(16px + env(safe-area-inset-top, 0px));right:16px;z-index:9999;
@@ -777,7 +785,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v52";   // affiché dans Appart › Maintenance
+const APP_VERSION="v53";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -1374,7 +1382,9 @@ function ouvrirPhoto(p,liste){
   if(lbIndex<0) {lbListe=[p];lbIndex=0;}
   afficherLB();
   $("#lb").classList.add("on");
-  document.body.classList.add("lb-ouverte");
+  document.body.classList.add("lb-ouverte");document.documentElement.classList.add("lb-ouverte");
+  // la racine porte le fond de la barre (clair) : on la noircit le temps de l'affichage
+  document.documentElement.style.background="#0A0F0E";
 }
 function naviguerLB(pas){
   if(lbListe.length<2) return;
@@ -1412,7 +1422,7 @@ function afficherLB(){
         const suivante=lbListe.length>1;
         supprimerPhoto(p);
         lbListe=lbListe.filter(x=>x.id!==p.id);
-        if(suivante&&lbListe.length){ lbIndex=lbIndex%lbListe.length; afficherLB(); $("#lb").classList.add("on"); document.body.classList.add("lb-ouverte"); }
+        if(suivante&&lbListe.length){ lbIndex=lbIndex%lbListe.length; afficherLB(); $("#lb").classList.add("on"); document.body.classList.add("lb-ouverte");document.documentElement.classList.add("lb-ouverte"); }
         else fermerLB();
       }}},"Supprimer")));
 
@@ -1424,7 +1434,9 @@ function afficherLB(){
 }
 const fermerLB=()=>{
   $("#lb").classList.remove("on");
-  document.body.classList.remove("lb-ouverte");   // la barre de navigation revient
+  document.body.classList.remove("lb-ouverte");
+  document.documentElement.classList.remove("lb-ouverte");   // la barre revient
+  document.documentElement.style.removeProperty("background");
 };
 
 $("#lb-x").onclick=fermerLB;
