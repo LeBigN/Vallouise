@@ -798,7 +798,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v54";   // affiché dans Appart › Maintenance
+const APP_VERSION="v55";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -2718,6 +2718,10 @@ function rendreInfos(){
    14. ACCUEIL — météo, soleil, alertes, suggestions, village
    ═══════════════════════════════════════════════════════════ */
 const LIENS_VILLAGE=[
+  /* Illiwap en tête : quand le Flash info est vide, c'est le seul accès
+     à la source d'alertes immédiate de la commune depuis l'accueil. */
+  {t:"Alertes de la mairie",u:"https://station.illiwap.com/fr/public/05101",
+   r:"Le fil Illiwap officiel : route coupée, coupure d'eau, événements. Alertes immédiates."},
   {t:"Vallouise-Pelvoux",u:"https://www.paysdesecrins.com/ma-station-mon-village/pelvoux-vallouise-ailefroide/",
    r:"La page officielle de la commune : village, station, Ailefroide et infos pratiques."},
   {t:"Station Pelvoux-Vallouise",u:"https://www.ski-pelvoux.com/",
@@ -3457,17 +3461,15 @@ function detailActu(a){
 function blocFlash(){
   const f=document.createDocumentFragment();
   const l=fluxActus();
-  f.append(el("div",{class:"titre-bloc"},"Flash info Vallouise"));
-  if(!l.length){
-    f.append(el("div",{class:"vide"},
-      el("b",{},"Aucune alerte en cours pour la commune"),
-      "Ni arrêté municipal récent, ni publication de la famille. "+
-      "Les alertes immédiates de la mairie restent diffusées sur Illiwap."));
-  } else {
-    const z=el("div",{class:"actu-liste"});
-    l.slice(0,3).forEach(a=>z.append(carteActu(a,true)));
-    f.append(z);
-  }
+  // Rien à signaler : la section entière disparaît, titre et encart compris.
+  // Les deux accès (Illiwap, toutes les actus) restent atteignables plus bas.
+  if(!l.length) return f;
+
+  f.append(el("div",{class:"respire"}));
+  f.append(el("div",{class:"titre-bloc",style:"margin-top:0"},"Flash info Vallouise"));
+  const z=el("div",{class:"actu-liste"});
+  l.slice(0,3).forEach(a=>z.append(carteActu(a,true)));
+  f.append(z);
   f.append(el("a",{class:"btn rouge plein",style:"margin-top:8px",href:ILLIWAP,
     target:"_blank",rel:"noopener noreferrer"},
     "Alertes de la mairie sur Illiwap ↗"));
