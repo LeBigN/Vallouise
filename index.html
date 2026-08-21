@@ -58,6 +58,13 @@ html[data-theme="dark"]{
 
 html[data-theme="dark"] .txt{color:#E5E7EB}
 html[data-theme="dark"] .mini{background:#26332F;color:#D1D5DB}
+/* encart Illiwap : fond sombre, liseré rouge, texte clair */
+html[data-theme="dark"] .mr-live{background:#241A18;border-color:#5A2A22}
+html[data-theme="dark"] .mr-live b{color:#F08A6E}
+html[data-theme="dark"] .mr-live .txt{color:#F3F4F6}
+/* onglets webcam : inactifs sombres et lisibles, actif contrasté */
+html[data-theme="dark"] .cam-onglets button{background:#1A2421;color:#E5E7EB}
+html[data-theme="dark"] .cam-onglets button.on{background:#EDF1EF;color:#12211F}
 html[data-theme="dark"] .act{background:#26332F;color:#D1D5DB}
 html[data-theme="dark"] .act-danger{background:#2E1D1A;color:#E8836A}
 html[data-theme="dark"] .mini:active{background:#33413E}
@@ -75,12 +82,11 @@ html[data-theme="dark"] .jour.passe{color:#3C4A47}
 html[data-theme="dark"] .ptr-rond{background:#1B2725;border-color:#2B3937}
 html[data-theme="dark"] .ptr-rond::after{border-color:#33413E;border-top-color:var(--meleze)}
 html[data-theme="dark"] .actu .res{color:#D1D5DB}
-html[data-theme="dark"] html[data-theme="dark"] html[data-theme="dark"] .alerte-c p{color:#E5E7EB}
+html[data-theme="dark"] .alerte-c p{color:#E5E7EB}
 html[data-theme="dark"] .a-orage{background:#221C2E;border-color:#332A45} html[data-theme="dark"] .a-orage .pic{background:#33294A;color:#C3A6E8}
 html[data-theme="dark"] .a-pluie{background:#182631;border-color:#25384A} html[data-theme="dark"] .a-pluie .pic{background:#22384A;color:#8FC2E4}
 html[data-theme="dark"] .a-neige{background:#1A272B;border-color:#27393F} html[data-theme="dark"] .a-neige .pic{background:#25383E;color:#9CC6D6}
 html[data-theme="dark"] .a-vent {background:#271F14;border-color:#3B2F1D} html[data-theme="dark"] .a-vent  .pic{background:#3B2C15;color:#E8BC7A}
-html[data-theme="dark"] html[data-theme="dark"] html[data-theme="dark"] html[data-theme="dark"] html[data-theme="dark"] .cam-onglets button{background:#26332F;color:#C2CFCB}
 html[data-theme="dark"] .sugg .badge{background:rgba(240,244,242,.94);color:#12211F}
 html[data-theme="dark"] .non-sync{background:rgba(0,0,0,.7)}
 html[data-theme="dark"] .lb{background:#0A0F0E}   /* opaque, comme en clair */
@@ -100,6 +106,13 @@ html[data-theme="auto"]{
 
 html[data-theme="auto"] .txt{color:#E5E7EB}
 html[data-theme="auto"] .mini{background:#26332F;color:#D1D5DB}
+/* encart Illiwap : fond sombre, liseré rouge, texte clair */
+html[data-theme="auto"] .mr-live{background:#241A18;border-color:#5A2A22}
+html[data-theme="auto"] .mr-live b{color:#F08A6E}
+html[data-theme="auto"] .mr-live .txt{color:#F3F4F6}
+/* onglets webcam : inactifs sombres et lisibles, actif contrasté */
+html[data-theme="auto"] .cam-onglets button{background:#1A2421;color:#E5E7EB}
+html[data-theme="auto"] .cam-onglets button.on{background:#EDF1EF;color:#12211F}
 html[data-theme="auto"] .act{background:#26332F;color:#D1D5DB}
 html[data-theme="auto"] .act-danger{background:#2E1D1A;color:#E8836A}
 html[data-theme="auto"] .mini:active{background:#33413E}
@@ -117,12 +130,11 @@ html[data-theme="auto"] .jour.passe{color:#3C4A47}
 html[data-theme="auto"] .ptr-rond{background:#1B2725;border-color:#2B3937}
 html[data-theme="auto"] .ptr-rond::after{border-color:#33413E;border-top-color:var(--meleze)}
 html[data-theme="auto"] .actu .res{color:#D1D5DB}
-html[data-theme="auto"] html[data-theme="auto"] html[data-theme="auto"] .alerte-c p{color:#E5E7EB}
+html[data-theme="auto"] .alerte-c p{color:#E5E7EB}
 html[data-theme="auto"] .a-orage{background:#221C2E;border-color:#332A45} html[data-theme="auto"] .a-orage .pic{background:#33294A;color:#C3A6E8}
 html[data-theme="auto"] .a-pluie{background:#182631;border-color:#25384A} html[data-theme="auto"] .a-pluie .pic{background:#22384A;color:#8FC2E4}
 html[data-theme="auto"] .a-neige{background:#1A272B;border-color:#27393F} html[data-theme="auto"] .a-neige .pic{background:#25383E;color:#9CC6D6}
 html[data-theme="auto"] .a-vent {background:#271F14;border-color:#3B2F1D} html[data-theme="auto"] .a-vent  .pic{background:#3B2C15;color:#E8BC7A}
-html[data-theme="auto"] html[data-theme="auto"] html[data-theme="auto"] html[data-theme="auto"] html[data-theme="auto"] .cam-onglets button{background:#26332F;color:#C2CFCB}
 html[data-theme="auto"] .sugg .badge{background:rgba(240,244,242,.94);color:#12211F}
 html[data-theme="auto"] .non-sync{background:rgba(0,0,0,.7)}
 html[data-theme="auto"] .lb{background:#0A0F0E}   /* opaque, comme en clair */
@@ -168,6 +180,7 @@ main{padding:12px 14px 20px;max-width:600px;margin:0 auto;width:100%}
 .vue.on{display:block}
 @keyframes monte{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
+.respire{height:22px}
 .titre-bloc{font-family:var(--corps);font-size:11.5px;font-weight:600;letter-spacing:.13em;
   text-transform:uppercase;color:var(--granit);margin:18px 0 8px;display:flex;align-items:center;gap:10px}
 .titre-bloc::after{content:"";flex:1;height:1px;background:var(--bord)}
@@ -785,7 +798,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v53";   // affiché dans Appart › Maintenance
+const APP_VERSION="v54";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -1634,6 +1647,16 @@ function sourceLien(u){
   if(/openrunner/.test(h))return "Openrunner"; if(/ign|geoportail/.test(h))return "IGN";
   return h||"Lien";
 }
+/* Tri unique de l'application : du plus récent au plus ancien.
+   On compare la date saisie, puis l'horodatage de création en secours. */
+const quand=o=>{
+  const d=val(o?.date)||val(o?.debut)||"";
+  const h=val(o?.heure)||"";
+  const c=o?.cree?.seconds ?? (o?.cree?.getTime? o.cree.getTime()/1000 : 0);
+  return (d?d+"T"+(h||"00:00"):"0000") + "|" + String(c).padStart(12,"0");
+};
+const parRecence=(a,b)=>quand(b)<quand(a)?-1:1;
+
 const liensDe=r=>r?.liens?.length?r.liens:(r?.lien?[r.lien]:[]);
 
 function formRando(r){
@@ -1781,7 +1804,7 @@ function rendreRandos(){
     el("b",{},"Le carnet est vide"),"Ajoute la première avec le bouton ci-dessus : celle que tu referais demain."));return;}
   z.append(el("div",{class:"meta",style:"margin:-4px 2px 10px"},
     `${mes.length} rando${mes.length>1?"s":""} enregistrée${mes.length>1?"s":""}`));
-  [...mes].sort((a,b)=>(val(b.date)||"")<(val(a.date)||"")?-1:1).forEach(r=>{
+  [...mes].sort(parRecence).forEach(r=>{
     const faite=(r.faite||[]).includes(auth.currentUser.uid);
     const mien=true;   // carnet commun : chacun peut corriger
     const photos=photosVisibles().filter(p=>p.rando===r.id);
@@ -1935,7 +1958,7 @@ function rendreVTT(){
   z.append(el("div",{class:"meta",style:"margin:-4px 2px 10px"},
     `${mes.length} sortie${mes.length>1?"s":""} · ${nb(mes.reduce((s,v)=>s+(v.km||0),0).toFixed(0))} km cumulés`));
 
-  [...mes].sort((a,b)=>(val(b.date)||"")<(val(a.date)||"")?-1:1).forEach(v=>{
+  [...mes].sort(parRecence).forEach(v=>{
     const n=nivVTT(v.niveau), mien=true;
     const photos=photosVisibles().filter(p=>p.vtt===v.id);
     const carte=el("div",{class:"carte"},
@@ -2241,7 +2264,7 @@ function ouvrirAnnuaire(){
       const g=l.filter(k=>k.cat===cat.c);
       if(!g.length)return;
       zl.append(el("div",{class:"titre-bloc"},cat.lib));
-      g.forEach(k=>zl.append(carteContact(k)));
+      [...g].sort(parRecence).forEach(k=>zl.append(carteContact(k)));
     });
   };
 
@@ -2343,7 +2366,7 @@ function rendrePeche(){
       "Taille moyenne "+(mes.reduce((s,p)=>s+p.taille,0)/mes.length).toFixed(1)+" cm"):null,
     el("button",{class:"btn fant plein",style:"margin-top:12px",onclick:pdfPeche},"Exporter le carnet en PDF")));
   z.append(el("div",{class:"titre-bloc"},"Le carnet de prises"));
-  [...S.prises].sort((a,b)=>((b.date||"")+(b.heure||""))<((a.date||"")+(a.heure||""))?-1:1).forEach(p=>{
+  [...S.prises].sort(parRecence).forEach(p=>{
     const mien=true;
     const photos=photosVisibles().filter(x=>x.prise===p.id);
     const carte=el("div",{class:"carte"},
@@ -2450,7 +2473,7 @@ async function pdfPeche(){
     let y=110; d.setFontSize(9);d.setTextColor(127,138,134);
     ["Date","Espèce","Taille","Lieu","Par"].forEach((t,i)=>d.text(t,[40,120,250,320,480][i],y));
     y+=8;d.setDrawColor(228,233,230);d.line(40,y,555,y);y+=16;
-    [...S.prises].sort((a,b)=>(b.date||"")<(a.date||"")?-1:1).forEach(p=>{
+    [...S.prises].sort(parRecence).forEach(p=>{
       if(y>770){d.addPage();y=60;}
       d.setTextColor(18,33,31);d.setFontSize(10);
       d.text(jolie(p.date),40,y);
@@ -2573,7 +2596,7 @@ function rendrePlans(){
   CATS.forEach(cat=>{
     const l=S.plans.filter(p=>p.cat===cat);if(!l.length)return;
     z.append(el("div",{class:"titre-bloc"},cat));
-    l.sort((a,b)=>(b.note||0)-(a.note||0)).forEach(p=>{
+    l.sort(parRecence).forEach(p=>{
       const mien=true;
       const photos=photosVisibles().filter(x=>x.plan===p.id);
       const carte=el("div",{class:"carte"},
@@ -2667,7 +2690,7 @@ function rendreInfos(){
     el("p",{class:"txt",style:"margin:0 0 12px"},
       "Secours, mairie, commerces et taxis de la vallée, avec appel et itinéraire en un geste."),
     el("button",{class:"btn plein",onclick:ouvrirAnnuaire},"Ouvrir l'annuaire")));
-  z.append(el("div",{class:"titre-bloc"},"Le mode d'emploi de l'appart"));
+  z.append(el("div",{class:"titre-bloc"},"Fiches utiles"));
   const fiches=S.infos.filter(i=>i.wifi!==true);
   if(!fiches.length)z.append(el("div",{class:"vide"},el("b",{},"Rien de noté"),
     "La vanne d'eau, le jour des poubelles, la notice du poêle."));
@@ -3458,10 +3481,6 @@ function rendreAccueil(){
   z.innerHTML="";
   z.append(el("div",{id:"vigilance"}));
 
-  const zFlash=el("div",{id:"flash"});
-  zFlash.append(blocFlash());
-  z.append(zFlash);
-
   const futurs=S.sejours.filter(s=>s.fin>=auj()).sort((a,b)=>a.debut<b.debut?-1:1);
   const enCours=futurs.find(s=>s.debut<=auj()), prochain=enCours||futurs[0];
   z.append(el("div",{class:"titre-bloc"},enCours?"En ce moment à l'appart":"Prochain séjour"));
@@ -3497,14 +3516,14 @@ function rendreAccueil(){
   majCam();
 
 
-  /* ── Randonnées suggérées : même module que dans l'onglet Sorties ── */
+  /* ── Randonnées suggérées, détachées du bloc précédent ── */
+  z.append(el("div",{class:"respire"}));
   z.append(blocSuggestions());
 
-  z.append(el("div",{class:"titre-bloc"},"Numéros utiles"));
-  z.append(el("div",{class:"carte"},
-    el("p",{class:"txt",style:"margin:0 0 12px"},
-      "Secours, mairie, commerces et taxis de la vallée : appel et itinéraire en un geste."),
-    el("button",{class:"btn plein",onclick:ouvrirAnnuaire},"Ouvrir l'annuaire")));
+  /* ── Flash info, juste sous les randonnées ── */
+  const zFlash=el("div",{id:"flash"});
+  zFlash.append(blocFlash());
+  z.append(zFlash);
 
 
   /* ── Actualités ───────────────────────────────────────────── */
