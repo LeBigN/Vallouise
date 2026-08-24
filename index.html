@@ -95,6 +95,11 @@ html[data-theme="dark"] .reseau.off{background:#33413E;color:#EDF1EF}
 html[data-theme="dark"] .recap{background:#212E2B}
 
 @media (prefers-color-scheme: dark){
+html[data-theme="auto"] .jour.we{background:rgba(255,255,255,.08)}
+html[data-theme="auto"] .jour.vac{background:repeating-linear-gradient(45deg,
+  rgba(255,255,255,.11) 0 4px, rgba(255,255,255,.02) 4px 8px)}
+html[data-theme="auto"] .jour.we.vac{background:repeating-linear-gradient(45deg,
+  rgba(255,255,255,.16) 0 4px, rgba(255,255,255,.06) 4px 8px)}
 html[data-theme="auto"]{
   --nuit:#F3F4F6; --ardoise:#D1D5DB; --granit:#9CA3AF;
   --brume:#26332F; --bord:#2B3937; --neve:#141E1C; --blanc:#1B2725;
@@ -278,6 +283,26 @@ a.btn,a.mini{text-decoration:none}
 .jour:active{transform:scale(.9)}
 .jour.hors{visibility:hidden;pointer-events:none}
 .jour.passe{color:#C3CBC7}
+/* Repères de fond, empilés du plus discret au plus marqué.
+   Les séjours (.pris) passent au-dessus grâce à leur couleur pleine. */
+.jour.we{background:rgba(18,33,31,.08)}
+.jour.vac{background:repeating-linear-gradient(45deg,
+  rgba(18,33,31,.10) 0 4px, rgba(18,33,31,.02) 4px 8px)}
+.jour.we.vac{background:repeating-linear-gradient(45deg,
+  rgba(18,33,31,.15) 0 4px, rgba(18,33,31,.06) 4px 8px)}
+.jour.ferie{box-shadow:inset 0 0 0 1.5px rgba(196,71,44,.45);font-weight:700}
+.jour.ferie::after{content:"";position:absolute;top:3px;right:3px;
+  width:5px;height:5px;border-radius:50%;background:var(--alerte)}
+.jour.pris{background-image:none!important}
+.legende .lg-we{background:rgba(18,33,31,.12)}
+.legende .lg-vac{background:repeating-linear-gradient(45deg,
+  var(--granit) 0 3px, transparent 3px 6px);border:1px solid var(--bord)}
+.legende .lg-ferie{background:var(--alerte)}
+html[data-theme="dark"] .jour.we{background:rgba(255,255,255,.08)}
+html[data-theme="dark"] .jour.vac{background:repeating-linear-gradient(45deg,
+  rgba(255,255,255,.11) 0 4px, rgba(255,255,255,.02) 4px 8px)}
+html[data-theme="dark"] .jour.we.vac{background:repeating-linear-gradient(45deg,
+  rgba(255,255,255,.16) 0 4px, rgba(255,255,255,.06) 4px 8px)}
 .jour.auj{box-shadow:inset 0 0 0 1.5px var(--nuit);font-weight:700}
 .jour.pris{color:var(--blanc);font-weight:600}
 .jour.deb{border-radius:9px 3px 3px 9px}
@@ -734,6 +759,13 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
     <div class="titre-bloc">Maintenance</div>
     <div class="carte">
       <div class="entre">
+        <div><b>Droits d'écriture</b><div class="meta">Vérifie ce que le serveur autorise</div></div>
+        <button class="btn fant" id="test-droits">Tester</button>
+      </div>
+      <div id="res-droits" class="meta" style="margin-top:10px;line-height:1.6"></div>
+    </div>
+    <div class="carte">
+      <div class="entre">
         <div><b>Version installée</b><div class="meta" id="version-app">—</div></div>
         <button class="btn fant" id="maj-btn">Forcer la mise à jour</button>
       </div>
@@ -798,7 +830,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v55";   // affiché dans Appart › Maintenance
+const APP_VERSION="v57";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -896,11 +928,20 @@ function ecrire(promesse,msgOk,apres){
   apres?.(); if(msgOk) toast(msgOk);
   enAttente++; majReseau();
   promesse.then(()=>{enAttente=Math.max(0,enAttente-1);majReseau();})
-    .catch(err=>{enAttente=Math.max(0,enAttente-1);majReseau();console.error(err);
+    .catch(err=>{
+      enAttente=Math.max(0,enAttente-1);majReseau();console.error(err);
       const c=err?.code||"";
-      toast(c.includes("permission")
-        ? "Écriture refusée : les règles Firestore doivent être mises à jour (voir README)."
-        : "Échec de l'enregistrement — "+(err?.message||c||"raison inconnue"), true);});
+      if(c.includes("permission")){
+        // message long et explicite : c'est presque toujours la même cause
+        toast("Refusé par Firestore. Appart › Maintenance › Tester les droits d'écriture "+
+              "pour savoir quelles règles republier.",true);
+      } else {
+        toast("Échec de l'enregistrement — "+(err?.message||c||"raison inconnue"),true);
+      }
+      // on redessine : l'écran ne doit pas montrer un changement qui n'a pas eu lieu
+      rendreSejours();rendreRandos();rendreVTT();rendrePeche();rendrePlans();
+      rendreInfos();rendrePhotos();rendreAccueil();
+    });
 }
 addEventListener("unhandledrejection",e=>console.error(e.reason));
 addEventListener("error",e=>{
@@ -1492,6 +1533,59 @@ function consigne(){
 }
 function demarrerSel(){S.selMode=true;S.selDeb=null;dessinerCal();
   $("#bloc-cal").scrollIntoView({behavior:"smooth",block:"center"});}
+/* ═══════════════════════════════════════════════════════════
+   REPÈRES DU CALENDRIER — jours fériés et vacances scolaires
+   Les dates viennent de sources officielles, jamais écrites en dur :
+   · jours fériés  : API Etalab (calendrier.api.gouv.fr)
+   · vacances Zone B : jeu de données du ministère de l'Éducation
+   En cas d'échec, aucun repère n'est affiché plutôt qu'une date fausse.
+   ═══════════════════════════════════════════════════════════ */
+let FERIES={}, VACANCES=[];
+
+const cacheLire=(cle,heures)=>{
+  try{
+    const b=JSON.parse(localStorage.getItem(cle)||"null");
+    if(b && (Date.now()-b.t)/36e5 < heures) return b.v;
+  }catch(e){}
+  return null;
+};
+const cacheEcrire=(cle,v)=>{
+  try{ localStorage.setItem(cle,JSON.stringify({t:Date.now(),v})); }catch(e){}
+};
+
+async function chargerFeries(){
+  const c=cacheLire("vl-feries",24*30);
+  if(c){ FERIES=c; return; }
+  try{
+    const r=await fetch("https://calendrier.api.gouv.fr/jours-feries/metropole.json");
+    if(!r.ok) throw new Error(r.status);
+    FERIES=await r.json();
+    cacheEcrire("vl-feries",FERIES);
+  }catch(e){ console.warn("jours fériés :",e.message); }
+}
+
+async function chargerVacances(){
+  const c=cacheLire("vl-vacances",24*30);
+  if(c){ VACANCES=c; return; }
+  try{
+    const u="https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/"
+      +"fr-en-calendrier-scolaire/records?limit=100"
+      +"&refine="+encodeURIComponent('zone:"Zone B"')
+      +"&refine="+encodeURIComponent('population:"-"');
+    const r=await fetch(u);
+    if(!r.ok) throw new Error(r.status);
+    const j=await r.json();
+    VACANCES=(j.results||[]).map(x=>({
+      nom:x.description||x.libelle||"Vacances",
+      debut:(x.start_date||"").slice(0,10),
+      fin:(x.end_date||"").slice(0,10)
+    })).filter(v=>v.debut&&v.fin);
+    if(VACANCES.length) cacheEcrire("vl-vacances",VACANCES);
+  }catch(e){ console.warn("vacances scolaires :",e.message); }
+}
+
+const vacanceDu=d=>VACANCES.find(v=>d>=v.debut && d<=v.fin);
+
 function dessinerCal(){
   const c=$("#cal");if(!c)return;c.innerHTML="";
   const d=S.curseur,an=d.getFullYear(),mo=d.getMonth();
@@ -1512,7 +1606,16 @@ function dessinerCal(){
     if(date===auj())cl.push("auj");
     if(date<auj())cl.push("passe");
     if(!dessus.length)cl.push("libre");
-    const cell=el("div",{class:cl.join(" "),onclick:()=>toucherJour(date,dessus)},String(j));
+    // repères de fond, sous les séjours : week-end, férié, vacances Zone B
+    const jsem=new Date(an,mo,j).getDay();
+    const ferie=FERIES[date];
+    const vac=vacanceDu(date);
+    if(jsem===0||jsem===6) cl.push("we");
+    if(vac) cl.push("vac");
+    if(ferie) cl.push("ferie");
+    const infos=[ferie||null, vac?vac.nom+" (Zone B)":null].filter(Boolean);
+    const cell=el("div",{class:cl.join(" "),onclick:()=>toucherJour(date,dessus,infos),
+      title:infos.join(" · ")||null},String(j));
     if(dessus.length){
       cell.style.background=membre(dessus[0].uid).couleur;cell.classList.add("pris");
       const av=dessus.some(x=>decale(date,-1)>=x.debut&&decale(date,-1)<x.fin);
@@ -1526,7 +1629,13 @@ function dessinerCal(){
   const lg=$("#legende");lg.innerHTML="";
   [...uids].forEach(u=>{const m=membre(u);
     lg.append(el("span",{},el("i",{style:`background:${m.couleur}`}),m.nom));});
-  lg.style.display=uids.size?"flex":"none";
+  // légende des repères, affichée seulement si le mois en contient
+  const aFerie=[...c.children].some(e=>e.classList?.contains("ferie"));
+  const aVac=[...c.children].some(e=>e.classList?.contains("vac"));
+  if(aFerie) lg.append(el("span",{},el("i",{class:"lg-ferie"}),"Jour férié"));
+  if(aVac)   lg.append(el("span",{},el("i",{class:"lg-vac"}),"Vacances Zone B"));
+  lg.append(el("span",{},el("i",{class:"lg-we"}),"Week-end"));
+  lg.style.display="flex";
 }
 /* lectureSeule : l'encart de l'accueil informe, il ne modifie rien.
    L'édition reste dans l'onglet Séjours. */
@@ -1546,12 +1655,15 @@ function ligneSejour(s,dansFeuille,lectureSeule){
     s.note?el("p",{class:"txt"},val(s.note)):null);
   return c;
 }
-function toucherJour(date,dessus){
+function toucherJour(date,dessus,infos){
   if(S.selMode){
     if(date<auj())return toast("Ce jour est déjà passé");
     if(!S.selDeb||date<=S.selDeb){S.selDeb=date;dessinerCal();return;}
     const deb=S.selDeb,f=date;S.selMode=false;S.selDeb=null;dessinerCal();formSejour(deb,f);return;}
-  if(!dessus.length){S.selMode=true;S.selDeb=date;dessinerCal();
+  if(!dessus.length){
+    // un jour libre marqué férié ou vacances : on le dit avant de poser des dates
+    if(infos?.length) toast(jolie(date)+" · "+infos.join(" · "));
+    S.selMode=true;S.selDeb=date;dessinerCal();
     toast("Touche maintenant le jour du départ");return;}
   const c=el("div");
   c.append(el("p",{class:"meta"},jolie(date)));
@@ -2020,7 +2132,6 @@ function formWifi(){
   const w=docWifi();
   const c=el("div");
   c.append(
-    el("p",{class:"meta"},"Visible par toute la famille, mise à jour instantanée sur tous les téléphones."),
     el("label",{},"Nom du réseau (SSID)"),
     el("input",{id:"w-ssid",placeholder:"Vallouise_Appart",value:val(w?.ssid)}),
     el("label",{},"Mot de passe"),
@@ -2049,8 +2160,7 @@ function blocWifi(){
       el("b",{},"Wi-Fi")),
     el("button",{class:"mini",onclick:formWifi},w?"Modifier":"Configurer")));
   if(!w||!w.ssid){
-    z.append(el("p",{class:"txt",style:"margin-top:8px"},
-      "Aucun réseau enregistré. Renseigne-le une fois, tout le monde l'aura."));
+    z.append(el("p",{class:"txt",style:"margin-top:8px"},"Aucun réseau enregistré."));
     return z;
   }
   z.append(
@@ -2533,6 +2643,9 @@ function formPlan(p){
     el("select",{id:"p-note",html:[5,4,3,2,1].map(n=>`<option value="${n}" ${p?.note==n?"selected":""}>${"★".repeat(n)}</option>`).join("")}),
     el("label",{},"Lieu / adresse"),
     el("input",{id:"p-adr",placeholder:"Place de l'Église, Vallouise",value:val(p?.adresse)}),
+    el("label",{},"Lien web / site internet (facultatif)"),
+    el("input",{id:"p-url",type:"url",inputmode:"url",
+      placeholder:"https://… réservation, carte, page du lieu",value:val(p?.url)}),
     el("button",{class:"btn fant plein",id:"p-geo",style:"margin-top:8px"},"Me géolocaliser"),
     el("div",{id:"p-gps",style:"margin-top:6px"}),
     el("label",{},"Pourquoi c'est bien"),
@@ -2544,7 +2657,7 @@ function formPlan(p){
     el("button",{class:"btn accent plein",style:"margin-top:16px",onclick:()=>{
       const nom=$("#p-nom").value.trim();if(!nom)return toast("Il manque le nom");
       const d={nom,cat:$("#p-cat").value,note:+$("#p-note").value,
-        adresse:$("#p-adr").value.trim(),gps,
+        adresse:$("#p-adr").value.trim(),url:$("#p-url").value.trim(),gps,
         texte:$("#p-txt").value.trim(),...auteurConserve(p)};
       const ref=p?doc(db,"plans",p.id):doc(collection(db,"plans"));
       ecrire(p?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
@@ -2609,6 +2722,9 @@ function rendrePlans(){
           onclick:()=>ouvrirPhoto(x,photos)})));
         carte.append(bande);}
       const zlp=el("div",{class:"liens-gauche"});
+      // bouton affiché uniquement si une adresse web est renseignée
+      if(val(p.url)) zlp.append(el("a",{class:"mini",href:p.url,
+        target:"_blank",rel:"noopener noreferrer"},"Ouvrir le site ↗"));
       if(p.gps||p.adresse){
         const cible=p.gps?`${p.gps.lat},${p.gps.lon}`
           :encodeURIComponent([p.nom,val(p.adresse)].filter(Boolean).join(", "));
@@ -3614,6 +3730,38 @@ async function forcerMaj(){
   location.replace(location.pathname+"?maj="+Date.now());
 }
 $("#maj-btn").onclick=forcerMaj;
+
+/* Écrit puis efface un document témoin dans chaque collection : dit exactement
+   quelles règles Firestore bloquent la modification depuis cet appareil. */
+const COLLECTIONS=["sejours","randos","vtt","prises","plans","photos","infos","liens","annuaire"];
+$("#test-droits").onclick=async e=>{
+  const b=e.currentTarget, z=$("#res-droits");
+  b.disabled=true; b.textContent="Test…"; z.textContent="";
+  const u=auth.currentUser?.uid;
+  if(!u){ z.textContent="Session non établie. Réessaie dans quelques secondes.";
+    b.disabled=false; b.textContent="Tester"; return; }
+  const lignes=[];
+  for(const col of COLLECTIONS){
+    const ref=doc(collection(db,col));
+    try{
+      await setDoc(ref,{__test:true,uid:u,cree:serverTimestamp()});
+      // on se fait passer pour un autre auteur : c'est le cas qui échouait
+      await updateDoc(ref,{__test:true,uid:"autre-membre"});
+      await deleteDoc(ref);
+      lignes.push("✓ "+col);
+    }catch(err){
+      lignes.push("✗ "+col+" — "+(err?.code||err?.message||"refusé"));
+      try{ await deleteDoc(ref); }catch(_){}
+    }
+  }
+  const ko=lignes.filter(l=>l.startsWith("✗"));
+  z.innerHTML="";
+  z.append(el("div",{},lignes.join(" · ")));
+  z.append(el("div",{style:"margin-top:8px;font-weight:600"},
+    ko.length ? ko.length+" collection(s) refusée(s) : republie les règles du README."
+              : "Tout est autorisé : chacun peut modifier et supprimer partout."));
+  b.disabled=false; b.textContent="Retester";
+};
 $("#version-app").textContent=APP_VERSION+" · déposée le "+
   new Date(document.lastModified).toLocaleDateString("fr-FR");
 
@@ -3698,6 +3846,8 @@ onAuthStateChanged(auth,user=>{
     return;}
   $("#boot")?.remove();
   majUrgence(); majReseau(); rendreTheme(); aller("accueil");
+  // repères du calendrier : sources officielles, mises en cache un mois
+  Promise.all([chargerFeries(),chargerVacances()]).then(()=>dessinerCal());
   // relevé mairie (dont la vigilance officielle) dès le démarrage
   chargerMairie().then(()=>{ rendreAccueil(); chargerMeteo(); });
   // vigilance officielle en direct, puis redessin
