@@ -78,7 +78,10 @@ html[data-theme="dark"] .vide{background:#1B2725;border-color:#2B3937}
 html[data-theme="dark"] nav{background:var(--blanc)}   /* opaque, identique au fond racine */
 html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#141E1C;border-color:#2B3937;color:#EDF1EF}
 html[data-theme="dark"] input:focus,html[data-theme="dark"] select:focus,html[data-theme="dark"] textarea:focus{box-shadow:0 0 0 3px rgba(224,122,31,.18)}
-html[data-theme="dark"] .jour.passe{color:#3C4A47}
+html[data-theme="dark"] .jour.passe{color:#B4C0BD}
+html[data-theme="dark"] .legende .lg-we{background:rgba(255,255,255,.22)}
+html[data-theme="dark"] .legende .lg-vac{background:repeating-linear-gradient(45deg,
+  rgba(255,255,255,.5) 0 3px, transparent 3px 6px);border-color:rgba(255,255,255,.2)}   /* était illisible sur fond sombre */
 html[data-theme="dark"] .ptr-rond{background:#1B2725;border-color:#2B3937}
 html[data-theme="dark"] .ptr-rond::after{border-color:#33413E;border-top-color:var(--meleze)}
 html[data-theme="dark"] .actu .res{color:#D1D5DB}
@@ -95,11 +98,13 @@ html[data-theme="dark"] .reseau.off{background:#33413E;color:#EDF1EF}
 html[data-theme="dark"] .recap{background:#212E2B}
 
 @media (prefers-color-scheme: dark){
-html[data-theme="auto"] .jour.we{background:rgba(255,255,255,.08)}
+html[data-theme="auto"] .jour.we{background:rgba(255,255,255,.16);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10)}
 html[data-theme="auto"] .jour.vac{background:repeating-linear-gradient(45deg,
   rgba(255,255,255,.11) 0 4px, rgba(255,255,255,.02) 4px 8px)}
 html[data-theme="auto"] .jour.we.vac{background:repeating-linear-gradient(45deg,
-  rgba(255,255,255,.16) 0 4px, rgba(255,255,255,.06) 4px 8px)}
+  rgba(255,255,255,.26) 0 4px, rgba(255,255,255,.13) 4px 8px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10)}
 html[data-theme="auto"]{
   --nuit:#F3F4F6; --ardoise:#D1D5DB; --granit:#9CA3AF;
   --brume:#26332F; --bord:#2B3937; --neve:#141E1C; --blanc:#1B2725;
@@ -131,7 +136,10 @@ html[data-theme="auto"] .vide{background:#1B2725;border-color:#2B3937}
 html[data-theme="auto"] nav{background:var(--blanc)}   /* opaque, identique au fond racine */
 html[data-theme="auto"] input,html[data-theme="auto"] select,html[data-theme="auto"] textarea{background:#141E1C;border-color:#2B3937;color:#EDF1EF}
 html[data-theme="auto"] input:focus,html[data-theme="auto"] select:focus,html[data-theme="auto"] textarea:focus{box-shadow:0 0 0 3px rgba(224,122,31,.18)}
-html[data-theme="auto"] .jour.passe{color:#3C4A47}
+html[data-theme="auto"] .jour.passe{color:#B4C0BD}
+html[data-theme="auto"] .legende .lg-we{background:rgba(255,255,255,.22)}
+html[data-theme="auto"] .legende .lg-vac{background:repeating-linear-gradient(45deg,
+  rgba(255,255,255,.5) 0 3px, transparent 3px 6px);border-color:rgba(255,255,255,.2)}   /* était illisible sur fond sombre */
 html[data-theme="auto"] .ptr-rond{background:#1B2725;border-color:#2B3937}
 html[data-theme="auto"] .ptr-rond::after{border-color:#33413E;border-top-color:var(--meleze)}
 html[data-theme="auto"] .actu .res{color:#D1D5DB}
@@ -191,6 +199,9 @@ main{padding:12px 14px 20px;max-width:600px;margin:0 auto;width:100%}
 .titre-bloc::after{content:"";flex:1;height:1px;background:var(--bord)}
 .titre-bloc:first-child{margin-top:2px}
 
+.cliquable{cursor:pointer}
+@media (hover:hover) and (pointer:fine){.cliquable:hover{box-shadow:var(--ombre-h)}}
+.cliquable:active{transform:scale(.995)}
 .carte{background:var(--blanc);border-radius:var(--r);padding:13px 14px 8px;
   border:1px solid var(--bord);box-shadow:var(--ombre);margin-bottom:8px}
 /* Séjours : nom, dates et actions sur une seule ligne */
@@ -282,7 +293,7 @@ a.btn,a.mini{text-decoration:none}
   font-size:13.5px;position:relative;transition:transform .1s}
 .jour:active{transform:scale(.9)}
 .jour.hors{visibility:hidden;pointer-events:none}
-.jour.passe{color:#C3CBC7}
+.jour.passe{color:#7A8582}
 /* Repères de fond, empilés du plus discret au plus marqué.
    Les séjours (.pris) passent au-dessus grâce à leur couleur pleine. */
 .jour.we{background:rgba(18,33,31,.08)}
@@ -298,11 +309,13 @@ a.btn,a.mini{text-decoration:none}
 .legende .lg-vac{background:repeating-linear-gradient(45deg,
   var(--granit) 0 3px, transparent 3px 6px);border:1px solid var(--bord)}
 .legende .lg-ferie{background:var(--alerte)}
-html[data-theme="dark"] .jour.we{background:rgba(255,255,255,.08)}
+html[data-theme="dark"] .jour.we{background:rgba(255,255,255,.16);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10)}
 html[data-theme="dark"] .jour.vac{background:repeating-linear-gradient(45deg,
   rgba(255,255,255,.11) 0 4px, rgba(255,255,255,.02) 4px 8px)}
 html[data-theme="dark"] .jour.we.vac{background:repeating-linear-gradient(45deg,
-  rgba(255,255,255,.16) 0 4px, rgba(255,255,255,.06) 4px 8px)}
+  rgba(255,255,255,.26) 0 4px, rgba(255,255,255,.13) 4px 8px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10)}
 .jour.auj{box-shadow:inset 0 0 0 1.5px var(--nuit);font-weight:700}
 .jour.pris{color:var(--blanc);font-weight:600}
 .jour.deb{border-radius:9px 3px 3px 9px}
@@ -383,10 +396,40 @@ textarea{min-height:78px;resize:vertical}
   .photos{grid-template-columns:repeat(4,1fr)}
   .sugg,.actu{width:264px}
 }
+/* ── Ordinateur : on occupe la largeur au lieu d'une colonne étroite ──
+   Les listes passent en grille de cartes, le calendrier et le carnet
+   se placent côte à côte. */
 @media(min-width:1000px){
-  main{max-width:860px}
-  .photos{grid-template-columns:repeat(5,1fr)}
-  nav{padding-left:calc(50vw - 430px);padding-right:calc(50vw - 430px)}
+  main{max-width:1180px;padding:20px 24px 28px}
+  .photos{grid-template-columns:repeat(6,1fr)}
+  .feuille{max-width:780px;margin:0 auto}
+  /* deux colonnes pour les listes de fiches */
+  #liste-randos, #liste-vtt, #liste-peche, #liste-plans, #liste-sejours, #liste-infos{
+    display:grid;grid-template-columns:1fr 1fr;gap:0 16px;align-items:start}
+  #liste-randos > .titre-bloc, #liste-vtt > .titre-bloc, #liste-peche > .titre-bloc,
+  #liste-plans > .titre-bloc, #liste-sejours > .titre-bloc, #liste-infos > .titre-bloc,
+  #liste-randos > .btn, #liste-vtt > .btn, #liste-peche > .btn,
+  #liste-plans > .btn, #liste-sejours > .btn, #liste-infos > .btn,
+  #liste-randos > .carrousel, #liste-vtt > .carrousel, #liste-peche > .carrousel,
+  #liste-randos > .meta, #liste-vtt > .meta, #liste-peche > .meta,
+  #liste-plans > .meta, #liste-sejours > .meta, #liste-infos > .meta,
+  #liste-randos > .vide, #liste-vtt > .vide, #liste-peche > .vide,
+  #liste-plans > .vide, #liste-sejours > .vide, #liste-infos > .vide,
+  #liste-infos > .wifi-bulle{grid-column:1 / -1}
+  /* accueil : deux colonnes également */
+  #accueil{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;align-items:start}
+  #accueil > .titre-bloc, #accueil > .respire{grid-column:1 / -1}
+  #accueil .carrousel{grid-column:1 / -1}
+  .carrousel{overflow-x:visible;flex-wrap:wrap}
+  .sugg,.actu{width:calc(33.33% - 8px)}
+  nav{padding-left:calc(50vw - 590px);padding-right:calc(50vw - 590px)}
+  .fab{right:calc(50vw - 590px + 16px)}
+}
+@media(min-width:1400px){
+  main{max-width:1320px}
+  #liste-randos, #liste-vtt, #liste-peche, #liste-plans{grid-template-columns:repeat(3,1fr)}
+  nav{padding-left:calc(50vw - 660px);padding-right:calc(50vw - 660px)}
+  .fab{right:calc(50vw - 660px + 16px)}
 }
 
 /* ── Navigation ─────────────────────────────────────────────── */
@@ -759,24 +802,9 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
     <div class="titre-bloc">Maintenance</div>
     <div class="carte">
       <div class="entre">
-        <div><b>Droits d'écriture</b><div class="meta">Vérifie ce que le serveur autorise</div></div>
-        <button class="btn fant" id="test-droits">Tester</button>
-      </div>
-      <div id="res-droits" class="meta" style="margin-top:10px;line-height:1.6"></div>
-    </div>
-    <div class="carte">
-      <div class="entre">
         <div><b>Version installée</b><div class="meta" id="version-app">—</div></div>
         <button class="btn fant" id="maj-btn">Forcer la mise à jour</button>
       </div>
-      <p class="txt" style="white-space:normal;margin-top:10px">Si l'app ne se comporte pas comme
-      annoncé après un dépôt sur GitHub, c'est presque toujours l'ancienne version qui tourne encore
-      en cache. Ce bouton la remplace immédiatement.</p>
-    </div>
-    <div class="carte">
-      <b>Réinitialiser l'application</b>
-      <p class="txt" style="white-space:normal">Vide le cache local de cet appareil : données hors ligne, prénom retenu, contact d'urgence et configuration. <b>Rien n'est supprimé pour les autres</b> — tout ce qui est déjà synchronisé revient au prochain lancement.</p>
-      <button class="btn rouge plein" id="reset-btn" style="margin-top:12px">Réinitialiser</button>
     </div>
     <button class="mini" id="cfg-lien" style="margin-top:4px">Configuration Firebase</button>
   </section>
@@ -830,7 +858,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v57";   // affiché dans Appart › Maintenance
+const APP_VERSION="v59";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -1542,6 +1570,19 @@ function demarrerSel(){S.selMode=true;S.selDeb=null;dessinerCal();
    ═══════════════════════════════════════════════════════════ */
 let FERIES={}, VACANCES=[];
 
+/* Repli vérifié — Zone B (Aix-Marseille, dont les Bouches-du-Rhône),
+   année scolaire 2026-2027, d'après l'arrêté publié au Journal officiel
+   des 22-23 octobre 2025. Départ le samedi après la classe, reprise le
+   lundi matin : le dernier jour de vacances est donc le dimanche.
+   Utilisé seulement si le jeu de données officiel n'est pas joignable. */
+const VACANCES_ZONE_B_2627=[
+  {nom:"Vacances de la Toussaint", debut:"2026-10-17", fin:"2026-11-01"},
+  {nom:"Vacances de Noël",         debut:"2026-12-19", fin:"2027-01-03"},
+  {nom:"Vacances d'hiver",         debut:"2027-02-20", fin:"2027-03-07"},
+  {nom:"Vacances de printemps",    debut:"2027-04-17", fin:"2027-05-02"},
+  {nom:"Vacances d'été",           debut:"2027-07-03", fin:"2027-08-31"}
+];
+
 const cacheLire=(cle,heures)=>{
   try{
     const b=JSON.parse(localStorage.getItem(cle)||"null");
@@ -1581,7 +1622,11 @@ async function chargerVacances(){
       fin:(x.end_date||"").slice(0,10)
     })).filter(v=>v.debut&&v.fin);
     if(VACANCES.length) cacheEcrire("vl-vacances",VACANCES);
-  }catch(e){ console.warn("vacances scolaires :",e.message); }
+    else throw new Error("aucune période trouvée");
+  }catch(e){
+    console.warn("vacances scolaires :",e.message,"— repli sur les dates vérifiées");
+    VACANCES=VACANCES_ZONE_B_2627;
+  }
 }
 
 const vacanceDu=d=>VACANCES.find(v=>d>=v.debut && d<=v.fin);
@@ -1650,7 +1695,7 @@ function ligneSejour(s,dansFeuille,lectureSeule){
   if(!lectureSeule) ligne.append(el("div",{class:"sej-act"},
     actModifier(()=>formSejour(s.debut,s.fin,s)),
     actSupprimer(()=>{ if(confirm("Annuler ce séjour ?"))
-      ecrire(deleteDoc(doc(db,"sejours",s.id)),"Séjour annulé",dansFeuille?fermer:null); })));
+      supprimerDoc("sejours",s.id,"Séjour",dansFeuille?fermer:null); })));
   const c=el("div",{class:"carte"}, ligne,
     s.note?el("p",{class:"txt"},val(s.note)):null);
   return c;
@@ -1769,6 +1814,26 @@ const quand=o=>{
 };
 const parRecence=(a,b)=>quand(b)<quand(a)?-1:1;
 
+/* ═══════════════════════════════════════════════════════════
+   FICHE EN PLEIN ÉCRAN
+   Un appui sur le corps d'une carte ouvre le détail complet.
+   Les boutons d'action gardent leur propre comportement.
+   ═══════════════════════════════════════════════════════════ */
+function ouvrirFiche(titre, construire){
+  const c=el("div");
+  construire(c);
+  feuille(titre,c);
+}
+/* Rend le corps d'une carte cliquable sans gêner les boutons */
+function carteCliquable(carte, ouvrir){
+  carte.classList.add("cliquable");
+  carte.addEventListener("click",e=>{
+    if(e.target.closest("button,a,input,select,textarea,.bande-photos")) return;
+    ouvrir();
+  });
+  return carte;
+}
+
 const liensDe=r=>r?.liens?.length?r.liens:(r?.lien?[r.lien]:[]);
 
 function formRando(r){
@@ -1880,6 +1945,39 @@ function blocSuggestions(){
 
 /* Même principe que pour les photos : la rando disparaît à l'instant du clic
    et reste masquée, même si le serveur refuse ou tarde à confirmer. */
+/* ═══════════════════════════════════════════════════════════
+   SUPPRESSION GÉNÉRIQUE
+   La fiche disparaît immédiatement de l'écran et le reste, même si
+   Firestore refuse. Dans ce cas on le dit clairement : masquée ici,
+   toujours présente pour les autres tant que les règles ne sont pas ouvertes.
+   ═══════════════════════════════════════════════════════════ */
+const MASQUES=new Set(JSON.parse(localStorage.getItem("vl-masques")||"[]"));
+const cleMasque=(col,id)=>col+"/"+id;
+const estMasque=(col,id)=>MASQUES.has(cleMasque(col,id));
+function masquer(col,id){
+  MASQUES.add(cleMasque(col,id));
+  localStorage.setItem("vl-masques",JSON.stringify([...MASQUES]));
+}
+function supprimerDoc(col,id,libelle,apres){
+  masquer(col,id);
+  if(S[col]) S[col]=S[col].filter(x=>x.id!==id);
+  redessinerTout(); apres?.();
+  deleteDoc(doc(db,col,id))
+    .then(()=>toast(libelle+" supprimé"+(libelle.endsWith("e")?"e":"")))
+    .catch(err=>{
+      console.error("suppression "+col,err);
+      const c=err?.code||"";
+      toast(c.includes("permission")
+        ? "Masqué ici seulement : Firestore refuse la suppression dans « "+col+" ». "+
+          "Republie les règles (Appart › Maintenance › Tester les droits)."
+        : "Suppression impossible — "+(err?.message||c), true);
+    });
+}
+function redessinerTout(){
+  rendreSejours();rendreRandos();rendreVTT();rendrePeche();
+  rendrePlans();rendreInfos();rendrePhotos();rendreAccueil();
+}
+
 const randosMasquees=new Set(JSON.parse(localStorage.getItem("vl-randos-masquees")||"[]"));
 function supprimerRando(r){
   const id=r.id;
@@ -1941,6 +2039,22 @@ function rendreRandos(){
       actPartager(()=>partager(texteRando(r))),
       actModifier(()=>formRando(r)),
       actSupprimer(()=>{ if(confirm("Supprimer cette rando ?")) supprimerRando(r); })));
+    carteCliquable(carte,()=>ouvrirFiche(r.nom,z2=>{
+      z2.append(el("div",{class:"meta"},
+        [r.date?jolie(r.date):null,val(r.depart),r.trace?.km?`↔ ${r.trace.km} km`:null,
+         r.denivele?`▲ ${nb(r.denivele)} m`:null,r.duree?`⏱ ${r.duree} h`:null,
+         val(r.niveau)].filter(Boolean).join("  ·  ")));
+      if(val(r.texte)) z2.append(el("p",{class:"txt"},val(r.texte)));
+      const ph=photosVisibles().filter(x=>x.rando===r.id);
+      if(ph.length){const bd=el("div",{class:"photos",style:"margin-top:12px"});
+        ph.forEach(x=>bd.append(el("img",{src:x.data,alt:"",loading:"lazy",
+          onclick:()=>ouvrirPhoto(x,ph)})));z2.append(bd);}
+      const tr=dessinerTrace(r.trace); if(tr) z2.append(tr);
+      liensDe(r).forEach(l=>z2.append(el("a",{class:"btn fant plein",style:"margin-top:8px",
+        href:l,target:"_blank",rel:"noopener noreferrer"},sourceLien(l)+" ↗")));
+      z2.append(el("button",{class:"btn accent plein",style:"margin-top:12px",
+        onclick:()=>{fermer();formRando(r);}},"Modifier"));
+    }));
     z.append(carte);});
 }
 const texteRando=r=>[`🥾 ${r.nom}`,
@@ -2096,6 +2210,22 @@ function rendreVTT(){
       actPartager(()=>partager(texteVTT(v))),
       actModifier(()=>formVTT(v)),
       actSupprimer(()=>{ if(confirm("Supprimer cette sortie ?")) supprimerVTT(v); })));
+    carteCliquable(carte,()=>ouvrirFiche(v.nom,z2=>{
+      z2.append(el("div",{class:"meta"},
+        [v.date?jolie(v.date):null,val(v.depart),v.km?v.km+" km":null,
+         v.dplus?"▲ "+nb(v.dplus)+" m":null,v.duree?v.duree+" h":null,
+         val(v.pratique),val(v.niveau)].filter(Boolean).join("  ·  ")));
+      if(val(v.texte)) z2.append(el("p",{class:"txt"},val(v.texte)));
+      const ph=photosVisibles().filter(x=>x.vtt===v.id);
+      if(ph.length){const bd=el("div",{class:"photos",style:"margin-top:12px"});
+        ph.forEach(x=>bd.append(el("img",{src:x.data,alt:"",loading:"lazy",
+          onclick:()=>ouvrirPhoto(x,ph)})));z2.append(bd);}
+      const tr=dessinerTrace(v.trace); if(tr) z2.append(tr);
+      if(v.trace) z2.append(el("button",{class:"btn fant plein",style:"margin-top:8px",
+        onclick:()=>exporterGPX(v)},"Exporter la trace GPX"));
+      z2.append(el("button",{class:"btn accent plein",style:"margin-top:12px",
+        onclick:()=>{fermer();formVTT(v);}},"Modifier"));
+    }));
     z.append(carte);
   });
 }
@@ -2326,7 +2456,7 @@ function formContact(k){
         "Contact enregistré",fermer);
     }},k?.id?"Enregistrer":"Ajouter le contact"),
     k?.id?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
-      if(confirm("Supprimer ce contact ?"))ecrire(deleteDoc(doc(db,"annuaire",k.id)),"Supprimé",fermer);
+      if(confirm("Supprimer ce contact ?")) supprimerDoc("annuaire",k.id,"Contact",fermer);
     }},"Supprimer"):null);
   feuille(k?.id?"Modifier le contact":"Nouveau contact",c,()=>{$("#k-h").value=val(k?.horaires);});
 }
@@ -2354,7 +2484,7 @@ function carteContact(k){
   if(k.id) carte.append(barreActions(
     actModifier(()=>formContact(k)),
     actSupprimer(()=>{ if(confirm("Supprimer ce contact ?"))
-      ecrire(deleteDoc(doc(db,"annuaire",k.id)),"Contact supprimé"); })));
+      supprimerDoc("annuaire",k.id,"Contact"); })));
   return carte;
 }
 
@@ -2496,7 +2626,22 @@ function rendrePeche(){
       actPartager(()=>partager(textePrise(p))),
       actModifier(()=>formPrise(p)),
       actSupprimer(()=>{ if(confirm("Supprimer cette prise ?"))
-        ecrire(deleteDoc(doc(db,"prises",p.id)),"Prise supprimée"); })));
+        supprimerDoc("prises",p.id,"Prise"); })));
+    carteCliquable(carte,()=>ouvrirFiche(p.espece,z2=>{
+      z2.append(el("div",{class:"meta"},
+        [horodatage(p),p.taille?p.taille+" cm":null,p.poids?nb(p.poids)+" g":null,
+         val(p.lieu),val(p.technique),val(p.leurre),val(p.devenir)].filter(Boolean).join("  ·  ")));
+      if(val(p.notes)) z2.append(el("p",{class:"txt"},val(p.notes)));
+      const ph=photosVisibles().filter(x=>x.prise===p.id);
+      if(ph.length){const bd=el("div",{class:"photos",style:"margin-top:12px"});
+        ph.forEach(x=>bd.append(el("img",{src:x.data,alt:"",loading:"lazy",
+          onclick:()=>ouvrirPhoto(x,ph)})));z2.append(bd);}
+      if(p.gps) z2.append(el("a",{class:"btn fant plein",style:"margin-top:8px",target:"_blank",
+        rel:"noopener noreferrer",
+        href:`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`},"Le spot ↗"));
+      z2.append(el("button",{class:"btn accent plein",style:"margin-top:12px",
+        onclick:()=>{fermer();formPrise(p);}},"Modifier"));
+    }));
     z.append(carte);});
 }
 const horodatage=p=>p.date?jolie(p.date)+(p.heure?" à "+val(p.heure).replace(":","h"):""):"";
@@ -2737,7 +2882,26 @@ function rendrePlans(){
           .filter(Boolean).join("\n"))),
         actModifier(()=>formPlan(p)),
         actSupprimer(()=>{ if(confirm("Supprimer ce bon plan ?"))
-          ecrire(deleteDoc(doc(db,"plans",p.id)),"Supprimé"); })));
+          supprimerDoc("plans",p.id,"Bon plan"); })));
+      carteCliquable(carte,()=>ouvrirFiche(p.nom,z2=>{
+        z2.append(el("div",{class:"meta"},
+          [val(p.cat),"★".repeat(p.note||0),val(p.adresse)].filter(Boolean).join("  ·  ")));
+        if(val(p.texte)) z2.append(el("p",{class:"txt"},val(p.texte)));
+        const ph=photosVisibles().filter(x=>x.plan===p.id);
+        if(ph.length){const bd=el("div",{class:"photos",style:"margin-top:12px"});
+          ph.forEach(x=>bd.append(el("img",{src:x.data,alt:"",loading:"lazy",
+            onclick:()=>ouvrirPhoto(x,ph)})));z2.append(bd);}
+        if(val(p.url)) z2.append(el("a",{class:"btn fant plein",style:"margin-top:8px",
+          href:p.url,target:"_blank",rel:"noopener noreferrer"},"Ouvrir le site ↗"));
+        if(p.gps||p.adresse){
+          const cible=p.gps?`${p.gps.lat},${p.gps.lon}`
+            :encodeURIComponent([p.nom,val(p.adresse)].filter(Boolean).join(", "));
+          z2.append(el("a",{class:"btn fant plein",style:"margin-top:7px",target:"_blank",
+            rel:"noopener noreferrer",
+            href:"https://maps.apple.com/?"+(p.gps?"ll="+cible:"q="+cible)},"Itinéraire ↗"));}
+        z2.append(el("button",{class:"btn accent plein",style:"margin-top:12px",
+          onclick:()=>{fermer();formPlan(p);}},"Modifier"));
+      }));
       z.append(carte);});
   });
 }
@@ -2784,7 +2948,7 @@ function formInfo(i){
          uid:u,cree:serverTimestamp()})));
     }},i?"Enregistrer":"Ajouter la fiche"),
     i?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
-      if(confirm("Supprimer cette fiche ?"))ecrire(deleteDoc(doc(db,"infos",i.id)),"Fiche supprimée",fermer);
+      if(confirm("Supprimer cette fiche ?")) supprimerDoc("infos",i.id,"Fiche",fermer);
     }},"Supprimer la fiche"):null);
   feuille(i?"Modifier la fiche":"Nouvelle fiche pratique",c,()=>{
     $("#i-c").value=val(i?.texte);
@@ -3444,7 +3608,7 @@ function formLien(l){
          info:null,actu:refA.id,uid:u,cree:serverTimestamp()})));
     }},l?"Enregistrer":"Publier l'actualité"),
     l?el("button",{class:"btn danger plein",style:"margin-top:6px",onclick:()=>{
-      if(confirm("Supprimer cette actualité ?"))ecrire(deleteDoc(doc(db,"liens",l.id)),"Supprimée",fermer);
+      if(confirm("Supprimer cette actualité ?")) supprimerDoc("liens",l.id,"Actualité",fermer);
     }},"Supprimer"):null);
   feuille(l?"Modifier l'actualité":"Nouvelle actualité",c,()=>{
     majLph(); selecteurPhotos($("#l-ph"),zLph,nouvelles,majLph);
@@ -3570,7 +3734,7 @@ function detailActu(a){
       actPartager(()=>partager([a.titre,val(a.resume),val(a.url)].filter(Boolean).join("\n"))),
       actModifier(()=>formLien(a.edit)),
       actSupprimer(()=>{ if(confirm("Supprimer cette actualité ?"))
-        ecrire(deleteDoc(doc(db,"liens",a.edit.id)),"Actualité supprimée"); })):null);
+        supprimerDoc("liens",a.edit.id,"Actualité"); })):null);
   feuille("L'actu",c);
 }
 
@@ -3693,30 +3857,6 @@ $("#fab").onclick=()=>{
   if(S.vue==="photos")  return formPhoto();
 };
 $("#changer-nom").onclick=()=>demanderNom(false);
-/* Remise à zéro locale : cache Firestore (IndexedDB), localStorage,
-   caches du service worker. Les données du serveur ne sont pas touchées. */
-async function reinitialiser(){
-  const b=$("#reset-btn"); b.disabled=true; b.textContent="Réinitialisation…";
-  try{
-    try{ await terminate(db); await clearIndexedDbPersistence(db); }
-    catch(e){ console.warn("cache Firestore :",e); }
-    ["vl-config","vl-urgence","vl-urgence-nom"].forEach(k=>localStorage.removeItem(k));
-    try{ localStorage.clear(); sessionStorage.clear(); }catch(e){}
-    if(window.caches) for(const k of await caches.keys()) await caches.delete(k);
-    if(navigator.serviceWorker){
-      const rs=await navigator.serviceWorker.getRegistrations();
-      for(const r of rs) await r.unregister();
-    }
-    if(indexedDB.databases){
-      for(const d of await indexedDB.databases())
-        if(d.name && /firestore|firebase/i.test(d.name)) indexedDB.deleteDatabase(d.name);
-    }
-    location.reload();
-  }catch(e){
-    b.disabled=false; b.textContent="Réinitialiser";
-    toast("Réinitialisation incomplète : "+(e.message||e),true);
-  }
-}
 /* Remplace la version en cache sans toucher aux données */
 async function forcerMaj(){
   const b=$("#maj-btn"); b.disabled=true; b.textContent="Mise à jour…";
@@ -3730,48 +3870,9 @@ async function forcerMaj(){
   location.replace(location.pathname+"?maj="+Date.now());
 }
 $("#maj-btn").onclick=forcerMaj;
-
-/* Écrit puis efface un document témoin dans chaque collection : dit exactement
-   quelles règles Firestore bloquent la modification depuis cet appareil. */
-const COLLECTIONS=["sejours","randos","vtt","prises","plans","photos","infos","liens","annuaire"];
-$("#test-droits").onclick=async e=>{
-  const b=e.currentTarget, z=$("#res-droits");
-  b.disabled=true; b.textContent="Test…"; z.textContent="";
-  const u=auth.currentUser?.uid;
-  if(!u){ z.textContent="Session non établie. Réessaie dans quelques secondes.";
-    b.disabled=false; b.textContent="Tester"; return; }
-  const lignes=[];
-  for(const col of COLLECTIONS){
-    const ref=doc(collection(db,col));
-    try{
-      await setDoc(ref,{__test:true,uid:u,cree:serverTimestamp()});
-      // on se fait passer pour un autre auteur : c'est le cas qui échouait
-      await updateDoc(ref,{__test:true,uid:"autre-membre"});
-      await deleteDoc(ref);
-      lignes.push("✓ "+col);
-    }catch(err){
-      lignes.push("✗ "+col+" — "+(err?.code||err?.message||"refusé"));
-      try{ await deleteDoc(ref); }catch(_){}
-    }
-  }
-  const ko=lignes.filter(l=>l.startsWith("✗"));
-  z.innerHTML="";
-  z.append(el("div",{},lignes.join(" · ")));
-  z.append(el("div",{style:"margin-top:8px;font-weight:600"},
-    ko.length ? ko.length+" collection(s) refusée(s) : republie les règles du README."
-              : "Tout est autorisé : chacun peut modifier et supprimer partout."));
-  b.disabled=false; b.textContent="Retester";
-};
 $("#version-app").textContent=APP_VERSION+" · déposée le "+
   new Date(document.lastModified).toLocaleDateString("fr-FR");
 
-$("#reset-btn").onclick=()=>{
-  if(!confirm("Réinitialiser l'application sur cet appareil ?\n\nTes données partagées sont conservées sur le serveur, mais les saisies pas encore synchronisées seront perdues."))
-    return;
-  if(enAttente>0 && !confirm(`${enAttente} saisie(s) ne sont pas encore synchronisées et seront perdues. Continuer ?`))
-    return;
-  reinitialiser();
-};
 $("#cfg-lien").onclick=()=>{
   if(confirm("Effacer la configuration Firebase enregistrée sur cet appareil ?")){
     localStorage.removeItem("vl-config");location.reload();}};
@@ -3832,7 +3933,8 @@ function ecouter(nom,champ,tri,rendu){
     snap=>{
       S[champ]=snap.docs.map(d=>({id:d.id,...d.data()}))
         .filter(x=>!(champ==="randos"&&randosMasquees.has(x.id)))
-        .filter(x=>!(champ==="vtt"&&vttMasquees.has(x.id)));
+        .filter(x=>!(champ==="vtt"&&vttMasquees.has(x.id)))
+        .filter(x=>!estMasque(champ,x.id));
       rendu();},
     err=>{console.error(nom,err);
       toast(`Lecture de « ${nom} » refusée — les règles Firestore doivent être mises à jour.`,true);});
