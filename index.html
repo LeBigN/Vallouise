@@ -858,7 +858,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v59";   // affiché dans Appart › Maintenance
+const APP_VERSION="v60";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -961,8 +961,7 @@ function ecrire(promesse,msgOk,apres){
       const c=err?.code||"";
       if(c.includes("permission")){
         // message long et explicite : c'est presque toujours la même cause
-        toast("Refusé par Firestore. Appart › Maintenance › Tester les droits d'écriture "+
-              "pour savoir quelles règles republier.",true);
+        toast("Refusé par Firestore : les règles de la base doivent être republiées.",true);
       } else {
         toast("Échec de l'enregistrement — "+(err?.message||c||"raison inconnue"),true);
       }
@@ -1968,8 +1967,8 @@ function supprimerDoc(col,id,libelle,apres){
       console.error("suppression "+col,err);
       const c=err?.code||"";
       toast(c.includes("permission")
-        ? "Masqué ici seulement : Firestore refuse la suppression dans « "+col+" ». "+
-          "Republie les règles (Appart › Maintenance › Tester les droits)."
+        ? "Masqué sur cet appareil : Firestore refuse la suppression dans « "+col+" ». "+
+          "Les règles de la base doivent être republiées."
         : "Suppression impossible — "+(err?.message||c), true);
     });
 }
