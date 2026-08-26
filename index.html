@@ -64,7 +64,17 @@ html[data-theme="dark"] .mr-live b{color:#F08A6E}
 html[data-theme="dark"] .mr-live .txt{color:#F3F4F6}
 /* onglets webcam : inactifs sombres et lisibles, actif contrasté */
 html[data-theme="dark"] .cam-onglets button{background:#1A2421;color:#E5E7EB}
-html[data-theme="dark"] .cam-onglets button.on{background:#EDF1EF;color:#12211F}
+html[data-theme="dark"] .cam-onglets button.on{background:#334155;color:#F3F4F6}
+/* Surfaces qui restaient claires en thème sombre : boutons pleins,
+   badges de difficulté et pastilles d'actualité. */
+html[data-theme="dark"]{--btn-bg:#334155; --btn-fg:#F3F4F6}
+html[data-theme="dark"] .sugg .badge{background:#3A2A18;color:#F0B26B}
+html[data-theme="dark"] .actu-badge{filter:brightness(.5) saturate(1.4)}
+html[data-theme="dark"] .vt-niv{filter:brightness(.55) saturate(1.3)}
+html[data-theme="dark"] .rd-badge{filter:brightness(.55) saturate(1.3)}
+html[data-theme="dark"] .mr-badge{filter:brightness(.6) saturate(1.2)}
+html[data-theme="dark"] .onglets button.on{background:#334155;color:#F3F4F6}
+html[data-theme="dark"] .fleche{background:#1E293B;border-color:#334155}
 html[data-theme="dark"] .act{background:#26332F;color:#D1D5DB}
 html[data-theme="dark"] .act-danger{background:#2E1D1A;color:#E8836A}
 html[data-theme="dark"] .mini:active{background:#33413E}
@@ -90,7 +100,6 @@ html[data-theme="dark"] .a-orage{background:#221C2E;border-color:#332A45} html[d
 html[data-theme="dark"] .a-pluie{background:#182631;border-color:#25384A} html[data-theme="dark"] .a-pluie .pic{background:#22384A;color:#8FC2E4}
 html[data-theme="dark"] .a-neige{background:#1A272B;border-color:#27393F} html[data-theme="dark"] .a-neige .pic{background:#25383E;color:#9CC6D6}
 html[data-theme="dark"] .a-vent {background:#271F14;border-color:#3B2F1D} html[data-theme="dark"] .a-vent  .pic{background:#3B2C15;color:#E8BC7A}
-html[data-theme="dark"] .sugg .badge{background:rgba(240,244,242,.94);color:#12211F}
 html[data-theme="dark"] .non-sync{background:rgba(0,0,0,.7)}
 html[data-theme="dark"] .lb{background:#0A0F0E}   /* opaque, comme en clair */
 html[data-theme="dark"] .reseau{background:#212E2B;color:#C2CFCB}
@@ -122,7 +131,17 @@ html[data-theme="auto"] .mr-live b{color:#F08A6E}
 html[data-theme="auto"] .mr-live .txt{color:#F3F4F6}
 /* onglets webcam : inactifs sombres et lisibles, actif contrasté */
 html[data-theme="auto"] .cam-onglets button{background:#1A2421;color:#E5E7EB}
-html[data-theme="auto"] .cam-onglets button.on{background:#EDF1EF;color:#12211F}
+html[data-theme="auto"] .cam-onglets button.on{background:#334155;color:#F3F4F6}
+/* Surfaces qui restaient claires en thème sombre : boutons pleins,
+   badges de difficulté et pastilles d'actualité. */
+html[data-theme="auto"]{--btn-bg:#334155; --btn-fg:#F3F4F6}
+html[data-theme="auto"] .sugg .badge{background:#3A2A18;color:#F0B26B}
+html[data-theme="auto"] .actu-badge{filter:brightness(.5) saturate(1.4)}
+html[data-theme="auto"] .vt-niv{filter:brightness(.55) saturate(1.3)}
+html[data-theme="auto"] .rd-badge{filter:brightness(.55) saturate(1.3)}
+html[data-theme="auto"] .mr-badge{filter:brightness(.6) saturate(1.2)}
+html[data-theme="auto"] .onglets button.on{background:#334155;color:#F3F4F6}
+html[data-theme="auto"] .fleche{background:#1E293B;border-color:#334155}
 html[data-theme="auto"] .act{background:#26332F;color:#D1D5DB}
 html[data-theme="auto"] .act-danger{background:#2E1D1A;color:#E8836A}
 html[data-theme="auto"] .mini:active{background:#33413E}
@@ -148,7 +167,6 @@ html[data-theme="auto"] .a-orage{background:#221C2E;border-color:#332A45} html[d
 html[data-theme="auto"] .a-pluie{background:#182631;border-color:#25384A} html[data-theme="auto"] .a-pluie .pic{background:#22384A;color:#8FC2E4}
 html[data-theme="auto"] .a-neige{background:#1A272B;border-color:#27393F} html[data-theme="auto"] .a-neige .pic{background:#25383E;color:#9CC6D6}
 html[data-theme="auto"] .a-vent {background:#271F14;border-color:#3B2F1D} html[data-theme="auto"] .a-vent  .pic{background:#3B2C15;color:#E8BC7A}
-html[data-theme="auto"] .sugg .badge{background:rgba(240,244,242,.94);color:#12211F}
 html[data-theme="auto"] .non-sync{background:rgba(0,0,0,.7)}
 html[data-theme="auto"] .lb{background:#0A0F0E}   /* opaque, comme en clair */
 html[data-theme="auto"] .reseau{background:#212E2B;color:#C2CFCB}
@@ -400,7 +418,7 @@ textarea{min-height:78px;resize:vertical}
    Les listes passent en grille de cartes, le calendrier et le carnet
    se placent côte à côte. */
 @media(min-width:1000px){
-  main{max-width:1180px;padding:20px 24px 28px}
+  main{max-width:min(94vw, 1400px);padding:20px 24px 28px}
   .photos{grid-template-columns:repeat(6,1fr)}
   .feuille{max-width:780px;margin:0 auto}
   /* deux colonnes pour les listes de fiches */
@@ -416,20 +434,40 @@ textarea{min-height:78px;resize:vertical}
   #liste-randos > .vide, #liste-vtt > .vide, #liste-peche > .vide,
   #liste-plans > .vide, #liste-sejours > .vide, #liste-infos > .vide,
   #liste-infos > .wifi-bulle{grid-column:1 / -1}
-  /* accueil : deux colonnes également */
-  #accueil{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;align-items:start}
-  #accueil > .titre-bloc, #accueil > .respire{grid-column:1 / -1}
-  #accueil .carrousel{grid-column:1 / -1}
+  /* accueil : les sections regroupées se posent côte à côte */
+  #accueil{display:grid;grid-template-columns:repeat(auto-fill, minmax(380px,1fr));
+    gap:0 24px;align-items:start}
+  .bloc-section > .titre-bloc:first-child{margin-top:12px}
+  /* les blocs larges gardent toute la largeur */
+  /* seuls les carrousels prennent toute la largeur ; la webcam reste
+     dans sa colonne, sinon elle occupe tout l'écran à elle seule */
+  .bloc-section:has(.carrousel){grid-column:1 / -1}
+  .bloc-section:has(.carrousel) .carrousel{flex-wrap:wrap}
+  .bloc-section:has(.cam-bloc){grid-column:span 2}
+  .cam-cadre{aspect-ratio:16/10;max-height:420px}
   .carrousel{overflow-x:visible;flex-wrap:wrap}
   .sugg,.actu{width:calc(33.33% - 8px)}
-  nav{padding-left:calc(50vw - 590px);padding-right:calc(50vw - 590px)}
-  .fab{right:calc(50vw - 590px + 16px)}
+  nav{padding-left:max(24px, calc(50vw - min(47vw, 700px)));
+      padding-right:max(24px, calc(50vw - min(47vw, 700px)))}
+  .fab{right:max(32px, calc(50vw - min(47vw, 700px) + 16px))}
 }
+/* Au-delà, la largeur suit l'écran au lieu d'être plafonnée : on garde
+   seulement une gouttière et une limite haute pour ne pas étirer les lignes. */
 @media(min-width:1400px){
-  main{max-width:1320px}
-  #liste-randos, #liste-vtt, #liste-peche, #liste-plans{grid-template-columns:repeat(3,1fr)}
-  nav{padding-left:calc(50vw - 660px);padding-right:calc(50vw - 660px)}
-  .fab{right:calc(50vw - 660px + 16px)}
+  main{max-width:min(94vw, 2000px)}
+  #liste-randos, #liste-vtt, #liste-peche, #liste-plans, #liste-sejours, #liste-infos{
+    grid-template-columns:repeat(auto-fill, minmax(340px, 1fr))}
+  #accueil{grid-template-columns:repeat(auto-fill, minmax(400px, 1fr))}
+  .photos{grid-template-columns:repeat(auto-fill, minmax(120px, 1fr))}
+  .sugg,.actu{width:auto;min-width:280px;max-width:380px;flex:1 1 280px}
+  nav{padding-left:max(24px, calc(50vw - min(47vw, 1000px)));
+      padding-right:max(24px, calc(50vw - min(47vw, 1000px)))}
+  .fab{right:max(40px, calc(50vw - min(47vw, 1000px) + 16px))}
+}
+/* Écrans très larges : le texte des fiches ne doit pas s'étaler sans fin */
+@media(min-width:1900px){
+  .feuille{max-width:900px}
+  main{padding-left:32px;padding-right:32px}
 }
 
 /* ── Navigation ─────────────────────────────────────────────── */
@@ -526,7 +564,9 @@ html.lb-ouverte body{overflow:hidden}
 .toast.on{opacity:1}
 .toast.mauvais{background:var(--alerte)}
 .chargement{text-align:center;padding:60px 20px;color:var(--granit);font-family:var(--corps);font-size:13.5px}
-.etoiles{color:var(--meleze);letter-spacing:1px}
+.etoiles{display:inline-flex;gap:2px;color:var(--meleze);flex:none}
+.etoiles i{width:14px;height:14px;display:block}
+.etoiles i svg{width:100%;height:100%}
 .onglets{display:flex;gap:4px;background:#E9EDEB;padding:4px;border-radius:13px;margin-bottom:16px}
 .onglets button{flex:1;padding:9px;border-radius:9px;font-weight:600;font-size:14.5px;color:var(--granit)}
 .onglets button.on{background:var(--blanc);color:var(--nuit);box-shadow:0 1px 3px rgba(18,33,31,.10)}
@@ -825,7 +865,8 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 
 <div class="voile" id="voile"><div class="feuille" id="feuille"></div></div>
 <div class="lb" id="lb">
-  <button class="lb-x" id="lb-x" aria-label="Fermer">✕</button>
+  <button class="lb-x" id="lb-x" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+  stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="lb-compteur" id="lb-n"></div>
   <button class="lb-nav lb-prev" id="lb-prev" aria-label="Photo précédente">‹</button>
   <div class="lb-scene"><img id="lb-img" alt=""></div>
@@ -858,7 +899,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v60";   // affiché dans Appart › Maintenance
+const APP_VERSION="v62";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -913,7 +954,7 @@ function feuille(titre,corps,apres){
       el("div",{class:"poignee"}),
       el("div",{class:"tete-ligne"},
         el("h2",{},titre),
-        el("button",{class:"fermer-x","aria-label":"Fermer",onclick:fermer},"✕"))),
+        el("button",{class:"fermer-x","aria-label":"Fermer",onclick:fermer,html:IC_CROIX}))),
     corps);
   f.scrollTop=0;
   f.classList.remove("defile");
@@ -1129,7 +1170,7 @@ function ecranConfig(){
   $("main").append(el("div",{class:"vue on"},
     el("div",{class:"carte",style:"border-left:3px solid var(--meleze)"},
       el("h3",{},"Configuration Firebase"),
-      el("p",{class:"txt"},"Console Firebase → ⚙ Paramètres du projet → Vos applications → icône </> → copie le bloc firebaseConfig et colle-le ci-dessous.")),
+      el("p",{class:"txt"},"Console Firebase → Paramètres du projet → Vos applications → icône </> → copie le bloc firebaseConfig et colle-le ci-dessous.")),
     el("label",{},"Colle le bloc ici"), zone,
     el("button",{class:"btn accent plein",style:"margin-top:14px",onclick:()=>{
       const c=extraire(zone.value), manque=CLES.filter(k=>!c[k]);
@@ -1261,6 +1302,18 @@ function geolocaliser(bouton,ok){
 /* ═══════════════════════════════════════════════════════════
    ACTIONS DES CARTES — trois pictogrammes au trait, sans émoji
    ═══════════════════════════════════════════════════════════ */
+/* Croix de fermeture, commune à toutes les fenêtres et vignettes */
+const IC_CROIX=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+  stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+/* Étoile pleine, pour les notes des bons plans */
+const IC_ETOILE=`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+  ><path d="M12 3.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8Z"/></svg>`;
+const etoiles=n=>{
+  const z=el("span",{class:"etoiles","aria-label":n+" sur 5"});
+  for(let i=0;i<(n||0);i++) z.append(el("i",{html:IC_ETOILE}));
+  return z;
+};
+
 const SVG_ACTION=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const IC_PARTAGE=SVG_ACTION(`<circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/>
@@ -1332,11 +1385,11 @@ function vignettesForm(zone,existantes,liste,apres){
     if(estMien(p))
       v.append(el("button",{class:"sup",onclick:()=>{
         if(confirm("Supprimer cette photo ?")){supprimerPhoto(p);apres();}
-      }},"✕"));
+      },html:IC_CROIX}));
     zone.append(v);});
   liste.forEach((d,i)=>{
     const v=el("div",{class:"vignette"},el("img",{src:d,alt:""}));
-    v.append(el("button",{class:"sup",onclick:()=>{liste.splice(i,1);apres();}},"✕"));
+    v.append(el("button",{class:"sup",onclick:()=>{liste.splice(i,1);apres();},html:IC_CROIX}));
     zone.append(v);});
   zone.style.display=zone.children.length?"flex":"none";
 }
@@ -1899,7 +1952,7 @@ function formRando(r){
   function ajoutLien(v){
     const ligne=el("div",{class:"rangee",style:"margin-bottom:8px"});
     ligne.append(el("input",{type:"url",placeholder:"https://",value:val(v)}),
-      el("button",{class:"mini",onclick:()=>ligne.remove()},"✕"));
+      el("button",{class:"mini","aria-label":"Retirer",onclick:()=>ligne.remove(),html:IC_CROIX}));
     $("#r-liens").append(ligne);}
 
   feuille(r?"Modifier la rando":"Nouvelle rando",c,()=>{
@@ -2056,7 +2109,7 @@ function rendreRandos(){
     }));
     z.append(carte);});
 }
-const texteRando=r=>[`🥾 ${r.nom}`,
+const texteRando=r=>[`Rando · ${r.nom}`,
   [val(r.depart),r.trace?.km?r.trace.km+" km":null,r.denivele?"D+ "+r.denivele+" m":null,
    r.duree?r.duree+" h":null].filter(Boolean).join(" · "),
   val(r.texte), r.gps?`https://www.google.com/maps/search/?api=1&query=${r.gps.lat},${r.gps.lon}`:null,
@@ -2228,7 +2281,7 @@ function rendreVTT(){
     z.append(carte);
   });
 }
-const texteVTT=v=>[`🚵 ${v.nom}`,
+const texteVTT=v=>[`VTT · ${v.nom}`,
   [v.date?jolie(v.date):null,val(v.depart),v.km?v.km+" km":null,
    v.dplus?"D+ "+v.dplus+" m":null,val(v.pratique),val(v.niveau)].filter(Boolean).join(" · "),
   val(v.texte)].filter(Boolean).join("\n");
@@ -2644,7 +2697,7 @@ function rendrePeche(){
     z.append(carte);});
 }
 const horodatage=p=>p.date?jolie(p.date)+(p.heure?" à "+val(p.heure).replace(":","h"):""):"";
-const textePrise=p=>[`🎣 ${p.espece} — ${p.taille} cm`,
+const textePrise=p=>[`Pêche · ${p.espece} — ${p.taille} cm`,
   [horodatage(p),p.poids?p.poids+" g":null,val(p.lieu),val(p.leurre)].filter(Boolean).join(" · "),
   val(p.notes), p.gps?`https://www.google.com/maps/search/?api=1&query=${p.gps.lat},${p.gps.lon}`:null
 ].filter(Boolean).join("\n");
@@ -2784,7 +2837,7 @@ function formPlan(p){
     el("label",{},"Catégorie"),
     el("select",{id:"p-cat",html:CATS.map(x=>`<option ${p?.cat===x?"selected":""}>${x}</option>`).join("")}),
     el("label",{},"Note"),
-    el("select",{id:"p-note",html:[5,4,3,2,1].map(n=>`<option value="${n}" ${p?.note==n?"selected":""}>${"★".repeat(n)}</option>`).join("")}),
+    el("select",{id:"p-note",html:[5,4,3,2,1].map(n=>`<option value="${n}" ${p?.note==n?"selected":""}>${n} sur 5</option>`).join("")}),
     el("label",{},"Lieu / adresse"),
     el("input",{id:"p-adr",placeholder:"Place de l'Église, Vallouise",value:val(p?.adresse)}),
     el("label",{},"Lien web / site internet (facultatif)"),
@@ -2857,7 +2910,7 @@ function rendrePlans(){
       const mien=true;
       const photos=photosVisibles().filter(x=>x.plan===p.id);
       const carte=el("div",{class:"carte"},
-        el("div",{class:"entre"},el("h3",{},p.nom),el("span",{class:"etoiles"},"★".repeat(p.note||0))),
+        el("div",{class:"entre"},el("h3",{},p.nom),etoiles(p.note)),
         p.adresse?el("div",{class:"meta",style:"margin-top:3px"},val(p.adresse)):null,
         p.texte?el("p",{class:"txt"},val(p.texte)):null);
       if(photos.length){
@@ -2884,7 +2937,7 @@ function rendrePlans(){
           supprimerDoc("plans",p.id,"Bon plan"); })));
       carteCliquable(carte,()=>ouvrirFiche(p.nom,z2=>{
         z2.append(el("div",{class:"meta"},
-          [val(p.cat),"★".repeat(p.note||0),val(p.adresse)].filter(Boolean).join("  ·  ")));
+          [val(p.cat),(p.note?p.note+"/5":null),val(p.adresse)].filter(Boolean).join("  ·  ")));
         if(val(p.texte)) z2.append(el("p",{class:"txt"},val(p.texte)));
         const ph=photosVisibles().filter(x=>x.plan===p.id);
         if(ph.length){const bd=el("div",{class:"photos",style:"margin-top:12px"});
@@ -3559,7 +3612,7 @@ function formLien(l){
   const zi=el("div",{class:"bande-photos",style:"margin-top:8px"});
   const majI=()=>{zi.innerHTML="";
     if(image){const v=el("div",{class:"vignette"},el("img",{src:image,alt:""}));
-      v.append(el("button",{class:"sup",onclick:()=>{image=null;majI();}},"✕"));zi.append(v);}
+      v.append(el("button",{class:"sup",onclick:()=>{image=null;majI();},html:IC_CROIX}));zi.append(v);}
     zi.style.display=image?"flex":"none";};
   majI();
   const c=el("div");
@@ -3757,6 +3810,28 @@ function blocFlash(){
   return f;
 }
 
+/* Sur grand écran, chaque section (titre + contenu jusqu'au titre suivant)
+   devient un bloc autonome : la grille peut alors les poser côte à côte
+   sans laisser de colonnes vides. Sans ce regroupement, chaque titre
+   occupant toute la largeur, une seule colonne se remplissait. */
+function grouperSections(z){
+  const enfants=[...z.children];
+  if(!enfants.length) return;
+  const blocs=[]; let courant=null;
+  enfants.forEach(e=>{
+    if(e.classList.contains("titre-bloc")){
+      courant=el("div",{class:"bloc-section"});
+      blocs.push(courant);
+    }
+    if(!courant){ courant=el("div",{class:"bloc-section"}); blocs.push(courant); }
+    courant.append(e);
+  });
+  z.innerHTML="";
+  // un bloc sans contenu visible occuperait une colonne pour rien
+  blocs.filter(b=>b.textContent.trim()||b.querySelector("img,canvas,iframe,svg"))
+       .forEach(b=>z.append(b));
+}
+
 function rendreAccueil(){
   const z=$("#accueil");if(!z)return;
   z.innerHTML="";
@@ -3824,6 +3899,7 @@ function rendreAccueil(){
           el("a",{class:"mini",href:l.u,target:"_blank",rel:"noopener"},"Ouvrir ↗")))));
   });
   z.append(ca);
+  grouperSections(z);   // mise en colonnes possible sur grand écran
 }
 
 function aller(v){
