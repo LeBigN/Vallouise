@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#12211F">
 <script>
+/* Marqueur posé avant tout rendu : neutralise transitions et animations
+   pendant l'ouverture, puis se retire une fois la mise en page stabilisée. */
+document.documentElement.classList.add("demarrage");
+addEventListener("load",()=>setTimeout(
+  ()=>document.documentElement.classList.remove("demarrage"),400));
+
 /* Appliqué avant tout affichage : évite le clignotement clair au chargement */
 (function(){
   var t=localStorage.getItem("vl-theme")||"auto";
@@ -210,7 +216,8 @@ button{cursor:pointer;border:none;background:none}
   white-space:nowrap;line-height:1.5}
 .alt b{display:block;font-size:15px;color:var(--sur-texte);font-weight:500}
 
-main{padding:12px var(--gouttiere) 20px;max-width:var(--contenu);margin:0 auto;width:100%}
+main{padding:12px var(--gouttiere) 20px;max-width:var(--contenu);margin:0 auto;width:100%;
+  min-height:calc(100dvh - 260px)}
 /* Le bandeau et la bande d'état suivent exactement la même largeur */
 .borne-in{max-width:var(--contenu);margin:0 auto;padding-left:var(--gouttiere);
   padding-right:var(--gouttiere)}
@@ -218,6 +225,8 @@ main{padding:12px var(--gouttiere) 20px;max-width:var(--contenu);margin:0 auto;w
 nav{padding-left:max(0px, calc((100vw - var(--contenu)) / 2));
     padding-right:max(0px, calc((100vw - var(--contenu)) / 2))}
 .vue{display:none;animation:monte .22s ease both}
+html.demarrage .vue{animation:none}
+html.demarrage *{transition:none!important}
 .vue.on{display:block}
 @keyframes monte{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
@@ -479,7 +488,8 @@ textarea{min-height:78px;resize:vertical}
 
 /* ── Navigation ─────────────────────────────────────────────── */
 nav{position:fixed;bottom:0;left:0;right:0;width:100vw;max-width:100vw;z-index:9999;
-  margin:0;transform:none;
+  margin:0;transform:none;transition:none;animation:none;will-change:auto;
+  contain:layout paint;
   background:var(--blanc);border-top:1px solid var(--bord);
   display:grid;grid-template-columns:repeat(6,1fr);
   padding-bottom:env(safe-area-inset-bottom, 0px)}
@@ -570,7 +580,11 @@ html.lb-ouverte body{overflow:hidden}
   max-width:520px;margin:0 auto;text-align:center}
 .toast.on{opacity:1}
 .toast.mauvais{background:var(--alerte)}
-.chargement{text-align:center;padding:60px 20px;color:var(--granit);font-family:var(--corps);font-size:13.5px}
+/* L'écran de chargement occupe déjà toute la hauteur utile : la page ne
+   passe plus de « très courte » à « longue », ce qui évitait le saut de la
+   barre au moment où iOS réévalue sa fenêtre visible. */
+.chargement{text-align:center;color:var(--granit);font-family:var(--corps);font-size:13.5px;
+  min-height:calc(100dvh - 260px);display:grid;place-items:center;padding:20px}
 .etoiles{display:inline-flex;gap:2px;color:var(--meleze);flex:none}
 .etoiles i{width:14px;height:14px;display:block}
 .etoiles i svg{width:100%;height:100%}
@@ -907,7 +921,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v63";   // affiché dans Appart › Maintenance
+const APP_VERSION="v64";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
