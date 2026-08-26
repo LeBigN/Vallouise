@@ -36,6 +36,10 @@
      mais pointe désormais sur la même famille, en plus petit et espacé */
   --cote:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
   --bord:#E8ECEA;
+  /* Largeur unique du contenu : bandeau, bande d'état, vues et barre de
+     navigation s'y alignent, pour un centrage identique à tous les niveaux. */
+  --contenu:100%;
+  --gouttiere:14px;
   --sur-sombre:#12211F; --sur-texte:#F4F6F4;   /* bandeau, toast : toujours sombres */
   --btn-bg:#12211F; --btn-fg:#F4F6F4;          /* bouton principal */
   --r:16px; --r-s:11px; --r-xs:9px;
@@ -194,7 +198,7 @@ button{cursor:pointer;border:none;background:none}
 
 /* ── Bandeau d'altitude ─────────────────────────────────────── */
 .borne{position:relative;overflow:hidden;background:var(--sur-sombre);color:var(--sur-texte);
-  padding:calc(48px + env(safe-area-inset-top)) 18px 16px}
+  padding:calc(48px + env(safe-area-inset-top)) 0 16px}
 .borne svg.fond{position:absolute;inset:0;width:100%;height:100%;opacity:.28}
 .borne-in{position:relative;display:flex;align-items:flex-end;justify-content:space-between;
   gap:12px;padding-right:64px}
@@ -206,7 +210,13 @@ button{cursor:pointer;border:none;background:none}
   white-space:nowrap;line-height:1.5}
 .alt b{display:block;font-size:15px;color:var(--sur-texte);font-weight:500}
 
-main{padding:12px 14px 20px;max-width:600px;margin:0 auto;width:100%}
+main{padding:12px var(--gouttiere) 20px;max-width:var(--contenu);margin:0 auto;width:100%}
+/* Le bandeau et la bande d'état suivent exactement la même largeur */
+.borne-in{max-width:var(--contenu);margin:0 auto;padding-left:var(--gouttiere);
+  padding-right:var(--gouttiere)}
+.reseau{padding-left:var(--gouttiere);padding-right:var(--gouttiere)}
+nav{padding-left:max(0px, calc((100vw - var(--contenu)) / 2));
+    padding-right:max(0px, calc((100vw - var(--contenu)) / 2))}
 .vue{display:none;animation:monte .22s ease both}
 .vue.on{display:block}
 @keyframes monte{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -407,8 +417,8 @@ textarea{min-height:78px;resize:vertical}
 }
 /* Plein écran quelle que soit la taille : plus de format pop-up. */
 @media(min-width:640px){
+  :root{--contenu:720px; --gouttiere:20px}
   .feuille{max-width:100%}
-  main{max-width:720px}
   .btn{padding:13px 20px;font-size:15px}
   .mini{font-size:13px;padding:9px 15px;min-height:38px}
   .photos{grid-template-columns:repeat(4,1fr)}
@@ -418,7 +428,8 @@ textarea{min-height:78px;resize:vertical}
    Les listes passent en grille de cartes, le calendrier et le carnet
    se placent côte à côte. */
 @media(min-width:1000px){
-  main{max-width:min(94vw, 1400px);padding:20px 24px 28px}
+  :root{--contenu:min(94vw, 1400px); --gouttiere:24px}
+  main{padding-top:20px;padding-bottom:28px}
   .photos{grid-template-columns:repeat(6,1fr)}
   .feuille{max-width:780px;margin:0 auto}
   /* deux colonnes pour les listes de fiches */
@@ -447,27 +458,23 @@ textarea{min-height:78px;resize:vertical}
   .cam-cadre{aspect-ratio:16/10;max-height:420px}
   .carrousel{overflow-x:visible;flex-wrap:wrap}
   .sugg,.actu{width:calc(33.33% - 8px)}
-  nav{padding-left:max(24px, calc(50vw - min(47vw, 700px)));
-      padding-right:max(24px, calc(50vw - min(47vw, 700px)))}
-  .fab{right:max(32px, calc(50vw - min(47vw, 700px) + 16px))}
+  .fab{right:max(24px, calc((100vw - var(--contenu)) / 2 + 16px))}
 }
 /* Au-delà, la largeur suit l'écran au lieu d'être plafonnée : on garde
    seulement une gouttière et une limite haute pour ne pas étirer les lignes. */
 @media(min-width:1400px){
-  main{max-width:min(94vw, 2000px)}
+  :root{--contenu:min(94vw, 2000px)}
   #liste-randos, #liste-vtt, #liste-peche, #liste-plans, #liste-sejours, #liste-infos{
     grid-template-columns:repeat(auto-fill, minmax(340px, 1fr))}
   #accueil{grid-template-columns:repeat(auto-fill, minmax(400px, 1fr))}
   .photos{grid-template-columns:repeat(auto-fill, minmax(120px, 1fr))}
   .sugg,.actu{width:auto;min-width:280px;max-width:380px;flex:1 1 280px}
-  nav{padding-left:max(24px, calc(50vw - min(47vw, 1000px)));
-      padding-right:max(24px, calc(50vw - min(47vw, 1000px)))}
-  .fab{right:max(40px, calc(50vw - min(47vw, 1000px) + 16px))}
+  .fab{right:max(24px, calc((100vw - var(--contenu)) / 2 + 16px))}
 }
 /* Écrans très larges : le texte des fiches ne doit pas s'étaler sans fin */
 @media(min-width:1900px){
+  :root{--gouttiere:32px}
   .feuille{max-width:900px}
-  main{padding-left:32px;padding-right:32px}
 }
 
 /* ── Navigation ─────────────────────────────────────────────── */
@@ -673,7 +680,8 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
 .reseau i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:block}
 .reseau.off{background:var(--ardoise);color:var(--sur-texte)}
 .reseau.off i,.reseau.attente i{background:var(--meleze)}
-.sos-bulle{position:absolute;top:calc(10px + env(safe-area-inset-top));right:14px;z-index:5;
+.sos-bulle{position:absolute;top:calc(10px + env(safe-area-inset-top));
+  right:max(var(--gouttiere), calc((100vw - var(--contenu)) / 2 + var(--gouttiere)));z-index:5;
   background:var(--alerte);color:#fff;font-family:var(--corps);font-size:11.5px;letter-spacing:.08em;
   padding:6px 11px;border-radius:20px;font-weight:700}
 .soleil span{display:inline-flex;align-items:center;gap:7px}
@@ -899,7 +907,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v62";   // affiché dans Appart › Maintenance
+const APP_VERSION="v63";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
