@@ -10,7 +10,7 @@
 html,body{margin:0;padding:0}
 nav{position:fixed;bottom:0;left:0;right:0;width:100vw;z-index:9999;
   margin:0;transform:none;transition:none;animation:none;
-  padding-bottom:env(safe-area-inset-bottom, 0px);
+  padding-bottom:min(env(safe-area-inset-bottom, 0px), 16px);
   box-sizing:border-box;background:#fff}
 </style>
 <script>
@@ -63,7 +63,7 @@ addEventListener("load",()=>setTimeout(
   /* échelle typographique */
   --t-h1:26px; --t-h2:20px; --t-h3:17px; --t-corps:15.5px; --t-p:14.5px;
   --t-meta:11.5px; --t-micro:10px;
-  --marge-bas:min(env(safe-area-inset-bottom), 16px);
+  --marge-bas:min(env(safe-area-inset-bottom), 10px);
   --nav-h:calc(62px + var(--marge-bas));
 }
 html[data-theme="dark"]{
@@ -201,7 +201,7 @@ html,body{margin:0;padding:0}
 /* Retour à l'ossature simple : la page défile normalement, la barre est fixée
    au bas de la fenêtre. C'est le comportement le plus fiable sur iOS. */
 body{background:var(--neve);margin:0;padding:0;min-height:100dvh;
-  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom:calc(var(--nav-h) + 8px);
   touch-action:pan-y;-webkit-text-size-adjust:100%;color:var(--nuit);
   font-family:var(--corps);font-size:15px;line-height:1.45;
   overscroll-behavior-y:none}
@@ -499,12 +499,12 @@ textarea{min-height:78px;resize:vertical}
 nav{position:fixed;bottom:0;left:0;right:0;width:100vw;max-width:100vw;z-index:9999;
   margin:0;transform:none;transition:none;animation:none;will-change:auto;
   /* la hauteur est fixée d'avance : iOS n'a rien à recalculer au démarrage */
-  height:calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+  height:var(--nav-h);   /* --nav-h inclut déjà la zone de sécurité */
   box-sizing:border-box;
   background:var(--blanc);border-top:1px solid var(--bord);
   display:grid;grid-template-columns:repeat(6,1fr);
-  padding-bottom:env(safe-area-inset-bottom, 0px)}
-nav button{padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
+  padding-bottom:var(--marge-bas)}
+nav button{padding:8px 0 4px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--granit)}
 nav button svg.i{width:21px;height:21px}
 nav button span.l{font-family:var(--corps);font-size:9.5px;font-weight:600;letter-spacing:.02em;
   white-space:normal;text-align:center;line-height:1.15;max-width:100%}
@@ -932,7 +932,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v65";   // affiché dans Appart › Maintenance
+const APP_VERSION="v66";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
