@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#12211F">
+<style>
+/* Style critique : la barre est ancrée dès la première image affichée,
+   avant même que la feuille principale soit interprétée. */
+html,body{margin:0;padding:0}
+nav{position:fixed;bottom:0;left:0;right:0;width:100vw;z-index:9999;
+  margin:0;transform:none;transition:none;animation:none;
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+  box-sizing:border-box;background:#fff}
+</style>
 <script>
 /* Marqueur posé avant tout rendu : neutralise transitions et animations
    pendant l'ouverture, puis se retire une fois la mise en page stabilisée. */
@@ -489,7 +498,9 @@ textarea{min-height:78px;resize:vertical}
 /* ── Navigation ─────────────────────────────────────────────── */
 nav{position:fixed;bottom:0;left:0;right:0;width:100vw;max-width:100vw;z-index:9999;
   margin:0;transform:none;transition:none;animation:none;will-change:auto;
-  contain:layout paint;
+  /* la hauteur est fixée d'avance : iOS n'a rien à recalculer au démarrage */
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+  box-sizing:border-box;
   background:var(--blanc);border-top:1px solid var(--bord);
   display:grid;grid-template-columns:repeat(6,1fr);
   padding-bottom:env(safe-area-inset-bottom, 0px)}
@@ -921,7 +932,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v64";   // affiché dans Appart › Maintenance
+const APP_VERSION="v65";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -2210,6 +2221,9 @@ function formVTT(v){
     el("select",{id:"v-niv",html:NIV_VTT.map(x=>`<option ${v?.niveau===x.c?"selected":""}>${x.c}</option>`).join("")}),
     el("label",{},"État du terrain / notes"),
     el("textarea",{id:"v-txt",placeholder:"Sentiers secs, cailloux roulants dans la descente, singletracks propres…"}),
+    el("label",{},"Lien du parcours (facultatif)"),
+    el("input",{id:"v-url",type:"url",inputmode:"url",
+      placeholder:"https://… Komoot, Strava, Visorando",value:val(v?.liens?.[0]||v?.lien)}),
     el("label",{},"Photos"),
     el("input",{type:"file",id:"v-ph",accept:"image/*",multiple:""}),
     caseMasquer("v-hide"),
@@ -2225,6 +2239,7 @@ function formVTT(v){
         dplus:$("#v-dp").value?+$("#v-dp").value:(trace?trace.dplus:null),
         duree:$("#v-h").value?+$("#v-h").value:null,
         pratique:$("#v-prat").value,niveau:$("#v-niv").value,
+        liens:[$("#v-url").value.trim()].filter(Boolean),
         texte:$("#v-txt").value.trim(),trace,gps,...auteurConserve(v)};
       const ref=v?doc(db,"vtt",v.id):doc(collection(db,"vtt"));
       ecrire(v?updateDoc(ref,d):setDoc(ref,{...d,cree:serverTimestamp()}),
@@ -2279,8 +2294,10 @@ function rendreVTT(){
       photos.forEach(p=>bande.append(el("img",{src:p.data,alt:"",loading:"lazy",class:p.horsMur?"hors-mur":null,
         onclick:()=>ouvrirPhoto(p,photos)})));
       carte.append(bande);}
-    carte.append(barreActions(
-      ligneAuteur(v),
+    const zlv=el("div",{class:"liens-gauche"});
+    liensDe(v).forEach(l=>zlv.append(el("a",{class:"mini",href:l,target:"_blank",
+      rel:"noopener noreferrer"},sourceLien(l)+" ↗")));
+    carte.append(barreActions(zlv,
       actPartager(()=>partager(texteVTT(v))),
       actModifier(()=>formVTT(v)),
       actSupprimer(()=>{ if(confirm("Supprimer cette sortie ?")) supprimerVTT(v); })));
@@ -2295,6 +2312,8 @@ function rendreVTT(){
         ph.forEach(x=>bd.append(el("img",{src:x.data,alt:"",loading:"lazy",
           onclick:()=>ouvrirPhoto(x,ph)})));z2.append(bd);}
       const tr=dessinerTrace(v.trace); if(tr) z2.append(tr);
+      liensDe(v).forEach(l=>z2.append(el("a",{class:"btn fant plein",style:"margin-top:8px",
+        href:l,target:"_blank",rel:"noopener noreferrer"},sourceLien(l)+" ↗")));
       if(v.trace) z2.append(el("button",{class:"btn fant plein",style:"margin-top:8px",
         onclick:()=>exporterGPX(v)},"Exporter la trace GPX"));
       z2.append(el("button",{class:"btn accent plein",style:"margin-top:12px",
@@ -2305,7 +2324,8 @@ function rendreVTT(){
 }
 const texteVTT=v=>[`VTT · ${v.nom}`,
   [v.date?jolie(v.date):null,val(v.depart),v.km?v.km+" km":null,
-   v.dplus?"D+ "+v.dplus+" m":null,val(v.pratique),val(v.niveau)].filter(Boolean).join(" · "),
+   v.dplus?"D+ "+v.dplus+" m":null,val(v.pratique),val(v.niveau),
+  ...liensDe(v)].filter(Boolean).join(" · "),
   val(v.texte)].filter(Boolean).join("\n");
 
 /* Réexport de la trace importée, au format GPX */
