@@ -811,7 +811,7 @@ svg.trace{width:100%;height:auto;max-height:170px;display:block;margin:12px 0 2p
     <div class="alt"><b id="alt">1 166 m</b><span id="sous">altitude du village</span></div>
   </div>
 </header>
-<div class="reseau" id="reseau"><i></i><span id="reseau-txt">En ligne</span></div>
+<div class="reseau" id="reseau" style="display:none"><i></i><span id="reseau-txt"></span></div>
 <div id="panne"></div>
 
 <main>
@@ -932,7 +932,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v66";   // affiché dans Appart › Maintenance
+const APP_VERSION="v67";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -1050,15 +1050,19 @@ addEventListener("error",e=>{
   toast("Anomalie : "+(e.message||"erreur inattendue")+" — signale-le si ça se reproduit.",true);
 });
 
+/* La bande n'apparaît que si quelque chose mérite d'être signalé :
+   perte de réseau ou saisies pas encore parties. Tout va bien = rien à dire. */
 function majReseau(){
   const z=$("#reseau"), t=$("#reseau-txt");
   if(!z) return;
-  z.classList.toggle("off",!navigator.onLine);
-  z.classList.toggle("attente",navigator.onLine&&enAttente>0);
-  t.textContent = !navigator.onLine
+  const horsLigne=!navigator.onLine, enCours=enAttente>0;
+  z.style.display = (horsLigne||enCours) ? "" : "none";
+  if(!horsLigne && !enCours) return;
+  z.classList.toggle("off",horsLigne);
+  z.classList.toggle("attente",!horsLigne&&enCours);
+  t.textContent = horsLigne
     ? `Hors ligne · ${enAttente?enAttente+" saisie"+(enAttente>1?"s":"")+" en attente":"tes saisies sont gardées"}`
-    : enAttente>0 ? `Synchronisation de ${enAttente} saisie${enAttente>1?"s":""}…`
-    : "En ligne · tout est synchronisé";
+    : `Synchronisation de ${enAttente} saisie${enAttente>1?"s":""}…`;
 }
 addEventListener("online",()=>{majReseau();toast("Connexion retrouvée, synchronisation en cours");});
 addEventListener("offline",majReseau);
