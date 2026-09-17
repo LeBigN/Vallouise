@@ -932,7 +932,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v67";   // affiché dans Appart › Maintenance
+const APP_VERSION="v68";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -1734,7 +1734,9 @@ function dessinerCal(){
   const uids=new Set();
   for(let j=1;j<=fin;j++){
     const date=iso(new Date(an,mo,j));
-    const dessus=S.sejours.filter(s=>date>=s.debut&&date<s.fin);
+    // Le jour du départ compte : l'appartement est encore occupé ce matin-là.
+    // (auparavant date<s.fin ne colorait que les nuits, d'où la dernière case blanche)
+    const dessus=S.sejours.filter(s=>date>=s.debut&&date<=s.fin);
     dessus.forEach(s=>uids.add(s.uid));
     const cl=["jour"];
     if(date===auj())cl.push("auj");
@@ -1752,8 +1754,8 @@ function dessinerCal(){
       title:infos.join(" · ")||null},String(j));
     if(dessus.length){
       cell.style.background=membre(dessus[0].uid).couleur;cell.classList.add("pris");
-      const av=dessus.some(x=>decale(date,-1)>=x.debut&&decale(date,-1)<x.fin);
-      const ap=dessus.some(x=>decale(date,1)>=x.debut&&decale(date,1)<x.fin);
+      const av=dessus.some(x=>decale(date,-1)>=x.debut&&decale(date,-1)<=x.fin);
+      const ap=dessus.some(x=>decale(date,1)>=x.debut&&decale(date,1)<=x.fin);
       const forme=av&&ap?"mil":av?"fin":ap?"deb":null;
       if(forme)cell.classList.add(forme);
       if(dessus.length>1){const m=el("div",{class:"multi"});
