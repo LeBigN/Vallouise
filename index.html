@@ -53,6 +53,7 @@ addEventListener("load",()=>setTimeout(
   --bord:#E8ECEA;
   /* Largeur unique du contenu : bandeau, bande d'état, vues et barre de
      navigation s'y alignent, pour un centrage identique à tous les niveaux. */
+  --cadre-jour:#DFE5E2;   /* bordure des cases du calendrier */
   --contenu:100%;
   --gouttiere:14px;
   --sur-sombre:#12211F; --sur-texte:#F4F6F4;   /* bandeau, toast : toujours sombres */
@@ -108,6 +109,7 @@ html[data-theme="dark"] nav{background:var(--blanc)}   /* opaque, identique au f
 html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#141E1C;border-color:#2B3937;color:#EDF1EF}
 html[data-theme="dark"] input:focus,html[data-theme="dark"] select:focus,html[data-theme="dark"] textarea:focus{box-shadow:0 0 0 3px rgba(224,122,31,.18)}
 html[data-theme="dark"] .jour.passe{color:#B4C0BD}
+html[data-theme="dark"]{--cadre-jour:rgba(255,255,255,.16)}
 html[data-theme="dark"] .legende .lg-we{background:rgba(255,255,255,.22)}
 html[data-theme="dark"] .legende .lg-vac{background:repeating-linear-gradient(45deg,
   rgba(255,255,255,.5) 0 3px, transparent 3px 6px);border-color:rgba(255,255,255,.2)}   /* était illisible sur fond sombre */
@@ -175,6 +177,7 @@ html[data-theme="auto"] nav{background:var(--blanc)}   /* opaque, identique au f
 html[data-theme="auto"] input,html[data-theme="auto"] select,html[data-theme="auto"] textarea{background:#141E1C;border-color:#2B3937;color:#EDF1EF}
 html[data-theme="auto"] input:focus,html[data-theme="auto"] select:focus,html[data-theme="auto"] textarea:focus{box-shadow:0 0 0 3px rgba(224,122,31,.18)}
 html[data-theme="auto"] .jour.passe{color:#B4C0BD}
+html[data-theme="auto"]{--cadre-jour:rgba(255,255,255,.16)}
 html[data-theme="auto"] .legende .lg-we{background:rgba(255,255,255,.22)}
 html[data-theme="auto"] .legende .lg-vac{background:repeating-linear-gradient(45deg,
   rgba(255,255,255,.5) 0 3px, transparent 3px 6px);border-color:rgba(255,255,255,.2)}   /* était illisible sur fond sombre */
@@ -335,8 +338,12 @@ a.btn,a.mini{text-decoration:none}
   margin:0 auto;justify-items:stretch}
 .jsem{font-family:var(--corps);font-size:11px;font-weight:600;color:var(--granit);text-align:center;
   padding-bottom:5px;text-transform:uppercase;line-height:1}
+/* Chaque case est encadrée, sur le modèle du jour courant.
+   La bordure passe par border (et non box-shadow), laissé libre pour
+   les états « aujourd'hui », « férié » et « sélectionné ». */
 .jour{aspect-ratio:1;border-radius:9px;display:grid;place-items:center;width:100%;
-  font-size:13.5px;position:relative;transition:transform .1s}
+  font-size:13.5px;position:relative;transition:transform .1s;
+  border:1px solid var(--cadre-jour);box-sizing:border-box}
 .jour:active{transform:scale(.9)}
 .jour.hors{visibility:hidden;pointer-events:none}
 .jour.passe{color:#7A8582}
@@ -363,7 +370,7 @@ html[data-theme="dark"] .jour.we.vac{background:repeating-linear-gradient(45deg,
   rgba(255,255,255,.26) 0 4px, rgba(255,255,255,.13) 4px 8px);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.10)}
 .jour.auj{box-shadow:inset 0 0 0 1.5px var(--nuit);font-weight:700}
-.jour.pris{color:var(--blanc);font-weight:600}
+.jour.pris{color:var(--blanc);font-weight:600;border-color:rgba(0,0,0,.12)}
 .jour.deb{border-radius:9px 3px 3px 9px}
 .jour.fin{border-radius:3px 9px 9px 3px}
 .jour.mil{border-radius:3px}
@@ -932,7 +939,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 /* ═══════════════════════════════════════════════════════════
    2. OUTILS
    ═══════════════════════════════════════════════════════════ */
-const APP_VERSION="v68";   // affiché dans Appart › Maintenance
+const APP_VERSION="v69";   // affiché dans Appart › Maintenance
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
